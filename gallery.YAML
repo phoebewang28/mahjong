@@ -1,0 +1,36 @@
+---
+# Members of your group.
+group:  
+  - name: Caedy Lee 
+    netid: cl2727
+  - name: Jiaxuan Wang
+    netid: jw2773
+  - name: Elinor Tu 
+    netid: ejt74
+  - name: Phoebe Wang 
+    netid: pw483
+  - name: Albert Li 
+    netid: ajl396
+
+# Your PM.
+pm:
+  name: Shubham Mohole
+  netid: sam588
+# Set to false if you don't want your gallery entry to be public.
+publish: true
+
+## TODO:
+# Pithy title
+title: "OCaMahjong"
+# OK if this is a Cornell Github link, but public gallery viewers won't be able to see it.
+git-repo: https://github.coecis.cornell.edu/pw483/mahjong
+# Replace the URL with your own demo video.
+demo-video-url: "https://www.youtube.com/watch?v=eSBybJGZoCU"
+# Write a short, attention-grabbing description of your project.
+desc: >
+  This project simulates a game of Mahjong, allowing users to play with other players 
+  in a local multiplayer mode. The interface will display a standard Mahjong table, 
+  including player hands, the wall, discarded tiles, and bets. Players will be able to 
+  draw, discard, call tiles (chi, pon, kan), and declare winning hands according to 
+  standard Mahjong rules. The game will enforce legal moves and provide basic rule 
+  validation.
