@@ -31,6 +31,11 @@ type exposed_hand = (group * tile) list
    exposed_hand and returns a new exposed_hand with the specified group
    added. *)
 
+(* Caedy: My implementation of chi will just return the lowest number in the
+   set, cuz u can infer from the lowest number, what the rest of the tiles are
+   (precondition: already removed from hidden hand -> so only need to output to
+   exposed)*)
+
 (* Chi functions for left, middle, and right tiles. *)
 (* A chi is a sequence of three tiles in the same suit. The left, middle,
    and right functions specify which tile is being added to the sequence. *)
