@@ -1,2 +1,3 @@
 (library
- (name mahjong))
+ (name mahjong)
+ (libraries str))
