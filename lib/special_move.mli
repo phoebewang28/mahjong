@@ -1,7 +1,3 @@
-open Mahjong
-
-(** assuming we have hidden_hand type *)
-
 val chi : hidden_hand -> exposed_hand -> tile -> bool
 (** Given hidden hand [hid] of player, and most recently discarded tile [tile],
     [chi hid ex tile] returns true if the combination of tiles within [hid]
@@ -9,9 +5,7 @@ val chi : hidden_hand -> exposed_hand -> tile -> bool
     same type of tile.
 
     Side effect: outputs legal set into player's exposed hand [ex], removes
-    legal set from player's hidden hand [hid]
-
-    Hmmm, technically this could also return unit .... *)
+    legal set from player's hidden hand [hid]*)
 
 val peng : hidden_hand -> exposed_hand -> tile -> bool
 (** Given hidden hand [hid] of player, and most recently discarded tile [tile],

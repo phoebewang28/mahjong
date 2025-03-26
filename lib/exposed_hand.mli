@@ -43,9 +43,16 @@ val chi_left : tile -> exposed_hand -> exposed_hand
 val chi_middle : tile -> exposed_hand -> exposed_hand
 val chi_right : tile -> exposed_hand -> exposed_hand
 
+(* Caedy: Also, for all these fxns it might make more sense to return unit
+   instead, cuz the array of the exposed hand will be mutated anyways even if we
+   don't return it 
+   
+   Also, exposed_hand might be an array instead *)
+
+   
 (* Functions to add a peng or ming gang to the exposed_hand. *)
 (* A peng is a triplet of the same tile, while a ming gang is a quad. *)
-val peng : tile -> exposed_hand -> exposed_hand
+val peng : tile -> exposed_hand -> unit
 val ming_gang : tile -> exposed_hand -> exposed_hand
 
 (* Converts an exposed_hand to a string representation for display purposes. *)

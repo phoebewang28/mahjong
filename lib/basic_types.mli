@@ -7,5 +7,5 @@ type suit
 val get_num : tile -> int
 (** [get_num t] returns number associated with tile [t] *)
 
-val gel_tao : tile -> suit
+val get_tao : tile -> suit
 (** [get_tao t] returns tao associated with tile [t] *)
