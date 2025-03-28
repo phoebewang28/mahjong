@@ -44,7 +44,17 @@ let add hh t =
   force_RI hh.hand;
   hh.size <- hh.size + 1
 
-let remove hh idx =
-  hh.hand.(idx) <- None;
-  force_RI hh.hand;
-  hh.size <- hh.size - 1
+let remove hh tile =
+  match
+    Array.find_index
+      (fun x ->
+        match x with
+        | None -> false
+        | Some x -> x = tile)
+      hh.hand
+  with
+  | None -> raise (Invalid_argument "Tile does not exist")
+  | Some idx ->
+      hh.hand.(idx) <- None;
+      force_RI hh.hand;
+      hh.size <- hh.size - 1
