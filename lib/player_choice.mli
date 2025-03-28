@@ -1,4 +1,4 @@
-open Basic_types
+open Tile
 
 val draw : hidden_hand -> tile -> bool
 (* Pop tile from possible tiles and add to player hand *)

@@ -1,5 +1,3 @@
-open Exposed_hand
-
 type da_pai =
   | Dong
   | Nan
@@ -14,6 +12,11 @@ type suit =
   | Wan
   | Tiao
   | DaPai of da_pai
+
+type group =
+  | Shun
+  | San
+  | Si
 
 (* R.I: for tiles of da_pai, num is always set to 0 *)
 type tile = {
@@ -87,6 +90,18 @@ let discarded = ref [ { num = 3110; tao = Tong } ]
 
 let make_tile num tao = { num; tao }
 
+let make_group = function
+| "Shun" -> Shun
+| "San" -> San
+| "Si" -> Si
+| _ -> failwith "Invalid string passed to make_group fxn"
+  
+let group_to_string (g : group) : string =
+  match g with
+  | Shun -> "ShunZi"
+  | San -> "KeZi"
+  | Si -> "Gang"
+
 let string_to_tile str =
   let t = Str.split (Str.regexp " ") str in
   match List.hd t with
@@ -101,3 +116,20 @@ let string_to_tile str =
   | "Fa" -> { num = int_of_string (List.hd (List.tl t)); tao = DaPai Fa }
   | "Bai" -> { num = int_of_string (List.hd (List.tl t)); tao = DaPai Bai }
   | _ -> { num = 0; tao = Tong }
+
+let tile_to_string (t : tile) : string =
+  Printf.sprintf "%s%s"
+    (if t.num = 0 then "" else string_of_int t.num ^ " ")
+    (match t.tao with
+    | Tong -> "Tong"
+    | Wan -> "Wan"
+    | Tiao -> "Tiao"
+    | DaPai dp -> (
+        match dp with
+        | Dong -> "Dong"
+        | Nan -> "Nan"
+        | Xi -> "Xi"
+        | Bei -> "Bei"
+        | Zhong -> "Zhong"
+        | Fa -> "Fa"
+        | Bai -> "Bai"))
