@@ -13,6 +13,12 @@ val get_num : tile -> int
 val get_tao : tile -> suit
 (** [get_tao t] returns tao associated with tile [t] *)
 
+val init_tiles : unit -> tile array
+(** [init_tiles] initializes 136 tiles in a given order*)
+
+val deal : player -> tile
+(** [deal] deals a tile from the tile array*)
+
 val discarded : tile list ref
 (** [discarded] is a list collecting the discarded tiles. It is initialized with
     a random tile for now. [List.hd discarded] is the most recently discarded

@@ -1,3 +1,5 @@
+open Player
+
 type da_pai =
   | Dong
   | Nan
@@ -27,6 +29,20 @@ type tile = {
 let get_num (t : tile) = t.num
 let get_tao (t : tile) = t.tao
 let curr_index = ref 0
+
+(**[shuffle] shuffles the tiles, used at initialization*)
+let shuffle tiles =
+  let rec shuffle_helper n =
+    (*done shuffling*)
+    if n = 0 then tiles
+    else
+      let i = Random.int n in
+      let temp = tiles.(n) in
+      tiles.(n) <- tiles.(i);
+      tiles.(i) <- temp;
+      shuffle_helper (n - 1)
+  in
+  shuffle_helper 135
 
 (**[init_tiles] initializes 136 tiles in a given order*)
 let init_tiles () =
@@ -61,31 +77,14 @@ let init_tiles () =
   add_tiles 0 (DaPai Fa);
   add_tiles 0 (DaPai Bai);
 
-  tiles
-
-(**[shuffle] shuffles the tiles, used at initialization*)
-let shuffle tiles =
-  let rec shuffle_helper n =
-    (*done shuffling*)
-    if n = 0 then tiles
-    else
-      let i = Random.int n in
-      let temp = tiles.(n) in
-      tiles.(n) <- tiles.(i);
-      tiles.(i) <- temp;
-      shuffle_helper (n - 1)
-  in
-  shuffle_helper 135
-
-type player = {
-  index : int;
-  mutable money : int;
-  mutable hidden : tile option array;
-  mutable exposed : (group * int) list;
-}
-(** RI: hidden is size 14, exposed is size 4, index is from 0-3*)
+shuffle tiles
 
 let tiles_arr = shuffle (init_tiles ())
+
+let deal (player : player) =
+  get_hidden player := Array.sub tiles_arr !curr_index 14;
+  curr_index := !curr_index + 14;
+
 let discarded = ref [ { num = 3110; tao = Tong } ]
 
 let make_tile num tao = { num; tao }
