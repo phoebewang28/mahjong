@@ -21,4 +21,4 @@ val add : hidden_hand -> Tile.tile -> unit
 (** [add hh tile] adds Tile [tile] to the player's hand. *)
 
 val remove : hidden_hand -> int -> unit
-(** [remove hh idx] removes Tile [tile] from the player's hand. *)
+(** [remove hh idx] removes Tile at index [idx] from the player's hand. *)
