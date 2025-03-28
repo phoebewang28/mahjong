@@ -33,7 +33,7 @@ let chi_update t1 t2 dis : bool =
     let sorted = List.sort comp_tiles [ t1; t2; dis ] in
     if not (is_consec sorted) then false
     else (
-      Exposed_hand.chi_left (List.hd sorted);
+      Exposed_hand.chi (List.hd sorted);
       (* works only if Exposed_hand.peng updates a mutable array instead of
          returning an immutable list *)
       Hidden_hand.remove_chi (List.hd sorted);

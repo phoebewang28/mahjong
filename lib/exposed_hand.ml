@@ -1,40 +1,14 @@
 open Tile
 
+(* A.F.: list of p groups [(g1, n1);...; (gp, np)] represents legal sets in
+   player’s exposed hand R.I.: p (size of list) ≤ 4 *)
 type exposed_hand = (group * tile) list
 
-let chi_left (t : tile) (e : exposed_hand) : exposed_hand = (Shun, t) :: e
+let chi (t : tile) (e : exposed_hand) : exposed_hand = (make_group "Shun", t) :: e
 
-let chi_middle (t : tile) (e : exposed_hand) : exposed_hand =
-  (Shun, { num = t.num - 1; tao = t.tao }) :: e
+let peng (t : tile) (e : exposed_hand) : exposed_hand = (make_group "San", t) :: e
+let ming_gang (t : tile) (e : exposed_hand) : exposed_hand = (make_group "Si", t) :: e
 
-let chi_right (t : tile) (e : exposed_hand) : exposed_hand =
-  (Shun, { num = t.num - 2; tao = t.tao }) :: e
-
-let peng (t : tile) (e : exposed_hand) : exposed_hand = (San, t) :: e
-let ming_gang (t : tile) (e : exposed_hand) : exposed_hand = (Si, t) :: e
-
-let tile_to_string (t : tile) : string =
-  Printf.sprintf "%s%s"
-    (if t.num = 0 then "" else string_of_int t.num ^ " ")
-    (match t.tao with
-    | Tong -> "Tong"
-    | Wan -> "Wan"
-    | Tiao -> "Tiao"
-    | DaPai dp -> (
-        match dp with
-        | Dong -> "Dong"
-        | Nan -> "Nan"
-        | Xi -> "Xi"
-        | Bei -> "Bei"
-        | Zhong -> "Zhong"
-        | Fa -> "Fa"
-        | Bai -> "Bai"))
-
-let group_to_string (g : group) : string =
-  match g with
-  | Shun -> "ShunZi"
-  | San -> "KeZi"
-  | Si -> "Gang"
 
 let exposed_hand_to_string (e : exposed_hand) : string =
   String.concat ", "

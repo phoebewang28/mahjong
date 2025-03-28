@@ -21,10 +21,25 @@ val tiles_arr : tile array
 (** [tiles_arr] is an array containing the order of tiles at game play*)
 
 val string_to_tile : string -> tile
-(** [string_to_tile str] turns a string [str] into a tile*)
+(** [string_to_tile str] turns a string [str] into a tile
+
+TODO: add examples (Phoebe) *)
 
 val make_tile : int -> suit -> tile
 (** [make_tile num tao] creates a tile with number [num] and suit [tao]*)
 
+val group_to_string : group -> string
+(** [group_to_string] returns string representation of tile's group *)
+
 type player
 (** Type of player *)
+
+val make_group : string -> group
+(** [make_group str] returns the group with the name corresponding to [str] 
+
+Preconditin: [str] must be (case sensitive) "Shun", "San", "Si", raise o/w *)
+
+val tile_to_string : tile -> string
+(** [tile_to_string t] returns string representation of tile 
+
+Example: ... TODO (Jess))*)
