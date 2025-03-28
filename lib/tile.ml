@@ -80,7 +80,16 @@ shuffle tiles
 let tiles_arr = shuffle (init_tiles ())
 
 let discarded = ref [ { num = 3110; tao = Tong } ]
-let make_tile num tao = { num; tao }
+
+let make_tile num tao =
+  if num < 0 || num > 9 then failwith "Invalid number for tile"
+  else if tao = Tong && num = 0 then
+    failwith "Invalid tile: Tong cannot have num = 0"
+  else if tao = Wan && num = 0 then
+    failwith "Invalid tile: Wan cannot have num = 0"
+  else if tao = Tiao && num = 0 then
+    failwith "Invalid tile: Tiao cannot have num = 0"
+  else { num; tao }
 
 let make_group = function
   | "Shun" -> Shun
