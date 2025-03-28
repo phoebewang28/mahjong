@@ -1,3 +1,5 @@
+open Player
+
 type da_pai =
   | Dong
   | Nan
@@ -27,6 +29,20 @@ type tile = {
 let get_num (t : tile) = t.num
 let get_tao (t : tile) = t.tao
 let curr_index = ref 0
+
+(**[shuffle] shuffles the tiles, used at initialization*)
+let shuffle tiles =
+  let rec shuffle_helper n =
+    (*done shuffling*)
+    if n = 0 then tiles
+    else
+      let i = Random.int n in
+      let temp = tiles.(n) in
+      tiles.(n) <- tiles.(i);
+      tiles.(i) <- temp;
+      shuffle_helper (n - 1)
+  in
+  shuffle_helper 135
 
 (**[init_tiles] initializes 136 tiles in a given order*)
 let init_tiles () =
@@ -61,61 +77,64 @@ let init_tiles () =
   add_tiles 0 (DaPai Fa);
   add_tiles 0 (DaPai Bai);
 
-  tiles
-
-(**[shuffle] shuffles the tiles, used at initialization*)
-let shuffle tiles =
-  let rec shuffle_helper n =
-    (*done shuffling*)
-    if n = 0 then tiles
-    else
-      let i = Random.int n in
-      let temp = tiles.(n) in
-      tiles.(n) <- tiles.(i);
-      tiles.(i) <- temp;
-      shuffle_helper (n - 1)
-  in
-  shuffle_helper 135
-
-type player = {
-  index : int;
-  mutable money : int;
-  mutable hidden : tile option array;
-  mutable exposed : (group * int) list;
-}
-(** RI: hidden is size 14, exposed is size 4, index is from 0-3*)
+shuffle tiles
 
 let tiles_arr = shuffle (init_tiles ())
+
+let deal (player : player) =
+  get_hidden player := Array.sub tiles_arr !curr_index 14;
+  curr_index := !curr_index + 14;
+
 let discarded = ref [ { num = 3110; tao = Tong } ]
 
-let make_tile num tao = { num; tao }
+let make_tile num tao =
+  if num < 0 || num > 9 then failwith "Invalid number for tile"
+  else if tao = Tong && num = 0 then
+    failwith "Invalid tile: Tong cannot have num = 0"
+  else if tao = Wan && num = 0 then
+    failwith "Invalid tile: Wan cannot have num = 0"
+  else if tao = Tiao && num = 0 then
+    failwith "Invalid tile: Tiao cannot have num = 0"
+  else { num; tao }
 
 let make_group = function
-| "Shun" -> Shun
-| "San" -> San
-| "Si" -> Si
-| _ -> failwith "Invalid string passed to make_group fxn"
-  
+  | "Shun" -> Shun
+  | "San" -> San
+  | "Si" -> Si
+  | _ -> failwith "Invalid string passed to make_group fxn"
+
 let group_to_string (g : group) : string =
   match g with
   | Shun -> "ShunZi"
   | San -> "KeZi"
   | Si -> "Gang"
 
+(* Edge case: DaPai -> no number in front, list of length 1 created *)
 let string_to_tile str =
-  let t = Str.split (Str.regexp " ") str in
-  match List.hd t with
-  | "Tong" -> { num = int_of_string (List.hd (List.tl t)); tao = Tong }
-  | "Wan" -> { num = int_of_string (List.hd (List.tl t)); tao = Wan }
-  | "Tiao" -> { num = int_of_string (List.hd (List.tl t)); tao = Tiao }
-  | "Dong" -> { num = int_of_string (List.hd (List.tl t)); tao = DaPai Dong }
-  | "Nan" -> { num = int_of_string (List.hd (List.tl t)); tao = DaPai Nan }
-  | "Xi" -> { num = int_of_string (List.hd (List.tl t)); tao = DaPai Xi }
-  | "Bei" -> { num = int_of_string (List.hd (List.tl t)); tao = DaPai Bei }
-  | "Zhong" -> { num = int_of_string (List.hd (List.tl t)); tao = DaPai Zhong }
-  | "Fa" -> { num = int_of_string (List.hd (List.tl t)); tao = DaPai Fa }
-  | "Bai" -> { num = int_of_string (List.hd (List.tl t)); tao = DaPai Bai }
-  | _ -> { num = 0; tao = Tong }
+  try
+    let t = Str.split (Str.regexp " ") str in
+    (* list of number, followed by tile type *)
+    if List.length t = 2 then (* normal tile (not Da Pai) *)
+      let n = int_of_string (List.hd t) in
+      match List.hd (List.tl t) with
+      (* gets the tile type *)
+      | "Tong" -> { num = n; tao = Tong }
+      | "Wan" -> { num = n; tao = Wan }
+      | "Tiao" -> { num = n; tao = Tiao }
+      | _ -> failwith "Invalid string passed in, cannot convert to Tile type!"
+    else if List.length t = 1 then (* Da Pai *)
+      match List.hd t with
+      | "Dong" -> { num = 0; tao = DaPai Dong }
+      | "Nan" -> { num = 0; tao = DaPai Nan }
+      | "Xi" -> { num = 0; tao = DaPai Xi }
+      | "Bei" -> { num = 0; tao = DaPai Bei }
+      | "Zhong" -> { num = 0; tao = DaPai Zhong }
+      | "Fa" -> { num = 0; tao = DaPai Fa }
+      | "Bai" -> { num = 0; tao = DaPai Bai }
+      | _ -> failwith "Invalid string passed in, cannot convert to Tile type!"
+    else failwith "Invalid string passed in, cannot convert to Tile type!"
+  with Failure e when e = "int_of_string" ->
+    failwith (str ^ " cannot be converted to Tile type: Invalid integer.")
 
 let tile_to_string (t : tile) : string =
   Printf.sprintf "%s%s"
