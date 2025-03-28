@@ -1,4 +1,5 @@
 open Tile
+open Exposed_hand
 
 (** Effect: [comp_tiles t1 t2] returns
 
@@ -14,54 +15,40 @@ let comp_tiles t1 t2 = get_num t1 - get_num t2
 let rec is_consec = function
   | [] -> true
   | x :: xs :: t ->
-      if get_num x + 1 <> get_num xs then false
-      else is_consec (xs :: t)
+      if get_num x + 1 <> get_num xs then false else is_consec (xs :: t)
   | _ -> failwith "Cannot check consecutivity for list of length < 2!"
 
 (** Effect: Given two tiles from player's hidden hand [t1] & [t2], and discarded
-    tile [dis], return true if combination is a legal "chi".
+    tile [dis], checks if combination is a legal "chi".
 
-    Side effects: If combo is legal, removes from hidden hand and adds to
-    exposed hand. *)
-let chi_update t1 t2 dis : bool =
-  if
-    not
-      (get_tao t1 = get_tao t2
-      && get_tao t2 = get_tao dis)
-  then false
+    Side effects: If combo is legal, removes from hidden hand.
+
+    Returns: updated exposed hand [ex] after adding legal set to it*)
+let chi_update t1 t2 dis ex : exposed_hand =
+  if not (get_tao t1 = get_tao t2 && get_tao t2 = get_tao dis) then ex
+    (* returns exposed_hand unchanged *)
   else
     let sorted = List.sort comp_tiles [ t1; t2; dis ] in
-    if not (is_consec sorted) then false
+    if not (is_consec sorted) then ex
     else (
-      Exposed_hand.chi (List.hd sorted);
-      (* works only if Exposed_hand.peng updates a mutable array instead of
-         returning an immutable list *)
       Hidden_hand.remove_chi (List.hd sorted);
-      true)
+      (* returns exposed_hand, after adding set to it *)
+      Exposed_hand.chi (List.hd sorted) ex)
 
-(** Effect: Given two tiles from player's hidden hand [t1] & [t2], and discarded
-    tile [dis], return true if combination is a legal "peng" (aka. all tiles
-    have same suit and same number).
+(** Effect: Given two tiles from player's hidden hand [t1] & [t2] and discarded
+    tile [dis], checl if combination is a legal "peng" (aka. all tiles have same
+    suit and same number).
 
-    Side effects: If combo is legal, removes from hidden hand and adds to
-    exposed hand.
+    Side effects: If combo is legal, removes from hidden hand.
 
-    Edge case: da_pai *)
-let peng_update t1 t2 dis : bool =
-  if
-    not
-      (get_tao t1 = get_tao t2
-      && get_tao t2 = get_tao dis)
-  then false
-  else if
-    not
-      (get_num t1 = get_num t2
-      && get_num t2 = get_num dis)
-  then false
+    Returns: updated exposed hand [ex] after adding legal set to it Edge case:
+    da_pai *)
+let peng_update t1 t2 dis ex : exposed_hand =
+  if not (get_tao t1 = get_tao t2 && get_tao t2 = get_tao dis) then ex
+  else if not (get_num t1 = get_num t2 && get_num t2 = get_num dis) then ex
   else (
-    Exposed_hand.peng (List.hd sorted);
-    Hidden_hand.remove_peng (List.hd sorted);
-    true)
+    Hidden_hand.remove_peng t1;
+    Exposed_hand.peng t1 ex)
 
 (** Prompts user for input selection of 2 tiles (user selectes INDEX of tile).
     Returns tuple of tiles corresponding to selected indexes if valid, o/w
@@ -90,7 +77,6 @@ let rec select_tiles (lb, ub) : tile * tile =
       select_tiles (lb, ub)
 (* aka. reruns when invalid input given *)
 
-
 (** Effect: Displays prompt in terminal to initiate user selection of tiles,
     returns selected 2 tiles *)
 let prompt_selection hid =
@@ -102,11 +88,10 @@ let prompt_selection hid =
   (* for now, prompt appears in terminal, will update when GUI implemented *)
   select_tiles (0, len - 1)
 
-  
-let chi hid ex dis : bool =
+let chi hid ex dis : exposed_hand =
   let sel = prompt_selection hid in
-  chi_update (fst sel) (snd sel) dis
+  chi_update (fst sel) (snd sel) dis ex
 
-let peng hid ex dis : bool =
+let peng hid ex dis : exposed_hand =
   let sel = prompt_selection hid in
-  peng_update (fst sel) (snd sel) dis
+  peng_update (fst sel) (snd sel) dis ex
