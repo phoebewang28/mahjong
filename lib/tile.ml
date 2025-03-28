@@ -85,6 +85,8 @@ type player = {
 let tiles_arr = shuffle (init_tiles ())
 let discarded = ref [ { num = 3110; tao = Tong } ]
 
+let make_tile num tao = { num; tao }
+
 let string_to_tile str =
   let t = Str.split (Str.regexp " ") str in
   match List.hd t with

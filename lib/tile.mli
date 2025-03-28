@@ -20,5 +20,8 @@ val tiles_arr : tile array
 val string_to_tile : string -> tile
 (** [string_to_tile str] turns a string [str] into a tile*)
 
+val make_tile : int -> suit -> tile
+(** [make_tile num tao] creates a tile with number [num] and suit [tao]*)
+
 type player
 (** Type of player *)
