@@ -1,28 +1,36 @@
 open Tile
+open Hidden_hand
+open Exposed_hand
 
 type player = {
   name : string;
   index : int;
   mutable money : int;
-  mutable hidden : tile array;
-  mutable exposed : (group * int) list;
+  mutable hidden : hidden_hand;
+  mutable exposed : exposed_hand;
 }
-(** RI: hidden is size 14, exposed is size 4, index is from 0-3*)
 
 let create name index =
-  {
-    name;
-    index;
-    money = 1500;
-    hidden = [||];
-    exposed = [];
-  }
+  let player =
+    {
+      name;
+      index;
+      money = 1500;
+      hidden =
+        init_hidden_hand
+          (Array.to_list (Array.sub !Tile.tiles_arr !Tile.curr_index 13));
+      exposed = empty_exposed_hand ();
+    }
+  in
+  Tile.curr_index := !Tile.curr_index + 13;
+  player
 
-let deal player =
-  player.hidden <- Array.sub Tile.tiles_arr !(Tile.curr_index) 13;
-  Tile.curr_index := !(Tile.curr_index) + 13
+(* let deal player = player.hidden <- init_hidden_hand (Array.to_list (Array.sub
+   !Tile.tiles_arr !Tile.curr_index 13)); Tile.curr_index := !Tile.curr_index +
+   13 *)
+
 let get_index p = p.index
 let get_money p = p.money
-
 let get_name p = p.name
 let get_hidden p = p.hidden
+let get_exposed p = p.exposed

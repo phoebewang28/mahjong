@@ -1,14 +1,40 @@
 open Tile
+open Player
+open Hidden_hand
+open Exposed_hand
 
-val draw : hidden_hand -> bool
-(** [draw hid tile] adds the next tile in available tiles to player's hidden hand [hid].
-    
-    Precondition: Assumes [hid] is sorted! (And must resort after drawing!!)
-    *)
+val draw : player -> unit
+(** [draw hid tile] adds the next tile in available tiles to player's hidden
+    hand [hid].
 
-val throw : hidden_hand -> bool
+    Precondition: Assumes [hid] is sorted! (And must resort after drawing!!) *)
+val throw : player -> unit
 (* From player hand, let player choose which tile they want to discard *)
 
-val choose_move : player -> bool
+val choose_move : player -> unit
 (* Asking for user input (e.g. option #1: draw, option #2: chi; option #3: pong)
    Call corresponding functions below *)
+
+   val chi : player -> bool
+   (** [chi hid ex] takes in hidden hand [hid] of player, and exposed hand [ex] of
+       player.
+   
+       Prompts player to SELECT 2 tiles within [hid]. If selected tiles and most
+       recently discarded tile forms a combination that is a valid chi, adds combo
+       to [ex]. Returns updated [ex].
+   
+       Side effect: removes legal set from player's hidden hand [hid]
+   
+       Valid chi: 3 consecutive numbers of the same type of tile. *)
+   
+   val peng : player -> bool
+   (** [peng hid ex] takes in hidden hand [hid] of player, and exposed hand [ex] of
+       player.
+   
+       Prompts player to SELECT 2 tiles within [hid]. If selected tiles and most
+       recently discarded tile forms a combination that is a valid peng, adds combo
+       to [ex]. Returns updated [ex].
+   
+       Side effect: removes legal set from player's hidden hand [hid]
+   
+       Valid peng: 3 IDENTICAL tiles (by structural equality) *)

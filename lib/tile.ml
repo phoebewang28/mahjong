@@ -11,6 +11,7 @@ type suit =
   | Tong
   | Wan
   | Tiao
+  | Fake
   | DaPai of da_pai
 
 type group =
@@ -32,7 +33,7 @@ let curr_index = ref 0
 let shuffle tiles =
   let rec shuffle_helper n =
     (*done shuffling*)
-    if n = 0 then tiles
+    if n = 0 then ()
     else
       let i = Random.int n in
       let temp = tiles.(n) in
@@ -42,8 +43,12 @@ let shuffle tiles =
   in
   shuffle_helper 135
 
+(*blank tiles_arr to be initialized soon*)
+let tiles_arr = ref [||]
+
 (**[init_tiles] initializes 136 tiles in a given order*)
 let init_tiles () =
+  (*makes "blank tiles"*)
   let tiles = Array.make 136 { num = 1; tao = Tong } in
   let index = ref 0 in
 
@@ -75,9 +80,12 @@ let init_tiles () =
   add_tiles 0 (DaPai Fa);
   add_tiles 0 (DaPai Bai);
 
-  shuffle tiles
+  (*shuffles the tiles*)
+  shuffle tiles;
 
-let tiles_arr = shuffle (init_tiles ())
+  (*sets the tiles to be a "global" access variable*)
+  tiles_arr := tiles
+
 let discarded = ref [ { num = 3110; tao = Tong } ]
 
 let make_tile num tao =
@@ -144,4 +152,30 @@ let tile_to_string (t : tile) : string =
         | Bei -> "Bei"
         | Zhong -> "Zhong"
         | Fa -> "Fa"
-        | Bai -> "Bai"))
+        | Bai -> "Bai")
+    | Fake -> "Fake")
+
+(* May the lord have mercy on our souls *)
+let suit_prio = function
+  | Tong -> 0
+  | Wan -> 1
+  | Tiao -> 2
+  | DaPai dp -> (
+      match dp with
+      | Dong -> 3
+      | Nan -> 4
+      | Xi -> 5
+      | Bei -> 6
+      | Zhong -> 7
+      | Fa -> 8
+      | Bai -> 9)
+  | Fake -> 3110
+(* used to sort tiles by suit, then by number *)
+
+let compare_tile t1 t2 =
+  let suit_cmp = suit_prio (get_tao t1) - suit_prio (get_tao t2) in
+  if suit_cmp <> 0 then suit_cmp else get_num t1 - get_num t2
+(* used to sort tiles by number, then by suit *)
+
+let fake_tile = { num = 3110; tao = Fake }
+(* used to represent a tile that doesn't exist, for testing purposes *)

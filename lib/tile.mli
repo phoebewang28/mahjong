@@ -21,7 +21,7 @@ val get_tao : tile -> suit
       "Tiao"
     - Precondition: [t] must be a valid tile. *)
 
-val init_tiles : unit -> tile array
+val init_tiles : unit -> unit
 (** [init_tiles] initializes 136 tiles in a given order*)
 
 val curr_index : int ref
@@ -37,7 +37,7 @@ val discarded : tile list ref
       keep track of the discarded tiles during the game. The first tile in the
       list is the most recently discarded tile. *)
 
-val tiles_arr : tile array
+val tiles_arr : tile array ref
 (** [tiles_arr] is an array containing the order of tiles at game play*)
 
 val string_to_tile : string -> tile
@@ -78,3 +78,14 @@ val tile_to_string : tile -> string
       [tile_to_string t] returns "5 Tiao"
     - Example: if [t] is a tile with suit "Dong"(the number will be set to 0 as
       default), then [tile_to_string t] returns "Dong" *)
+
+val compare_tile : tile -> tile -> int
+(** [compare_tile t1 t2] compares two tiles [t1] and [t2]
+    - Returns 0 if they are equal, a negative number if [t1] is less than [t2],
+      and a positive number if [t1] is greater than [t2]
+    - Example: if [t1] is a tile with number 5 and suit "Tiao", and [t2] is a
+      tile with number 6 and suit "Tiao", then [compare_tile t1 t2] returns a
+      negative number (since 5 < 6)
+    - Precondition: both tiles must be valid tiles *)
+
+val fake_tile : tile

@@ -1,22 +1,22 @@
 open Tile
 
-type exposed_hand = (group * tile) list
+type exposed_hand = (group * tile) list ref
 (** - A.F.: list of p groups [(g1, n1);...; (gp, np)] represents legal sets in
       player’s exposed hand
     - R.I.: p (size of list) ≤ 4 *)
 
-let chi (t : tile) (e : exposed_hand) : exposed_hand =
-  (make_group "Shun", t) :: e
+let chi (t : tile) (e : exposed_hand) : unit = e := (make_group "Shun", t) :: !e
+let peng (t : tile) (e : exposed_hand) : unit = e := (make_group "San", t) :: !e
 
-let peng (t : tile) (e : exposed_hand) : exposed_hand =
-  (make_group "San", t) :: e
-
-let ming_gang (t : tile) (e : exposed_hand) : exposed_hand =
-  (make_group "Si", t) :: e
+let ming_gang (t : tile) (e : exposed_hand) : unit =
+  e := (make_group "Si", t) :: !e
 
 let exposed_hand_to_string (e : exposed_hand) : string =
   String.concat ", "
     (List.map
        (fun (g, t) ->
          Printf.sprintf "%s %s" (tile_to_string t) (group_to_string g))
-       e)
+       !e)
+
+(** [empty_exposed_hand] is an empty exposed hand. *)
+let empty_exposed_hand () : exposed_hand = ref []

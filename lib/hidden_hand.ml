@@ -1,60 +1,73 @@
 open Tile
 
-type elem = tile option
+type elem = tile
 (** The type of each element in the hidden hand. None corresponds to the absence
     of a tile. *)
 
 type hidden_hand = {
-  hand : elem array;
+  mutable hand : elem array;
   mutable size : int;
 }
 (** The type of the player's hidden hand includes an array of tiles and a size
     corresponding to the number of "actual" tiles in hand. *)
 
-let compare_elem e1 e2 =
-  match (e1, e2) with
-  | None, None -> 0
-  | None, _ -> 1
-  | _, None -> -1
-  | Some t1, Some t2 -> compare_tile t1 t2
+(* let compare_elem e1 e2 = match (e1, e2) with | None, None -> 0 | None, _ -> 1
+   | _, None -> -1 | Some t1, Some t2 -> compare_tile t1 t2 *)
 
-let force_RI hand = Array.sort compare_elem hand
+let force_RI hand = Array.sort compare_tile hand
 
 let init_hidden_hand tiles =
-  let hand = Array.make 14 None in
+  let size = List.length tiles in
+  let hand = Array.make size fake_tile in
   let _ =
     List.fold_left
       (fun acc x ->
-        hand.(acc) <- Some x;
+        hand.(acc) <- x;
         acc + 1)
       0 tiles
   in
   force_RI hand;
-  { hand; size = List.length tiles }
+  { hand; size }
 
-let get hh idx =
-  match hh.hand.(idx) with
+let get hh idx = hh.hand.(idx)
+(* match hh.hand.(idx) with | None -> raise (Invalid_argument "Tile does not
+   exist") | Some tile -> tile *)
+
+let get_tile hh tile =
+  match Array.find_index (fun x -> x = tile) hh.hand with
   | None -> raise (Invalid_argument "Index out of bounds")
   | Some x -> x
 
 let get_size hh = hh.size
 
 let add hh t =
-  hh.hand.(hh.size) <- Some t; (* index at hh.size is None *)
+  hh.hand <- Array.concat [ hh.hand; Array.make 1 t ];
+
+  (* extend the array by one tile, fill with fake tile *)
+  (* add the new tile to the end of the hand *)
+  (* index at hh.size is None *)
   force_RI hh.hand;
   hh.size <- hh.size + 1
 
 let remove hh tile =
-  match
-    Array.find_index
-      (fun x ->
-        match x with
-        | None -> false
-        | Some x -> x = tile)
-      hh.hand
-  with
+  match Array.find_index (fun x -> x = tile) hh.hand with
   | None -> raise (Invalid_argument "Tile does not exist")
   | Some idx ->
-      hh.hand.(idx) <- None;
+      hh.hand.(idx) <- fake_tile;
       force_RI hh.hand;
       hh.size <- hh.size - 1
+
+let get_hand hh = hh.hand
+
+let make_hidden_hand hand =
+  { hand = Array.of_list hand; size = List.length hand }
+
+let get_tiles hh = Array.to_list hh.hand
+
+let hidden_hand_to_string hh =
+  let s =
+    List.fold_left
+      (fun acc x -> acc ^ ", " ^ Tile.tile_to_string x)
+      "" (get_tiles hh)
+  in
+  String.sub s 1 (String.length s - 1)
