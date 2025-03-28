@@ -7,6 +7,9 @@ type suit
 type group
 (** Group type of mahjong tile *)
 
+val curr_index : int ref
+(** [curr_index] is a reference to the current index of the tile array *)
+
 val get_num : tile -> int
 (** [get_num t] returns number associated with tile [t]
     - Example: if [t] is a tile with number 5, then [get_num t] returns 5 *)
@@ -18,9 +21,6 @@ val get_tao : tile -> suit
 
 val init_tiles : unit -> tile array
 (** [init_tiles] initializes 136 tiles in a given order*)
-
-val deal : player -> tile
-(** [deal] deals a tile from the tile array*)
 
 val discarded : tile list ref
 (** [discarded] is a list collecting the discarded tiles. It is initialized with

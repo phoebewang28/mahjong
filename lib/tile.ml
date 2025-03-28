@@ -1,5 +1,3 @@
-open Player
-
 type da_pai =
   | Dong
   | Nan
@@ -80,10 +78,6 @@ let init_tiles () =
 shuffle tiles
 
 let tiles_arr = shuffle (init_tiles ())
-
-let deal (player : player) =
-  get_hidden player := Array.sub tiles_arr !curr_index 14;
-  curr_index := !curr_index + 14;
 
 let discarded = ref [ { num = 3110; tao = Tong } ]
 let make_tile num tao = { num; tao }
