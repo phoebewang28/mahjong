@@ -40,7 +40,7 @@ let get hh idx =
 let get_size hh = hh.size
 
 let add hh t =
-  hh.hand.(hh.size) <- Some t;
+  hh.hand.(hh.size) <- Some t; (* index at hh.size is None *)
   force_RI hh.hand;
   hh.size <- hh.size + 1
 

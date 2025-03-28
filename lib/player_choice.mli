@@ -1,8 +1,10 @@
 open Tile
 
 val draw : hidden_hand -> bool
-(** [draw hidden_hand tile] adds the next tile Pop tile from possible tiles and
-    add to player hand *)
+(** [draw hid tile] adds the next tile in available tiles to player's hidden hand [hid].
+    
+    Precondition: Assumes [hid] is sorted! (And must resort after drawing!!)
+    *)
 
 val throw : hidden_hand -> bool
 (* From player hand, let player choose which tile they want to discard *)

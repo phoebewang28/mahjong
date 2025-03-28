@@ -2,9 +2,9 @@
 open Tile
 open Str
 
-let draw (hidden_hand:tile option array) = 
+let draw (hid:tile option array) = 
   let tile = Array.get tiles_arr !curr_index in
-  hidden_hand.(13) <- Some (tile);
+  Hidden_hand.add hid tile 
   true
 
   (** Prompts user for input selection of 2 tiles (user selectes INDEX of tile).
@@ -44,15 +44,15 @@ let draw (hidden_hand:tile option array) =
       (* for now, prompt appears in terminal, will update when GUI implemented *)
       select_tiles (0, len - 1)
 
-let throw (hand:tile option array) = 
-  let tile = prompt_selection hand in
-  let ind = Array.find_index (fun x -> x = Some(tile)) hand in 
+let throw (hid:tile option array) = 
+  let tile = prompt_selection hid in
+  let ind = Array.find_index (fun x -> x = Some(tile)) hid in 
   match ind with 
     | None -> false (** if the tile they don't want to remove isn't in their hand*)
-    | Some i -> match hand.(i) with 
-      | None -> false
+    | Some i -> match hid.(i) with 
+      | None -> false 
       | Some t -> discarded := [(make_tile (get_num t) (get_tao t))];   
-    hand.(i) <- None; 
+    Hidden_hand.remove hid i;
     true
 
     (* filler functions, delete later *)

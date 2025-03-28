@@ -31,7 +31,8 @@ let chi_update t1 t2 dis ex : exposed_hand =
     let sorted = List.sort comp_tiles [ t1; t2; dis ] in
     if not (is_consec sorted) then ex
     else (
-      Hidden_hand.remove_chi (List.hd sorted);
+      Hidden_hand.remove t1;
+      Hidden_hand.remove t2;
       (* returns exposed_hand, after adding set to it *)
       Exposed_hand.chi (List.hd sorted) ex)
 
@@ -47,7 +48,8 @@ let peng_update t1 t2 dis ex : exposed_hand =
   if not (get_tao t1 = get_tao t2 && get_tao t2 = get_tao dis) then ex
   else if not (get_num t1 = get_num t2 && get_num t2 = get_num dis) then ex
   else (
-    Hidden_hand.remove_peng t1;
+    (Hidden_hand.remove t1;
+    Hidden_hand.remove t2;
     Exposed_hand.peng t1 ex)
 
 (** Prompts user for input selection of 2 tiles (user selectes INDEX of tile).
@@ -88,10 +90,12 @@ let prompt_selection hid =
   (* for now, prompt appears in terminal, will update when GUI implemented *)
   select_tiles (0, len - 1)
 
-let chi hid ex dis : exposed_hand =
+let chi hid ex : exposed_hand =
   let sel = prompt_selection hid in
+  let dis = Array.get tiles_arr !curr_index in (* most recently discarded tile *)
   chi_update (fst sel) (snd sel) dis ex
 
-let peng hid ex dis : exposed_hand =
+let peng hid ex : exposed_hand =
   let sel = prompt_selection hid in
+  let dis = Array.get tiles_arr !curr_index in
   peng_update (fst sel) (snd sel) dis ex
