@@ -78,8 +78,10 @@ let comp_tiles t1 t2 = get_num t1 - get_num t2
     all elements have an integer value ONE greater than the previous
 
     Precondition: [lst] must be ≥ 2, raises o/w *)
-let rec is_consec = function
+let rec is_consec lst =
+  match lst with
   | [] -> true
+  | [ a; b ] -> if get_num a + 1 <> get_num b then false else true
   | x :: xs :: t ->
       if get_num x + 1 <> get_num xs then false else is_consec (xs :: t)
   | _ -> failwith "Cannot check consecutivity for list of length < 2!"
@@ -99,12 +101,13 @@ let print_player_hid_exp player =
 
     Returns: updated exposed hand [ex] after adding legal set to it*)
 let chi_update t1 t2 dis ex hid : bool =
-  if not (get_tao t1 = get_tao t2 && get_tao t2 = get_tao dis) then false
+  if not (get_tao t1 = get_tao t2 || get_tao t2 = get_tao dis) then false
     (* returns exposed_hand unchanged *)
   else
     let sorted = List.sort comp_tiles [ t1; t2; dis ] in
     if not (is_consec sorted) then false
     else (
+      (* must move the index!! *)
       Hidden_hand.remove hid t1;
       Hidden_hand.remove hid t2;
       (* returns exposed_hand, after adding set to it *)
@@ -120,8 +123,8 @@ let chi_update t1 t2 dis ex hid : bool =
     Returns: updated exposed hand [ex] after adding legal set to it Edge case:
     da_pai *)
 let peng_update t1 t2 dis ex hid : bool =
-  if not (get_tao t1 = get_tao t2 && get_tao t2 = get_tao dis) then false
-  else if not (get_num t1 = get_num t2 && get_num t2 = get_num dis) then false
+  if not (get_tao t1 = get_tao t2 || get_tao t2 = get_tao dis) then false
+  else if not (get_num t1 = get_num t2 || get_num t2 = get_num dis) then false
   else (
     Hidden_hand.remove hid t1;
     Hidden_hand.remove hid t2;
@@ -172,7 +175,7 @@ let chi (player : player) : bool =
   let hid = get_hidden player in
   let ex = get_exposed player in
   let sel = prompt_selection_2 hid in
-  let dis = Array.get !tiles_arr !curr_index in
+  let dis = List.hd !discarded in
   (* most recently discarded tile *)
   chi_update (fst sel) (snd sel) dis ex hid
 
@@ -180,7 +183,7 @@ let peng (player : player) : bool =
   let hid = get_hidden player in
   let ex = get_exposed player in
   let sel = prompt_selection_2 hid in
-  let dis = Array.get !tiles_arr !curr_index in
+  let dis = List.hd !discarded in
   peng_update (fst sel) (snd sel) dis ex hid
 
 let rec choose_move player =

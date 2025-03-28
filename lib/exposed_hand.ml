@@ -5,7 +5,10 @@ type exposed_hand = (group * tile) list ref
       player’s exposed hand
     - R.I.: p (size of list) ≤ 4 *)
 
-let chi (t : tile) (e : exposed_hand) : unit = e := (make_group "Shun", t) :: !e
+let chi (t : tile) (e : exposed_hand) : unit = 
+  e := (make_group "Shun", t) :: !e
+
+
 let peng (t : tile) (e : exposed_hand) : unit = e := (make_group "San", t) :: !e
 
 let ming_gang (t : tile) (e : exposed_hand) : unit =
