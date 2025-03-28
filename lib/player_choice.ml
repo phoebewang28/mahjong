@@ -22,12 +22,12 @@ let choose_move player =
   let choice_tile = Str.split (Str.regexp " ") choice in
     if List.hd choice_tile = "draw" then 
       let tile = List.hd (List.tl choice_tile) in
-      draw player (Tile.string_to_tile tile) (* Queue.pop available_tiles*)
+      draw player (string_to_tile tile) (* Queue.pop available_tiles*)
     else if List.hd choice_tile = "chi" then 
       let tile = List.hd (List.tl choice_tile) in
-      chi player (Tile.string_to_tile tile) (* Queue.peek discarded_tiles*)
+      chi player (string_to_tile tile) (* Queue.peek discarded_tiles*)
     else if List.hd choice_tile = "pong" then 
       let tile = List.hd (List.tl choice_tile) in
-      pong player (Tile.string_to_tile tile) (* Queue.peek discarded_tiles*)
+      pong player (string_to_tile tile) (* Queue.peek discarded_tiles*)
     else 
       false
