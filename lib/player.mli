@@ -4,7 +4,7 @@ type player
 val players : player list
 (** List of all players *)
 
-val create : int -> player
+val create : string -> int -> player
 (** [create index] creates a player with the given [index] and initializes their
     money to 250. *)
 
@@ -13,3 +13,6 @@ val get_index : player -> int
 
 val get_money : player -> int
 (** [get_money p] returns the amount of money of player [p] currently has*)
+
+val get_hidden : player -> tile option array
+(** [get_hidden p] returns the hidden tiles of player [p] *)

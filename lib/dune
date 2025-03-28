@@ -1,3 +1,4 @@
 (library
  (name mahjong)
- (libraries str))
+ (libraries str)
+ (modules player tile))
