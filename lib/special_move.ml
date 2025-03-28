@@ -1,9 +1,11 @@
+open Tile
+
 (** Effect: [comp_tiles t1 t2] returns
 
     - 0 if [t1] is equal to [t2]
     - negative if [t1] is less than [t2]
     - positive if [t1] is greater than [t2] *)
-let comp_tiles t1 t2 = Basic_types.get_num t1 - Basic_types.get_num t2
+let comp_tiles t1 t2 = get_num t1 - get_num t2
 
 (** Effect: [is_consec lst] returns true if for list [lst] [t1; t;, ...; tn],
     all elements have an integer value ONE greater than the previous
@@ -12,7 +14,7 @@ let comp_tiles t1 t2 = Basic_types.get_num t1 - Basic_types.get_num t2
 let rec is_consec = function
   | [] -> true
   | x :: xs :: t ->
-      if Basic_types.get_num x + 1 <> Basic_types.get_num xs then false
+      if get_num x + 1 <> get_num xs then false
       else is_consec (xs :: t)
   | _ -> failwith "Cannot check consecutivity for list of length < 2!"
 
@@ -24,8 +26,8 @@ let rec is_consec = function
 let chi_update t1 t2 dis : bool =
   if
     not
-      (Basic_types.get_tao t1 = Basic_types.get_tao t2
-      && Basic_types.get_tao t2 = Basic_types.get_tao dis)
+      (get_tao t1 = get_tao t2
+      && get_tao t2 = get_tao dis)
   then false
   else
     let sorted = List.sort comp_tiles [ t1; t2; dis ] in
@@ -48,13 +50,13 @@ let chi_update t1 t2 dis : bool =
 let peng_update t1 t2 dis : bool =
   if
     not
-      (Basic_types.get_tao t1 = Basic_types.get_tao t2
-      && Basic_types.get_tao t2 = Basic_types.get_tao dis)
+      (get_tao t1 = get_tao t2
+      && get_tao t2 = get_tao dis)
   then false
   else if
     not
-      (Basic_types.get_num t1 = Basic_types.get_num t2
-      && Basic_types.get_num t2 = Basic_types.get_num dis)
+      (get_num t1 = get_num t2
+      && get_num t2 = get_num dis)
   then false
   else (
     Exposed_hand.peng (List.hd sorted);
@@ -69,7 +71,7 @@ let peng_update t1 t2 dis : bool =
     bound (inclusive) and [ub] rep. upper bound (inclusive).
 
     Note: Assuming hidden hand has fxn to get tile based on indexes *)
-let rec select_tiles (lb, ub) : Basic_types.tile * Basic_types.tile =
+let rec select_tiles (lb, ub) : tile * tile =
   try
     let t1 = Stdlib.read_int () in
     let t2 = Stdlib.read_int () in

@@ -1,3 +1,5 @@
+open Exposed_hand
+
 type da_pai =
   | Dong
   | Nan
@@ -21,27 +23,26 @@ type tile = {
 
 let get_num (t : tile) = t.num
 let get_tao (t : tile) = t.tao
-
 let curr_index = ref 0
 
 (**[init_tiles] initializes 136 tiles in a given order*)
-let init_tiles () = 
-  let tiles = Array.make 136 {num = 1; tao = Tong} in
-  let index = ref 0 in 
+let init_tiles () =
+  let tiles = Array.make 136 { num = 1; tao = Tong } in
+  let index = ref 0 in
 
   (*adds 4 copies of any tile*)
-  let add_tiles number suit = 
+  let add_tiles number suit =
     for _ = 1 to 4 do
-      tiles.(!index) <- {num = number; tao = suit};
+      tiles.(!index) <- { num = number; tao = suit };
       incr index
     done
-  in 
+  in
   (*adds the 3 suited tiles with associated numbers*)
   let add_by_suit suit =
     for i = 1 to 9 do
       add_tiles i suit
     done
-  in 
+  in
   add_by_suit Tong;
   add_by_suit Wan;
   add_by_suit Tiao;
@@ -59,7 +60,7 @@ let init_tiles () =
 
   tiles
 
-  (**[shuffle] shuffles the tiles, used at initialization*)
+(**[shuffle] shuffles the tiles, used at initialization*)
 let shuffle tiles =
   let rec shuffle_helper n =
     (*done shuffling*)
@@ -73,10 +74,16 @@ let shuffle tiles =
   in
   shuffle_helper 135
 
+type player = {
+  index : int;
+  mutable money : int;
+  mutable hidden : tile option array;
+  mutable exposed : (group * int) list;
+}
+(** RI: hidden is size 14, exposed is size 4, index is from 0-3*)
 
 let tiles_arr = shuffle (init_tiles ())
-
-let discarded = ref [{num = 3110; tao = Tong}]
+let discarded = ref [ { num = 3110; tao = Tong } ]
 
 let string_to_tile str =
   let t = Str.split (Str.regexp " ") str in

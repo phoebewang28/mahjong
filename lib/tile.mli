@@ -19,3 +19,6 @@ val tiles_arr : tile array
 
 val string_to_tile : string -> tile
 (** [string_to_tile str] turns a string [str] into a tile*)
+
+type player
+(** Type of player *)
