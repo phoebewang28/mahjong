@@ -1,3 +1,3 @@
 type dice
 
-val random: unit -> int
+val random : unit -> int
