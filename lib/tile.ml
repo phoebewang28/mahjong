@@ -15,6 +15,11 @@ type suit =
   | Tiao
   | DaPai of da_pai
 
+type group =
+  | Shun
+  | San
+  | Si
+
 (* R.I: for tiles of da_pai, num is always set to 0 *)
 type tile = {
   num : int;

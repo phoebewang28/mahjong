@@ -1,3 +1,6 @@
+open Tile
+open Exposed_hand
+
 val chi : hidden_hand -> exposed_hand -> tile -> bool
 (** Given hidden hand [hid] of player, and most recently discarded tile [tile],
     [chi hid ex tile] returns true if the combination of tiles within [hid]

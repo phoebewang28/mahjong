@@ -1,28 +1,3 @@
-type group =
-  | Shun
-  | San
-  | Si
-
-type da_pai =
-  | Dong
-  | Nan
-  | Xi
-  | Bei
-  | Zhong
-  | Fa
-  | Bai
-
-type suit =
-  | Tong
-  | Wan
-  | Tiao
-  | DaPai of da_pai
-
-type tile = {
-  num : int;
-  tao : suit;
-}
-
 (* A.F.: list of p groups [(g1, n1);...; (gp, np)] represents legal sets in
    player’s exposed hand R.I.: p (size of list) ≤ 4 *)
 type exposed_hand = (group * tile) list

@@ -4,6 +4,9 @@ type tile
 type suit
 (** Type of suit of mahjong itle *)
 
+type group
+(** Group type of mahjong tile *)
+
 val get_num : tile -> int
 (** [get_num t] returns number associated with tile [t] *)
 
