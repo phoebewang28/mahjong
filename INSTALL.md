@@ -8,13 +8,12 @@ git clone <repository-url>
 ```
 cd <repository-name>
 ```
-3. The following ocaml libraries need to be installed:
-- [yup]
-- [yup]
-
-Run `opam install ''` for the above libraries.
+3. The following ocaml libraries need to be installed: NIL
 
 ## Running the Game
-1. Run `dune build` ? ?
-2. Run `dune exec NAME_HERE` to start the game.
-3. The Mahjong GUI will appear: some how to set up the game maybe?
+1. Run `dune build`
+2. Run `dune exec bin/main.exe` to start the game.
+3. The Mahjong GUI will appear: 
+Set name for all players when you see the "Please enter your 4 player names: " prompt and the game will authomatically start.
+A list of player hands will be printed, and players will take turns moving. 
+4. To end the game: Control + C
