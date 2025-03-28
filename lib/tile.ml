@@ -77,14 +77,6 @@ let shuffle tiles =
   in
   shuffle_helper 135
 
-type player = {
-  index : int;
-  mutable money : int;
-  mutable hidden : tile option array;
-  mutable exposed : (group * int) list;
-}
-(** RI: hidden is size 14, exposed is size 4, index is from 0-3*)
-
 let tiles_arr = shuffle (init_tiles ())
 let discarded = ref [ { num = 3110; tao = Tong } ]
 let make_tile num tao = { num; tao }

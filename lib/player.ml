@@ -7,6 +7,7 @@ type player = {
   mutable hidden : tile option array;
   mutable exposed : (group * int) list;
 }
+(** RI: hidden is size 14, exposed is size 4, index is from 0-3*)
 
 let create name index =
   {

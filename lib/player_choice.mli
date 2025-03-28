@@ -1,9 +1,10 @@
 open Tile
 
-val draw : hidden_hand -> tile -> bool
-(* Pop tile from possible tiles and add to player hand *)
+val draw : hidden_hand -> bool
+(** [draw hidden_hand tile] adds the next tile Pop tile from possible tiles and
+    add to player hand *)
 
-val throw : hidden_hand -> tile -> bool
+val throw : hidden_hand -> bool
 (* From player hand, let player choose which tile they want to discard *)
 
 val choose_move : player -> bool

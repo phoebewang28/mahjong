@@ -16,6 +16,9 @@ val get_tao : tile -> suit
     - Example: if [t] is a tile with suit "Tiao", then [get_tao t] returns
       "Tiao" *)
 
+val curr_index : int ref
+(** [curr_index] is the index marking the next tile that will be put into play*)
+
 val discarded : tile list ref
 (** [discarded] is a list collecting the discarded tiles. It is initialized with
     a random tile for now. [List.hd discarded] is the most recently discarded
