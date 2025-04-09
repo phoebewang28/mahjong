@@ -1,14 +1,23 @@
+exception InvalidTile of string
+
 type tile
 (** Type of mahjong tile *)
 
+(* type da_pai = | Dong | Nan | Xi | Bei | Zhong | Fa | Bai
+
+   type suit = | Tong | Wan | Tiao | Fake | DaPai of da_pai *)
+
 type suit
-(** Type of suit of mahjong itle *)
+(** Type of suit of mahjong tile *)
 
 type group
 (** Group type of mahjong tile *)
 
 val curr_index : int ref
 (** [curr_index] is a reference to the current index of the tile array *)
+
+val shuffle : 'a array -> unit
+(**[shuffle] shuffles the tiles, used at initialization*)
 
 val get_num : tile -> int
 (** [get_num t] returns number associated with tile [t]
@@ -21,7 +30,7 @@ val get_tao : tile -> suit
       "Tiao"
     - Precondition: [t] must be a valid tile. *)
 
-val init_tiles : unit -> unit
+val init_tiles : unit -> tile array
 (** [init_tiles] initializes 136 tiles in a given order*)
 
 val curr_index : int ref
@@ -69,8 +78,10 @@ val make_group : string -> group
       corresponding to "Shun" (consecutive-number set)
     - Example: if [str] is "San", then [make_group str] returns the group
       corresponding to "San" (triplet of identical tiles)
-    - Preconditin: [str] must be (case sensitive) "Shun", "San", "Si", raise an
+    - Precondition: [str] must be (case sensitive) "Shun", "San", "Si", raise an
       exception if not. *)
+
+val suit_to_string : suit -> string
 
 val tile_to_string : tile -> string
 (** [tile_to_string t] returns string representation of tile

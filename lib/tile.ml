@@ -1,3 +1,5 @@
+exception InvalidTile of string
+
 type da_pai =
   | Dong
   | Nan
@@ -29,10 +31,9 @@ let get_num (t : tile) = t.num
 let get_tao (t : tile) = t.tao
 let curr_index = ref 0
 
-(**[shuffle] shuffles the tiles, used at initialization*)
 let shuffle tiles =
   let rec shuffle_helper n =
-    (*done shuffling*)
+    (*swaps tiles at random numbers *)
     if n = 0 then ()
     else
       let i = Random.int n in
@@ -80,29 +81,27 @@ let init_tiles () =
   add_tiles 0 (DaPai Fa);
   add_tiles 0 (DaPai Bai);
 
-  (*shuffles the tiles*)
-  shuffle tiles;
-
   (*sets the tiles to be a "global" access variable*)
-  tiles_arr := tiles
+  tiles_arr := tiles;
+  tiles
 
 let discarded = ref [ { num = 3110; tao = Tong } ]
 
 let make_tile num tao =
-  if num < 0 || num > 9 then failwith "Invalid number for tile"
+  if num < 0 || num > 9 then raise (InvalidTile "Invalid number for tile")
   else if tao = Tong && num = 0 then
-    failwith "Invalid tile: Tong cannot have num = 0"
+    raise (InvalidTile "Tong cannot have num = 0")
   else if tao = Wan && num = 0 then
-    failwith "Invalid tile: Wan cannot have num = 0"
+    raise (InvalidTile "Wan cannot have num = 0")
   else if tao = Tiao && num = 0 then
-    failwith "Invalid tile: Tiao cannot have num = 0"
+    raise (InvalidTile "Tiao cannot have num = 0")
   else { num; tao }
 
 let make_group = function
   | "Shun" -> Shun
   | "San" -> San
   | "Si" -> Si
-  | _ -> failwith "Invalid string passed to make_group fxn"
+  | _ -> raise (InvalidTile "Invalid string passed to make_group fxn")
 
 let group_to_string (g : group) : string =
   match g with
@@ -117,12 +116,20 @@ let string_to_tile str =
     (* list of number, followed by tile type *)
     if List.length t = 2 then (* normal tile (not Da Pai) *)
       let n = int_of_string (List.hd t) in
-      match List.hd (List.tl t) with
-      (* gets the tile type *)
-      | "Tong" -> { num = n; tao = Tong }
-      | "Wan" -> { num = n; tao = Wan }
-      | "Tiao" -> { num = n; tao = Tiao }
-      | _ -> failwith "Invalid string passed in, cannot convert to Tile type!"
+      if n < 1 || n > 9 then
+        raise
+          (InvalidTile
+             (str ^ " is an invalid string, cannot convert to Tile type!"))
+      else
+        match List.hd (List.tl t) with
+        (* gets the tile type *)
+        | "Tong" -> { num = n; tao = Tong }
+        | "Wan" -> { num = n; tao = Wan }
+        | "Tiao" -> { num = n; tao = Tiao }
+        | _ ->
+            raise
+              (InvalidTile
+                 (str ^ " is an invalid string, cannot convert to Tile type!"))
     else if List.length t = 1 then (* Da Pai *)
       match List.hd t with
       | "Dong" -> { num = 0; tao = DaPai Dong }
@@ -132,28 +139,38 @@ let string_to_tile str =
       | "Zhong" -> { num = 0; tao = DaPai Zhong }
       | "Fa" -> { num = 0; tao = DaPai Fa }
       | "Bai" -> { num = 0; tao = DaPai Bai }
-      | _ -> failwith "Invalid string passed in, cannot convert to Tile type!"
-    else failwith "Invalid string passed in, cannot convert to Tile type!"
+      | _ ->
+          raise
+            (InvalidTile
+               (str ^ " is an invalid string, cannot convert to Tile type!"))
+    else
+      raise
+        (InvalidTile
+           (str ^ "Invalid string passed in, cannot convert to Tile type!"))
   with Failure e when e = "int_of_string" ->
-    failwith (str ^ " cannot be converted to Tile type: Invalid integer.")
+    raise
+      (InvalidTile (str ^ " cannot be converted to Tile type: Invalid integer."))
+
+let suit_to_string (tao : suit) : string =
+  match tao with
+  | Tong -> "Tong"
+  | Wan -> "Wan"
+  | Tiao -> "Tiao"
+  | DaPai dp -> (
+      match dp with
+      | Dong -> "Dong"
+      | Nan -> "Nan"
+      | Xi -> "Xi"
+      | Bei -> "Bei"
+      | Zhong -> "Zhong"
+      | Fa -> "Fa"
+      | Bai -> "Bai")
+  | Fake -> "Fake"
 
 let tile_to_string (t : tile) : string =
   Printf.sprintf "%s%s"
     (if t.num = 0 then "" else string_of_int t.num ^ " ")
-    (match t.tao with
-    | Tong -> "Tong"
-    | Wan -> "Wan"
-    | Tiao -> "Tiao"
-    | DaPai dp -> (
-        match dp with
-        | Dong -> "Dong"
-        | Nan -> "Nan"
-        | Xi -> "Xi"
-        | Bei -> "Bei"
-        | Zhong -> "Zhong"
-        | Fa -> "Fa"
-        | Bai -> "Bai")
-    | Fake -> "Fake")
+    (suit_to_string t.tao)
 
 (* May the lord have mercy on our souls *)
 let suit_prio = function

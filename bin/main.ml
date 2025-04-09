@@ -42,7 +42,8 @@ let () =
     "Welcome to OCaMahJong made by love with Lao Gan [O Ca] Ma Jiang!";
   print_endline "Please enter your 4 player names: ";
 
-  Tile.init_tiles ();
+  let _ = Tile.init_tiles () in
+  Tile.shuffle !Tile.tiles_arr;
   let player1 = make_player 1 in
   let player2 = make_player 2 in
   let player3 = make_player 3 in
