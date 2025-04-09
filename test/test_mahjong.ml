@@ -1,6 +1,57 @@
 open OUnit2
+open Mahjong
+open Utilities
+open QCheck
+
+let tile_test fn print name expected_val =
+  name >:: fun _ -> assert_equal fn expected_val ~printer:print
+
+(*tests for any exception of type InvalidTile, the other way was forcing me to
+  have universal error messages.*)
+let tile_test_raise name fn tile =
+  name >:: fun _ ->
+  try
+    let _ = fn tile in
+    assert_failure "Expected InvalidTile exception was not raised."
+  with
+  | Tile.InvalidTile _ -> ()
+  | e -> raise e
+
+let tile_num_test tile expected_val =
+  tile_test (Tile.get_num tile) string_of_int
+    ("get_num test: " ^ Tile.tile_to_string tile)
+    expected_val
+
+let tile_suit_test tile (expected_val : string) =
+  tile_test
+    (Tile.suit_to_string (Tile.get_tao tile))
+    (fun x -> x)
+    ("get_suit test: " ^ Tile.tile_to_string tile)
+    expected_val
+
+(** [make_tile_test num suit] verifies the properties of a tile via qcheck. It
+    checks if the tile's tao/suit matches [suit], and its number is [num].*)
+let make_tile_test num suit =
+  let tile = Tile.make_tile num suit in
+  Tile.get_num tile = num && Tile.get_tao tile = suit
+
+let tile_tests =
+  List.map (fun (a, b, c) -> tile_num_test a c) Utilities.test_tiles
+  @ List.map (fun (a, b, c) -> tile_suit_test a b) Utilities.test_tiles
+  @ List.map
+      (fun a ->
+        tile_test_raise ("make tile fail test " ^ a) Tile.string_to_tile a)
+      Utilities.test_bad_tiles
+  @ [
+      (* tile_num_test tile expected_val; *)
+      ( "test init_tiles length" >:: fun _ ->
+        let tiles = Tile.init_tiles () in
+        assert_equal 136 (Array.length tiles) ~printer:string_of_int );
+      (* qtest (make_tile_test 1) 100; *)
+    ]
 
 let tests =
-  "test suite" >::: [ ("a trivial test" >:: fun _ -> assert_equal 0 0) ]
+  "test suite"
+  >::: [ ("a trivial test" >:: fun _ -> assert_equal 0 0) ] @ tile_tests
 
 let _ = run_test_tt_main tests

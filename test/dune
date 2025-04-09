@@ -1,4 +1,5 @@
 (test
  (name test_mahjong)
- (libraries ounit2 mahjong)
- (deps (glob_files_rec ../data/*)))
+ (libraries ounit2 mahjong qcheck)
+ (deps
+  (glob_files_rec ../data/*)))
