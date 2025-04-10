@@ -1,4 +1,4 @@
 (executable
  (public_name mahjong)
- (name main)
- (libraries mahjong ANSITerminal))
+ (name gui)
+ (libraries mahjong ANSITerminal raylib))
