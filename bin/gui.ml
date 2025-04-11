@@ -8,8 +8,8 @@ open Lwt
 (* tiles might wanna be buttons, since we have to click to select it *)
 
 type game_board = {
-  player_lst : Player.player list;
-  mutable cur_player : int; (* index of current player: 0,1,2,3 *)
+  mutable player_lst : Player.player list;
+  mutable cur_player_id : int; (* index of current player: 0,1,2,3 *)
   mutable player_hid : Hidden_hand.hidden_hand;
       (* hidden hand of CURRENT player *)
   mutable player_exp : Exposed_hand.exposed_hand;
@@ -19,15 +19,18 @@ type game_board = {
          render draw; if false, will not *)
   mutable is_chi : bool;
   mutable is_peng : bool;
-      (* mutable chi_fail : bool; mutable peng_fail : bool; *)
+  mutable chi_fail : bool;
+  mutable peng_fail : bool;
+  mutable player_name_inputs : string array;
+  mutable player_name_edit_mode : bool array;
+  mutable player_names : string array option;
+  mutable init_done : bool;
+  mutable on_start_screen : bool;
 }
 
 let window_width = 800
 let window_height = 600
-
-(** Center of the window *)
 let center_x = window_width / 2
-
 let center_y = window_height / 2
 
 let draw_chi_fail () : unit =
@@ -118,18 +121,8 @@ let draw_throw_button p : bool =
     true)
   else false
 
-(** [make_player] initializes a player with a certain index *)
-let make_player id =
-  (* TODO: get player name *)
-  let player = Player.create ("Player " ^ string_of_int id) id in
-  player
-
-let init_players () : Player.player list =
-  let p1 = make_player 1 in
-  let p2 = make_player 2 in
-  let p3 = make_player 3 in
-  let p4 = make_player 4 in
-  [ p1; p2; p3; p4 ]
+(** [make_player id name] creates a player with the given [id] and [name]. *)
+let make_player id name = Player.create name id
 
 (** set up starting state of mahjong: all 4 players have tiles, no discards *)
 let init_tiles () =
@@ -140,15 +133,16 @@ let init_tiles () =
 
 (** Initialization of main window *)
 let setup () : game_board =
-  Raylib.init_window window_width window_height "OCaMahJong";
+  init_window window_width window_height "OCaMahJong";
   set_config_flags [ ConfigFlags.Window_resizable ];
-  (* allows for user to resize screen *)
   set_target_fps 60;
   init_tiles ();
-  let p_lst = init_players () in
+  let p_lst = [ Player.create "placeholder" 0 ] in
+  (* placeholder *)
   {
+    (* TODO: should split game boards *)
     player_lst = p_lst;
-    cur_player = 0;
+    cur_player_id = 0;
     (* starts /w 1st player*)
     player_hid = Player.get_hidden (List.nth p_lst 0);
     player_exp = Player.get_exposed (List.nth p_lst 0);
@@ -156,21 +150,23 @@ let setup () : game_board =
     is_drawn = false;
     is_chi = false;
     is_peng = false;
+    chi_fail = false;
+    peng_fail = false;
+    player_name_inputs = [| "Player 1"; "Player 2"; "Player 3"; "Player 4" |];
+    player_name_edit_mode = [| false; false; false; false |];
+    player_names = None;
+    init_done = false;
+    on_start_screen = true;
     (* chi_fail = false; peng_fail = false; *)
   }
 
 let update_game_board (gb : game_board) : unit =
-  gb.player_hid <- Player.get_hidden (List.nth gb.player_lst gb.cur_player);
-  gb.player_exp <- Player.get_exposed (List.nth gb.player_lst gb.cur_player);
+  gb.player_hid <- Player.get_hidden (List.nth gb.player_lst gb.cur_player_id);
+  gb.player_exp <- Player.get_exposed (List.nth gb.player_lst gb.cur_player_id);
   gb.discard <- Tile.tile_to_string (List.hd !Tile.discarded)
 
-(** set background to green mahjong pelt
-
-    Note: Texture2D are used to load sprites (e.g. images)*)
-let draw_bg () : unit =
-  let background = load_texture "res/images/mahjong_pelt.jpg" in
-
-  (* gets max scale to ensure that bg covers entirety of window *)
+let draw_background filename =
+  let background = load_texture filename in
   let scale_x =
     float_of_int window_width /. float_of_int (Texture2D.width background)
   in
@@ -180,15 +176,22 @@ let draw_bg () : unit =
   let max_scale = max scale_x scale_y in
   draw_texture_ex background (Vector2.create 0. 0.) 0. max_scale Color.white
 
-let draw_discard dis : unit =
+let draw_discard dis =
   let font_size = 30 in
-  (* pos_x and pos_y parameters of [draw_text] is the TOP LEFT corner of
-     whatever you are drawing, so must translate position based on [dis]'s
-     dimensions
-
-     no preset way of measuring height of string *)
   let dis_x = center_x - (measure_text dis font_size / 2) in
   draw_text dis dis_x center_y font_size Color.red
+
+let draw_player_hid p : unit =
+  let hid = Hidden_hand.hidden_hand_to_string (Player.get_hidden p) in
+  let font_size = 15 in
+  let hid_x = center_x - (measure_text hid font_size / 2) in
+  draw_text hid hid_x (window_height - 100) font_size Color.white
+
+let draw_player_exp p : unit =
+  let exp = Exposed_hand.exposed_hand_to_string (Player.get_exposed p) in
+  let font_size = 15 in
+  let exp_x = center_x - (measure_text exp font_size / 2) in
+  draw_text exp exp_x (window_height - 150) font_size Color.white
 
 let draw_player_name p : unit =
   let font_size = 40 in
@@ -196,75 +199,138 @@ let draw_player_name p : unit =
   let name_x = center_x - (measure_text name font_size / 2) in
   draw_text name name_x 100 font_size Color.white
 
-let draw_player_hid p : unit =
-  let hid = Hidden_hand.hidden_hand_to_string (Player.get_hidden p) in
-  let font_size = 15 in
-  (* center of bottom of screen *)
-  let hid_x = center_x - (measure_text hid font_size / 2) in
-  (* 100 is hardcoded rn, will later change based on height of tile sprite *)
-  draw_text hid hid_x (window_height - 100) font_size Color.white
-
-let draw_player_exp p : unit =
-  let exp = Exposed_hand.exposed_hand_to_string (Player.get_exposed p) in
-  let font_size = 15 in
-  (* above hidden hand *)
-  let exp_x = center_x - (measure_text exp font_size / 2) in
-  (* 150 is hardcoded rn, will later change based on height of tile sprite *)
-  draw_text exp exp_x (window_height - 150) font_size Color.white
-
 let draw_all (gb : game_board) : unit =
   (* must call to start drawing on window *)
   begin_drawing ();
-
-  (* runs every game loop to ensure that no "traces" of objects are made *)
   clear_background Color.white;
 
-  draw_bg ();
-  draw_discard gb.discard;
+  let name_inputs = Array.copy gb.player_name_inputs in
+  let edit_modes = Array.copy gb.player_name_edit_mode in
+  let final_names = ref gb.player_names in
+  let init_done = ref gb.init_done in
+  let on_start_screen = ref gb.on_start_screen in
 
-  let p = List.nth gb.player_lst gb.cur_player in
-  draw_player_name p;
-  draw_player_hid p;
-  draw_player_exp p;
+  if !on_start_screen then begin
+    draw_background "res/images/among-us.png";
 
-  (* only render draw button when player has not drawn in turn yet && chi & peng
-     have not been selected *)
-  if not gb.is_drawn then draw_draw_button p gb;
+    (* Player name input boxes *)
+    let box_width = 200.0 in
+    let box_height = 35.0 in
+    let spacing = 15.0 in
+    let total_height = (box_height +. spacing) *. 4.0 in
+    let start_y =
+      (float_of_int window_height /. 2.0) -. (total_height /. 2.0)
+    in
+    for i = 0 to 3 do
+      let rect =
+        Rectangle.create
+          ((float_of_int window_width /. 2.0) -. (box_width /. 2.0))
+          (start_y +. (float_of_int i *. (box_height +. spacing)))
+          box_width box_height
+      in
+      let name, edit = text_box rect name_inputs.(i) edit_modes.(i) in
+      if edit && not edit_modes.(i) then (
+        for j = 0 to 3 do
+          edit_modes.(j) <- false
+        done;
+        edit_modes.(i) <- true);
+      name_inputs.(i) <- name
+    done;
 
-  (* todo: need extra game logic == stretch - only render chi & peng buttons
-     when discarded tile allows for possible combo with player hand && draw &
-     the other action have not been selected*)
-  if not gb.is_chi then draw_chi_button p gb;
-  if not gb.is_peng then draw_peng_button p gb;
+    (* START button *)
+    let button_width = 180.0 in
+    let button_height = 50.0 in
+    let button_x =
+      (float_of_int window_width /. 2.0) -. (button_width /. 2.0)
+    in
+    (* TODO: can simplify by using button object in raygui *)
+    let button_y = start_y +. (4.0 *. (box_height +. spacing)) +. 10.0 in
+    let button_rect =
+      Rectangle.create button_x button_y button_width button_height
+    in
+    let label = "START" in
+    let label_font_size = 24 in
+    let label_text_width = measure_text label label_font_size in
+    let label_x =
+      button_x +. (button_width /. 2.0) -. (float_of_int label_text_width /. 2.0)
+    in
+    let label_y =
+      button_y +. (button_height /. 2.0) -. (float_of_int label_font_size /. 2.0)
+    in
+    draw_rectangle_rounded button_rect 0.2 10 Color.darkgray;
+    draw_text label (int_of_float label_x) (int_of_float label_y)
+      label_font_size Color.white;
+    if
+      check_collision_point_rec (get_mouse_position ()) button_rect
+      && is_mouse_button_pressed MouseButton.Left
+    then begin
+      final_names := Some name_inputs;
+      (* create players here *)
+      gb.player_lst <-
+        List.mapi
+          (fun i name -> Player.create name (i + 1))
+          (Array.to_list name_inputs);
+      init_done := true;
+      on_start_screen := false;
+      for i = 0 to 3 do
+        edit_modes.(i) <- false
+      done
+    end;
+    Raygui.set_style (Button `Text_padding) 10;
 
-  (* if gb.chi_fail then draw_chi_fail (); if gb.peng_fail then draw_peng_fail
-     (); *)
+    (* reset padding *)
+    gb.player_name_inputs <- name_inputs;
+    gb.player_name_edit_mode <- edit_modes;
+    gb.player_names <- !final_names;
+    gb.init_done <- !init_done;
+    gb.on_start_screen <- !on_start_screen
+  end
+  else begin
+    update_game_board gb;
+    draw_background "res/images/mahjong_pelt.jpg";
+    let p = List.nth gb.player_lst gb.cur_player_id in
+    draw_discard gb.discard;
+    draw_player_name p;
+    draw_player_hid p;
+    draw_player_exp p;
 
-  (* only render throw button when player has already drawn/chi/peng.
+    (* only render draw button when player has not drawn in turn yet && chi &
+       peng have not been selected *)
+    if not gb.is_drawn then draw_draw_button p gb;
 
-     updates current player index & resets all boolean states
+    (* todo: need extra game logic == stretch - only render chi & peng buttons
+       when discarded tile allows for possible combo with player hand && draw &
+       the other action have not been selected*)
+    if not gb.is_chi then draw_chi_button p gb;
+    if not gb.is_peng then draw_peng_button p gb;
+    if gb.chi_fail then draw_chi_fail ();
+    if gb.peng_fail then draw_peng_fail ();
 
-     tbh might not even need throw button *)
-  if gb.is_drawn || gb.is_peng || gb.is_chi then
-    if draw_throw_button p then (
-      gb.cur_player <- (gb.cur_player + 1) mod 4;
-      gb.is_drawn <- false;
-      gb.is_peng <- false;
-      gb.is_chi <- false);
-
-  (* todo: toggle to next player when throw is completed *)
+    (* only render throw button when player has already drawn/chi/peng. updates
+       current player index & resets all boolean states tbh might not even need
+       throw button *)
+    if gb.is_drawn || gb.is_peng || gb.is_chi then
+      if draw_throw_button p then (
+        gb.cur_player_id <- (gb.cur_player_id + 1) mod 4;
+        (*hardcoded 4 players*)
+        gb.is_drawn <- false;
+        gb.is_peng <- false;
+        gb.is_chi <- false)
+  end;
 
   (* done drawing: now show it *)
   end_drawing ()
+
+(* player_name_inputs = name_inputs; player_name_edit_mode = edit_modes;
+   player_names = !final_names; init_done = !init_done; on_start_screen =
+   !on_start_screen; *)
 
 (** Game loop: runs perpetually if user does not close window *)
 let rec loop gb =
   match window_should_close () with
   | true -> close_window ()
   | false ->
-      update_game_board gb;
       draw_all gb;
       loop gb
 
-(* called when gui.exe is run from terminal *)
 let () = setup () |> loop

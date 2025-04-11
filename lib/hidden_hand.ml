@@ -1,4 +1,5 @@
 open Tile
+open Printf
 
 type elem = tile
 (** The type of each element in the hidden hand. None corresponds to the absence
@@ -33,7 +34,7 @@ let get hh idx = hh.hand.(idx)
 (* match hh.hand.(idx) with | None -> raise (Invalid_argument "Tile does not
    exist") | Some tile -> tile *)
 
-let get_tile hh tile =
+let get_tile_index hh tile =
   match Array.find_index (fun x -> x = tile) hh.hand with
   | None -> raise (Invalid_argument "Index out of bounds")
   | Some x -> x
@@ -57,6 +58,15 @@ let remove hh tile =
       force_RI hh.hand;
       hh.size <- hh.size - 1
 
+let replace hh tile idx =
+  if Tile.tile_to_string tile = "Fake" then hh.size <- hh.size - 1;
+  match idx with
+  | x when x >= 13 -> discarded := tile :: !discarded
+  | x ->
+      let discarded_tile = hh.hand.(idx) in
+      hh.hand.(idx) <- tile;
+      discarded := discarded_tile :: !discarded
+
 let get_hand hh = hh.hand
 
 let make_hidden_hand hand =
@@ -65,6 +75,10 @@ let make_hidden_hand hand =
 let get_tiles hh = Array.to_list hh.hand
 
 let hidden_hand_to_string hh =
+  (*Just to help w the terminal debugging.*)
+  List.iter (printf "  %d   |") [ 1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13 ];
+  print_endline "";
+
   let s =
     List.fold_left
       (fun acc x -> acc ^ ", " ^ Tile.tile_to_string x)

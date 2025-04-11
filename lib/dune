@@ -1,4 +1,4 @@
 (library
  (name mahjong)
- (libraries str)
+ (libraries str ANSITerminal)
  (modules player tile hidden_hand player_choice exposed_hand dice))

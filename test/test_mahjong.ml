@@ -3,11 +3,11 @@ open Mahjong
 open Utilities
 open QCheck
 
-let tile_test fn print name expected_val =
+let tile_test fn expected_val print name =
   name >:: fun _ -> assert_equal fn expected_val ~printer:print
 
-(*tests for any exception of type InvalidTile, the other way was forcing me to
-  have universal error messages.*)
+(**Tests for any exception of type InvalidTile, the other way was forcing me to
+   have universal error messages.*)
 let tile_test_raise name fn tile =
   name >:: fun _ ->
   try
@@ -17,17 +17,17 @@ let tile_test_raise name fn tile =
   | Tile.InvalidTile _ -> ()
   | e -> raise e
 
+(**Tests get_num function.*)
 let tile_num_test tile expected_val =
-  tile_test (Tile.get_num tile) string_of_int
+  tile_test (Tile.get_num tile) expected_val string_of_int
     ("get_num test: " ^ Tile.tile_to_string tile)
-    expected_val
 
+(**Tests get_tao function.*)
 let tile_suit_test tile (expected_val : string) =
-  tile_test
+  tile_test expected_val
     (Tile.suit_to_string (Tile.get_tao tile))
     (fun x -> x)
     ("get_suit test: " ^ Tile.tile_to_string tile)
-    expected_val
 
 (** [make_tile_test num suit] verifies the properties of a tile via qcheck. It
     checks if the tile's tao/suit matches [suit], and its number is [num].*)
@@ -36,19 +36,22 @@ let make_tile_test num suit =
   Tile.get_num tile = num && Tile.get_tao tile = suit
 
 let tile_tests =
+  (*Tests that will be applied on various selected tiles, refer to
+    Utilities.ml*)
   List.map (fun (a, b, c) -> tile_num_test a c) Utilities.test_tiles
   @ List.map (fun (a, b, c) -> tile_suit_test a b) Utilities.test_tiles
   @ List.map
       (fun a ->
         tile_test_raise ("make tile fail test " ^ a) Tile.string_to_tile a)
       Utilities.test_bad_tiles
-  @ [
-      (* tile_num_test tile expected_val; *)
-      ( "test init_tiles length" >:: fun _ ->
-        let tiles = Tile.init_tiles () in
-        assert_equal 136 (Array.length tiles) ~printer:string_of_int );
-      (* qtest (make_tile_test 1) 100; *)
-    ]
+  @
+  (*Tests that are moreso invariant checkers / one-time cases*)
+  [
+    tile_test
+      (Array.length (Tile.init_tiles ()))
+      136 string_of_int "test init_tiles length";
+    (* qtest (make_tile_test 1) 100; *)
+  ]
 
 let tests =
   "test suite"

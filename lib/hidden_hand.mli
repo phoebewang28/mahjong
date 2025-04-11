@@ -21,7 +21,7 @@ val get : hidden_hand -> int -> tile
     [Invalid_argument] if there is no tile at [idx], or if [idx ] is greater than
     13 (max hand size is 14). *)
 
-val get_tile : hidden_hand -> tile -> int
+val get_tile_index : hidden_hand -> tile -> int
 (** [get_tile hh tile] returns the index of Tile [tile] in the player's hand.
     Raises [Invalid_argument] if [tile] is not in the player's hand. *)
 
@@ -34,6 +34,11 @@ val add : hidden_hand -> Tile.tile -> unit
 val remove : hidden_hand -> tile -> unit
 (** [remove hh tile] removes Tile [tile] from the player's hand. Raises
     [Invalid_argument] if [tile] is not in player's hand. *)
+
+val replace : hidden_hand -> tile -> int -> unit
+(** [replace hh tile idx] replaces the tile at [idx] from the player's hand. If
+    [idx] is equal to 13, then [tile] is discarded. If [tile] is "Fake", then
+    the hand size is decremented. *)
 
 val make_hidden_hand : Tile.tile list -> hidden_hand
 (** [make_hidden_hand tiles] creates a hidden hand from a list of tiles. *)
