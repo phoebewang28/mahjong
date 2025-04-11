@@ -19,6 +19,9 @@ val choose_move : player -> unit
 val chi_check : hidden_hand -> bool
 (** [chi_check hand] returns true if a player's [hand] can chi *)
 
+val peng_check : hidden_hand -> bool
+(** [peng_check hand] returns true if a player's [hand] can peng *)
+
    val chi : player -> bool
    (** [chi hid ex] takes in hidden hand [hid] of player, and exposed hand [ex] of
        player.

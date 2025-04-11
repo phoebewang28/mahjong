@@ -132,6 +132,18 @@ let chi_check (hand : hidden_hand) : bool =
   then true
   else false
 
+let peng_check (hand : hidden_hand) : bool =
+  let counter = ref 0 in
+  let dis = List.hd !discarded in
+  let rec count_tiles h =
+    match h with
+    | [] -> 0
+    | h :: t ->
+        if h = dis then counter := !counter + 1;
+        count_tiles t
+  in
+  if count_tiles (get_tiles hand) >= 2 then true else false
+
 let chi (player : player) : bool =
   let hid = get_hidden player in
   let ex = get_exposed player in
