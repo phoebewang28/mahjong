@@ -82,6 +82,7 @@ val make_group : string -> group
       exception if not. *)
 
 val suit_to_string : suit -> string
+val string_to_suit : string -> suit
 
 val tile_to_string : tile -> string
 (** [tile_to_string t] returns string representation of tile
