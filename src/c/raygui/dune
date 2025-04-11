@@ -1,0 +1,41 @@
+(library
+ (name raygui_c)
+ (package raygui)
+ (ctypes
+  (external_library_name raylib)
+  (build_flags_resolver
+   (vendored
+    (c_flags :standard "-I../vendor/raygui/src" "-I../vendor/raylib/src")
+    (c_library_flags :standard)))
+  (headers
+   (include "raygui.h" "raylib.h"))
+  (type_description
+   (instance Types)
+   (functor Types))
+  (function_description
+   (instance Functions)
+   (functor Functions))
+  (generated_types Raygui_types_generated)
+  (generated_entry_point Raygui_generated))
+ (foreign_stubs
+  (language c)
+  (names raygui_impl)
+  (include_dirs ../vendor/raygui/src ../vendor/raylib/src))
+ (libraries raylib))
+
+;; dune's ctypes stanza cannot deal with header only libraries which pull in the
+;; implementation by a define, once. We solve it by creating a c-file with the
+;; implementation and using it as a foreign_stub
+
+(rule
+ (targets raygui_impl.c)
+ (deps
+  (source_tree ../vendor/raygui)
+  (source_tree ../vendor/raylib))
+ (action
+  (with-stdout-to
+   raygui_impl.c
+   (progn
+    (echo "#define RAYGUI_IMPLEMENTATION\n")
+    (echo "#define RAYGUI_SUPPORT_ICONS\n")
+    (echo "#include \"raygui.h\"\n")))))

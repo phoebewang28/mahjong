@@ -1,9 +1,11 @@
 (* GUI version of main *)
 
 open Raylib
+open Raygui
+open Mahjong
 
 type game_board = {
-  player_hid : string;
+  player_hid : string; (* hidden hand of CURRENT player *)
   player_exp : string;
   discard : string; (*for now, just one*)
 }
@@ -15,6 +17,34 @@ let window_height = 600
 let center_x = window_width / 2
 
 let center_y = window_height / 2
+(* 
+let draw_draw_button : unit =
+  let rect = Raylib.Rectangle.create (float_of_int window_width -. 100.) (float_of_int window_height -. 200.) 40.0 20.0 in
+  Raygui.button rect "Draw Tile" *)
+
+
+(** [make_player] initializes a player with a certain index *)
+let make_player id =
+  (* TODO: get player name *)
+  let player = Player.create "Player placeholder name" id in
+  player
+
+
+(** set up starting state of mahjong: all 4 players have tiles, no discards 
+
+returns value for player_hid & player_exp fields of game_board in a tuple *)
+let init_tiles () = 
+    (* Initialize the players' hands with tiles from the shuffled deck *)
+    Random.self_init ();
+    let _ = Tile.init_tiles () in
+    Tile.shuffle !Tile.tiles_arr;
+    let p1 = make_player 1 in
+    (* let p2 = make_player 2 in
+    let p3 = make_player 3 in
+    let p4 = make_player 4 in *)
+    ((Hidden_hand.hidden_hand_to_string (Player.get_hidden p1)), (Exposed_hand.exposed_hand_to_string (Player.get_exposed p1)))
+
+
 
 (** type definition containing every object that is within game environment
     (aka. on screen)
@@ -32,9 +62,10 @@ let setup () : game_board =
   set_config_flags [ ConfigFlags.Window_resizable ];
   (* allows for user to resize screen *)
   set_target_fps 60;
+  let (p_hid, p_exp) = init_tiles () in
   {
-    player_hid = "Player Hidden: ";
-    player_exp = "Exposed: ";
+    player_hid = p_hid;
+    player_exp = p_exp;
     discard = "discarded";
   }
 
@@ -42,8 +73,8 @@ let setup () : game_board =
     need to update yet *)
 let update_game_board (gb : game_board) : game_board =
   {
-    player_hid = gb.player_hid ^ "+";
-    player_exp = gb.player_exp ^ "-";
+    player_hid = gb.player_hid; (* same rn, will update later once player can move in gui *)
+    player_exp = gb.player_exp;
     discard = gb.discard;
   }
 
@@ -74,14 +105,14 @@ let draw_discard dis : unit =
   draw_text dis dis_x center_y font_size Color.red
 
 let draw_player_hid hid : unit =
-  let font_size = 30 in
+  let font_size = 15 in
   (* center of bottom of screen *)
   let hid_x = center_x - (measure_text hid font_size / 2) in
   (* 100 is hardcoded rn, will later change based on height of tile sprite *)
   draw_text hid hid_x (window_height - 100) font_size Color.white
 
 let draw_player_exp exp : unit =
-  let font_size = 30 in
+  let font_size = 15 in
   (* above hidden hand *)
   let exp_x = center_x - (measure_text exp font_size / 2) in
   (* 150 is hardcoded rn, will later change based on height of tile sprite *)
