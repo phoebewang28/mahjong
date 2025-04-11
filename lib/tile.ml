@@ -199,3 +199,22 @@ let compare_tile t1 t2 =
 
 let fake_tile = { num = 3110; tao = Fake }
 (* used to represent a tile that doesn't exist, for testing purposes *)
+
+let tile_to_key (t : tile) : string =
+  match t.tao with
+  | Tong -> Printf.sprintf "%dtong" t.num
+  | Wan -> Printf.sprintf "%dwan" t.num
+  | Tiao -> Printf.sprintf "%dtiao" t.num
+  | DaPai dp -> (
+      match dp with
+      | Dong -> "dong"
+      | Nan -> "nan"
+      | Xi -> "xi"
+      | Bei -> "bei"
+      | Zhong -> "zhong"
+      | Fa -> "fa"
+      | Bai -> "bai")
+  | Fake -> "fake"
+
+let tile_list_to_keys (tiles : tile list) : string list =
+  List.sort compare_tile tiles |> List.map tile_to_key

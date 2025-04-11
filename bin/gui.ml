@@ -13,20 +13,91 @@ type start_board = {
   mutable player_name_edit_mode : bool array;
 }
 
+(* Tile image handling *)
+let tile_image_table : (string, Texture2D.t) Hashtbl.t = Hashtbl.create 50
+
+let tile_keys =
+  [
+    "1tong";
+    "2tong";
+    "3tong";
+    "4tong";
+    "5tong";
+    "6tong";
+    "7tong";
+    "8tong";
+    "9tong";
+    "1wan";
+    "2wan";
+    "3wan";
+    "4wan";
+    "5wan";
+    "6wan";
+    "7wan";
+    "8wan";
+    "9wan";
+    "1tiao";
+    "2tiao";
+    "3tiao";
+    "4tiao";
+    "5tiao";
+    "6tiao";
+    "7tiao";
+    "8tiao";
+    "9tiao";
+    "dong";
+    "nan";
+    "xi";
+    "bei";
+    "zhong";
+    "fa";
+    "bai";
+  ]
+
+let load_tile_images () =
+  List.iter
+    (fun key ->
+      let path = Printf.sprintf "res/images/tile/%s.png" key in
+      let tex = load_texture path in
+      Hashtbl.add tile_image_table key tex;
+      print_endline (Printf.sprintf "Loaded %s" key))
+    tile_keys
+
+let get_tile_texture key = Hashtbl.find_opt tile_image_table key
+
+let draw_tile_list_from_keys keys x0 y0 =
+  let scale = 0.04 in
+  let x = ref (float_of_int x0) in
+  List.iter
+    (fun key ->
+      match get_tile_texture key with
+      | Some tex ->
+          let tex_w = float_of_int (Texture2D.width tex) *. scale in
+          draw_texture_ex tex
+            (Vector2.create !x (float_of_int y0))
+            0.0 scale Color.white;
+          x := !x +. tex_w
+      | None ->
+          draw_text "?" (int_of_float !x) y0 20 Color.red;
+          x := !x +. 40.0)
+    keys
+
 type game_board = {
   mutable player_lst : Player.player list;
   mutable cur_player_id : int; (* index of current player: 0,1,2,3 *)
   mutable player_hid : Hidden_hand.hidden_hand;
-      (* hidden hand of CURRENT player *)
   mutable player_exp : Exposed_hand.exposed_hand;
-  mutable discard : string; (*for now, just one*)
+  mutable discard : string;
   mutable is_drawn : bool;
-      (* state to track if drawn button is already clicked -> if true, will
-         render draw; if false, will not *)
   mutable is_chi : bool;
   mutable is_peng : bool;
   mutable chi_fail : bool;
   mutable peng_fail : bool;
+  mutable player_name_inputs : string array;
+  mutable player_name_edit_mode : bool array;
+  mutable player_names : string array option;
+  mutable init_done : bool;
+  mutable on_start_screen : bool;
 }
 
 let window_width = 800
@@ -61,13 +132,6 @@ let draw_chi_button p gb =
       gb.is_chi <- true;
       gb.is_drawn <- true)
     else draw_chi_fail ()
-(* gb.chi_fail <- true; *)
-(* i dont know how to do promise oof
-      
-      Lwt.async (fun () ->
-          Lwt_unix.sleep 0.5 >>= fun () ->
-          gb.chi_fail <- false;
-          Lwt.return_unit)) *)
 
 let draw_peng_button p gb =
   let rect =
@@ -92,8 +156,7 @@ let draw_draw_button p gb =
       100.0 70.0
   in
   let is_draw_clicked = Raygui.button rect "Draw Tile" in
-  if is_draw_clicked then (* update player's hidden hand *)
-    (
+  if is_draw_clicked then (
     Player_choice.draw p;
     gb.is_peng <- true;
     gb.is_chi <- true;
@@ -134,6 +197,7 @@ let setup_start () : start_board =
   (* todo: fix resizing bug *)
   init_window window_width window_height "OCaMahJong";
   set_target_fps 60;
+  load_tile_images ();
   {
     player_name_inputs = [| "Player 1"; "Player 2"; "Player 3"; "Player 4" |];
     player_name_edit_mode = [| false; false; false; false |];
@@ -151,25 +215,34 @@ let setup_game name_arr : game_board =
   init_tiles ();
 
   let p_lst = create_players name_arr in
+  let first_player = List.nth p_lst 0 in
   {
     player_lst = p_lst;
     cur_player_id = 0;
     (* starts /w 1st player*)
-    player_hid = Player.get_hidden (List.nth p_lst 0);
-    player_exp = Player.get_exposed (List.nth p_lst 0);
+    player_hid = Player.get_hidden first_player;
+    player_exp = Player.get_exposed first_player;
     discard = "";
     is_drawn = false;
     is_chi = false;
     is_peng = false;
     chi_fail = false;
     peng_fail = false;
+    player_name_inputs = name_arr;
+    player_name_edit_mode = [| false; false; false; false |];
+    player_names = Some name_arr;
+    init_done = true;
+    on_start_screen = false;
   }
 
 (** Updates current [gb] with new fields after player's actions *)
 let update_game_board (gb : game_board) : unit =
   gb.player_hid <- Player.get_hidden (List.nth gb.player_lst gb.cur_player_id);
   gb.player_exp <- Player.get_exposed (List.nth gb.player_lst gb.cur_player_id);
-  gb.discard <- Tile.tile_to_string (List.hd !Tile.discarded)
+  gb.discard <-
+    (if List.length !Tile.discarded > 0 then
+       Tile.tile_to_string (List.hd !Tile.discarded)
+     else "")
 
 (** [draw_bg f] draws background onto window screen using image in [filename] *)
 let draw_bg filename =
@@ -189,17 +262,18 @@ let draw_discard dis =
   let dis_x = center_x - (measure_text dis font_size / 2) in
   draw_text dis dis_x center_y font_size Color.red
 
+(* Combining both drawing approaches *)
 let draw_player_hid p : unit =
-  let hid = Hidden_hand.hidden_hand_to_string (Player.get_hidden p) in
-  let font_size = 15 in
-  let hid_x = center_x - (measure_text hid font_size / 2) in
-  draw_text hid hid_x (window_height - 100) font_size Color.white
+  let hidden_hand = Player.get_hidden p in
+  let tiles = Hidden_hand.get_tiles hidden_hand in
+  let keys = Tile.tile_list_to_keys tiles in
+  draw_tile_list_from_keys keys (center_x - 350) (window_height - 100)
 
 let draw_player_exp p : unit =
-  let exp = Exposed_hand.exposed_hand_to_string (Player.get_exposed p) in
-  let font_size = 15 in
-  let exp_x = center_x - (measure_text exp font_size / 2) in
-  draw_text exp exp_x (window_height - 150) font_size Color.white
+  let exposed_hand = Player.get_exposed p in
+  let tiles = Exposed_hand.get_tiles exposed_hand in
+  let keys = Tile.tile_list_to_keys tiles in
+  draw_tile_list_from_keys keys (center_x - 200) (window_height - 160)
 
 let draw_player_name p : unit =
   let font_size = 40 in
