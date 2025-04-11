@@ -18,7 +18,7 @@ val init_hidden_hand : Tile.tile list -> hidden_hand
 
 val get : hidden_hand -> int -> tile
 (** [get hh idx] returns the tile stored at index [idx]. Raises
-    [Invalid_argument] if there is no tile at [idx], or if [idx] is greater than
+    [Invalid_argument] if there is no tile at [idx], or if [idx ] is greater than
     13 (max hand size is 14). *)
 
 val get_tile_index : hidden_hand -> tile -> int
