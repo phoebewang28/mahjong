@@ -78,7 +78,7 @@ let draw_tile_list_from_keys keys x0 y0 =
             0.0 scale Color.white;
           x := !x +. tex_w
       | None ->
-          draw_text "?" (int_of_float !x) y0 20 Color.red;
+          draw_text " " (int_of_float !x) y0 20 Color.red;
           x := !x +. 40.0)
     keys
 
@@ -88,7 +88,7 @@ type game_board = {
   mutable player_hid : Hidden_hand.hidden_hand;
       (* hidden hand of CURRENT player *)
   mutable player_exp : Exposed_hand.exposed_hand;
-  mutable discard : string;
+  mutable discard : Tile.tile option;
   mutable is_drawn : bool;
   mutable is_chi : bool;
   mutable is_peng : bool;
@@ -123,6 +123,8 @@ let draw_chi_button p gb =
   let is_chi_clicked = Raygui.button rect "Chi Tile" in
   if is_chi_clicked then
     if Player_choice.chi p then (
+      Tile.discarded := [];
+
       gb.is_peng <- true;
       (* also disable other actions *)
       gb.is_chi <- true;
@@ -144,6 +146,7 @@ let draw_peng_button p gb =
   let is_peng_clicked = Raygui.button rect "Peng Tile" in
   if is_peng_clicked then
     if Player_choice.chi p then (
+      Tile.discarded := [];
       gb.is_peng <- true;
       gb.is_chi <- true;
       gb.is_drawn <- true)
@@ -224,7 +227,7 @@ let setup_game name_arr : game_board =
     (* starts /w 1st player*)
     player_hid = Player.get_hidden first_player;
     player_exp = Player.get_exposed first_player;
-    discard = "";
+    discard = None;
     is_drawn = false;
     is_chi = false;
     is_peng = false;
@@ -237,10 +240,9 @@ let update_game_board (gb : game_board) : unit =
   gb.player_hid <- Player.get_hidden (List.nth gb.player_lst gb.cur_player_id);
   gb.player_exp <- Player.get_exposed (List.nth gb.player_lst gb.cur_player_id);
   gb.discard <-
-  (* start from > 1 cuz 3110 Tong is always gonna be first *)
-    (if List.length !Tile.discarded > 1 then
-       Tile.tile_to_string (List.hd !Tile.discarded)
-     else "")
+    (* start from > 1 cuz 3110 Tong is always gonna be first *)
+    (if List.length !Tile.discarded > 1 then Some (List.hd !Tile.discarded)
+     else None)
 
 (** [draw_bg f] draws background onto window screen using image in [filename] *)
 let draw_bg filename =
@@ -255,12 +257,23 @@ let draw_bg filename =
   let max_scale = max scale_x scale_y in
   draw_texture_ex background (Vector2.create 0. 0.) 0. max_scale Color.white
 
-let draw_discard dis =
-  let font_size = 30 in
-  let dis_x = center_x - (measure_text dis font_size / 2) in
-  draw_text dis dis_x center_y font_size Color.red
+(* let draw_discard dis = let font_size = 30 in let dis_x = center_x -
+   (measure_text dis font_size / 2) in draw_text dis dis_x center_y font_size
+   Color.red *)
 
-(* Combining both drawing approaches *)
+let draw_discard_tile (tile_opt : Tile.tile option) =
+  match tile_opt with
+  | Some tile -> (
+      let scale = 0.04 in
+      let key = Tile.tile_to_key tile in
+      let x = float_of_int center_x in
+      let y = float_of_int center_y in
+      match get_tile_texture key with
+      | Some tex ->
+          draw_texture_ex tex (Vector2.create x y) 0.0 scale Color.white
+      | None -> draw_text " " (int_of_float x) (int_of_float y) 30 Color.red)
+  | None -> ()
+
 let draw_player_hid p : unit =
   let hidden_hand = Player.get_hidden p in
   let tiles = Hidden_hand.get_tiles hidden_hand in
@@ -271,7 +284,9 @@ let draw_player_exp p : unit =
   let exposed_hand = Player.get_exposed p in
   let tiles = Exposed_hand.get_tiles exposed_hand in
   let keys = Tile.tile_list_to_keys tiles in
-  draw_tile_list_from_keys keys (center_x - 200) (window_height - 160)
+  Printf.printf "Exposed hand keys:\n";
+  List.iter (fun k -> Printf.printf " - %s\n" k) keys;
+  draw_tile_list_from_keys keys (center_x - 300) (window_height - 200)
 
 let draw_player_name p : unit =
   let font_size = 40 in
@@ -340,7 +355,7 @@ let draw_all_game (gb : game_board) : unit =
   draw_bg "res/images/mahjong_pelt.jpg";
 
   let p = List.nth gb.player_lst gb.cur_player_id in
-  draw_discard gb.discard;
+  draw_discard_tile gb.discard;
   draw_player_name p;
   draw_player_hid p;
   draw_player_exp p;

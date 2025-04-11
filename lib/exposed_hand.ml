@@ -23,7 +23,7 @@ let get_tiles (e : exposed_hand) : tile list =
     (List.map
        (fun (g, t) ->
          match group_to_string g with
-         | "Shun" ->
+         | "ShunZi" ->
              let n = get_num t in
              if n <= 7 then
                [
@@ -32,8 +32,8 @@ let get_tiles (e : exposed_hand) : tile list =
                  make_tile (n + 2) (get_tao t);
                ]
              else []
-         | "San" -> [ t; t; t ]
-         | "Si" -> [ t; t; t; t ]
+         | "KeZi" -> [ t; t; t ]
+         | "Gang" -> [ t; t; t; t ]
          | _ -> [])
        !e)
 
