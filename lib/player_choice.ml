@@ -46,7 +46,7 @@ let draw (player : player) : unit =
   add hidden_hand tile;
   curr_index := !curr_index + 1;
   ANSITerminal.printf [ blue ] "Tile added at index: %d\n"
-    (get_tile hidden_hand tile);
+    (get_tile_index hidden_hand tile);
   throw player
 
 let comp_tiles t1 t2 = get_num t1 - get_num t2
