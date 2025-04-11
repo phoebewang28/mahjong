@@ -3,61 +3,182 @@
 open Raylib
 open Raygui
 open Mahjong
+open Lwt
+
+(* tiles might wanna be buttons, since we have to click to select it *)
+
+type start_board = {
+  mutable on_start_screen : bool;
+  mutable player_name_inputs : string array;
+  mutable player_name_edit_mode : bool array;
+}
 
 type game_board = {
-  player_hid : string;
-  player_exp : string;
-  discard : string;
-  player_name_inputs : string array;
-  player_name_edit_mode : bool array;
-  player_names : string array option;
-  init_done : bool;
-  current_player_index : int;
-  on_start_screen : bool;
-  players : Player.player array option;
+  mutable player_lst : Player.player list;
+  mutable cur_player_id : int; (* index of current player: 0,1,2,3 *)
+  mutable player_hid : Hidden_hand.hidden_hand;
+      (* hidden hand of CURRENT player *)
+  mutable player_exp : Exposed_hand.exposed_hand;
+  mutable discard : string; (*for now, just one*)
+  mutable is_drawn : bool;
+      (* state to track if drawn button is already clicked -> if true, will
+         render draw; if false, will not *)
+  mutable is_chi : bool;
+  mutable is_peng : bool;
+  mutable chi_fail : bool;
+  mutable peng_fail : bool;
 }
-(** [game_board] represents the state of the visible game interface. *)
 
 let window_width = 800
 let window_height = 600
 let center_x = window_width / 2
 let center_y = window_height / 2
 
+let create_players name_arr : Player.player list =
+  List.mapi (fun i name -> Player.create name (i + 1)) (Array.to_list name_arr)
+
+let draw_chi_fail () : unit =
+  draw_text "Chi was unsuccessful!" 200 200 30 Color.white
+
+let draw_peng_fail () : unit =
+  draw_text "Peng was unsuccessful!" 200 200 30 Color.white
+
+(* todo: prob try combining into a list *)
+
+(* todo: game logic: must check if CAN chi first b4 rendering!! *)
+let draw_chi_button p gb =
+  let rect =
+    Raylib.Rectangle.create
+      (float_of_int window_width -. 300.)
+      (float_of_int window_height -. 400.)
+      100.0 70.0
+  in
+  (* note: button in raygui automatically accounts for user's mouse position &
+     when clicked *)
+  let is_chi_clicked = Raygui.button rect "Chi Tile" in
+  if is_chi_clicked then
+    if Player_choice.chi p then (
+      gb.is_peng <- true;
+      (* also disable other actions *)
+      gb.is_chi <- true;
+      gb.is_drawn <- true)
+    else draw_chi_fail ()
+(* gb.chi_fail <- true; *)
+(* i dont know how to do promise oof
+      
+      Lwt.async (fun () ->
+          Lwt_unix.sleep 0.5 >>= fun () ->
+          gb.chi_fail <- false;
+          Lwt.return_unit)) *)
+
+let draw_peng_button p gb =
+  let rect =
+    Raylib.Rectangle.create
+      (float_of_int window_width -. 300.)
+      (float_of_int window_height -. 300.)
+      100.0 70.0
+  in
+  (* note: button in raygui automatically accounts for user's mouse position &
+     when clicked *)
+  let is_peng_clicked = Raygui.button rect "Peng Tile" in
+  if is_peng_clicked then
+    if Player_choice.chi p then (
+      gb.is_peng <- true;
+      (* also disable other actions *)
+      gb.is_chi <- true;
+      gb.is_drawn <- true)
+    else draw_peng_fail ()
+
+(** Effect: when player [p] clicks draw button, returns updated player hand *)
+let draw_draw_button p gb =
+  let rect =
+    Raylib.Rectangle.create
+      (float_of_int window_width -. 300.)
+      (float_of_int window_height -. 200.)
+      100.0 70.0
+  in
+  (* note: button in raygui automatically accounts for user's mouse position &
+     when clicked *)
+  let is_draw_clicked = Raygui.button rect "Draw Tile" in
+  if is_draw_clicked then (* update player's hidden hand -> add card *)
+    (
+    Player_choice.draw p;
+    gb.is_peng <- true;
+    (* also disable other actions *)
+    gb.is_chi <- true;
+    gb.is_drawn <- true)
+
+(** Effect: when player [p] clicks throw button, returns true if thrown is
+    completed. *)
+let draw_throw_button p : bool =
+  let rect =
+    Raylib.Rectangle.create
+      (float_of_int window_width -. 300.)
+      (float_of_int window_height -. 500.)
+      100.0 70.0
+  in
+  (* note: button in raygui automatically accounts for user's mouse position &
+     when clicked *)
+  let is_throw_clicked = Raygui.button rect "Throw Tile" in
+  if is_throw_clicked then (
+    Player_choice.throw p;
+    true)
+  else false
+
 (** [make_player id name] creates a player with the given [id] and [name]. *)
 let make_player id name = Player.create name id
 
-(** Initializes player hands and the tile pool. *)
+(** set up starting state of mahjong: all 4 players have tiles, no discards *)
 let init_tiles () =
+  (* Initialize the players' hands with tiles from the shuffled deck *)
   Random.self_init ();
   let _ = Tile.init_tiles () in
-  Tile.shuffle !Tile.tiles_arr;
-  let p1 = make_player 1 "Placeholder" in
-  ( Hidden_hand.hidden_hand_to_string (Player.get_hidden p1),
-    Exposed_hand.exposed_hand_to_string (Player.get_exposed p1) )
+  Tile.shuffle !Tile.tiles_arr
 
-(** Initializes the game window and GUI state *)
-let setup () : game_board =
+(* should only be called ONCE *)
+let setup_start () : start_board =
   init_window window_width window_height "OCaMahJong";
   set_config_flags [ ConfigFlags.Window_resizable ];
   set_target_fps 60;
-  let p_hid, p_exp = init_tiles () in
   {
-    player_hid = p_hid;
-    player_exp = p_exp;
-    discard = "discarded";
     player_name_inputs = [| "Player 1"; "Player 2"; "Player 3"; "Player 4" |];
     player_name_edit_mode = [| false; false; false; false |];
-    player_names = None;
-    init_done = false;
-    current_player_index = 0;
     on_start_screen = true;
-    players = None;
   }
 
-(** Updates the game board state. *)
-let update_game_board (gb : game_board) : game_board = gb
+(** Initialization of game window
 
-let draw_background filename =
+    should only be called ONCE
+
+    precondition: [name_arr] must already be initialized*)
+let setup_game name_arr : game_board =
+  init_tiles ();
+  (* tiles must be initialized b4 players created!! *)
+  let p_lst = create_players name_arr in
+
+  {
+    (* TODO: should split game boards *)
+    player_lst = p_lst;
+    cur_player_id = 0;
+    (* starts /w 1st player*)
+    player_hid = Player.get_hidden (List.nth p_lst 0);
+    player_exp = Player.get_exposed (List.nth p_lst 0);
+    discard = "";
+    is_drawn = false;
+    is_chi = false;
+    is_peng = false;
+    chi_fail = false;
+    peng_fail = false;
+  }
+
+(* todo should also prob put updating index here??? maybe not tho cuz need
+   condition *)
+let update_game_board (gb : game_board) : unit =
+  gb.player_hid <- Player.get_hidden (List.nth gb.player_lst gb.cur_player_id);
+  gb.player_exp <- Player.get_exposed (List.nth gb.player_lst gb.cur_player_id);
+  gb.discard <- Tile.tile_to_string (List.hd !Tile.discarded)
+
+let draw_bg filename =
   let background = load_texture filename in
   let scale_x =
     float_of_int window_width /. float_of_int (Texture2D.width background)
@@ -73,126 +194,140 @@ let draw_discard dis =
   let dis_x = center_x - (measure_text dis font_size / 2) in
   draw_text dis dis_x center_y font_size Color.red
 
-let draw_player_hid hid =
+let draw_player_hid p : unit =
+  let hid = Hidden_hand.hidden_hand_to_string (Player.get_hidden p) in
   let font_size = 15 in
   let hid_x = center_x - (measure_text hid font_size / 2) in
   draw_text hid hid_x (window_height - 100) font_size Color.white
 
-let draw_player_exp exp =
+let draw_player_exp p : unit =
+  let exp = Exposed_hand.exposed_hand_to_string (Player.get_exposed p) in
   let font_size = 15 in
   let exp_x = center_x - (measure_text exp font_size / 2) in
   draw_text exp exp_x (window_height - 150) font_size Color.white
 
-let draw_player_name (names_opt : string array option) (idx : int) =
-  match names_opt with
-  | Some names ->
-      let name = names.(idx) in
-      let font_size = 20 in
-      let name_x = center_x - (measure_text name font_size / 2) in
-      draw_text name name_x (center_y - 50) font_size Color.black
-  | None -> ()
+let draw_player_name p : unit =
+  let font_size = 40 in
+  let name = Player.get_name p in
+  let name_x = center_x - (measure_text name font_size / 2) in
+  draw_text name name_x 100 font_size Color.white
 
-(** Main GUI drawing logic *)
-let draw_all (gb : game_board) : game_board =
-  let players = ref gb.players in
+let draw_all_start (sb : start_board) : unit =
+  (* must call to start drawing on window *)
   begin_drawing ();
   clear_background Color.white;
 
-  let name_inputs = Array.copy gb.player_name_inputs in
-  let edit_modes = Array.copy gb.player_name_edit_mode in
-  let final_names = ref gb.player_names in
-  let init_done = ref gb.init_done in
-  let on_start_screen = ref gb.on_start_screen in
+  draw_bg "res/images/among-us.png";
 
-  if !on_start_screen then begin
-    draw_background "res/images/among-us.png";
-
-    (* Player name input boxes *)
-    let box_width = 200.0 in
-    let box_height = 35.0 in
-    let spacing = 15.0 in
-    let total_height = (box_height +. spacing) *. 4.0 in
-    let start_y =
-      (float_of_int window_height /. 2.0) -. (total_height /. 2.0)
+  (* Player name input boxes *)
+  let box_width = 200.0 in
+  let box_height = 35.0 in
+  let spacing = 15.0 in
+  let total_height = (box_height +. spacing) *. 4.0 in
+  let start_y = (float_of_int window_height /. 2.0) -. (total_height /. 2.0) in
+  for i = 0 to 3 do
+    let rect =
+      Rectangle.create
+        ((float_of_int window_width /. 2.0) -. (box_width /. 2.0))
+        (start_y +. (float_of_int i *. (box_height +. spacing)))
+        box_width box_height
     in
+    let name, edit =
+      Raygui.text_box rect sb.player_name_inputs.(i) sb.player_name_edit_mode.(i)
+    in 
+    if edit && not sb.player_name_edit_mode.(i) then (
+      for j = 0 to 3 do
+        sb.player_name_edit_mode.(j) <- false
+      done;
+      sb.player_name_edit_mode.(i) <- true);
+    sb.player_name_inputs.(i) <- name
+  done;
+
+  (* START button *)
+  let button_width = 180.0 in
+  let button_height = 50.0 in
+  let button_x = (float_of_int window_width /. 2.0) -. (button_width /. 2.0) in
+  (* TODO: can simplify by using button object in raygui *)
+  let button_y = start_y +. (4.0 *. (box_height +. spacing)) +. 10.0 in
+  let button_rect =
+    Rectangle.create button_x button_y button_width button_height
+  in
+  let is_start_clicked = Raygui.button button_rect "START" in
+  if is_start_clicked then begin
+    (* start button pressed todo: might want to take out and put elsewhere?? or
+       pull back create players here -> same properties so shouldnt separate *)
+    (* todo: check if these variables are necessary *)
+    sb.on_start_screen <- false;
     for i = 0 to 3 do
-      let rect =
-        Rectangle.create
-          ((float_of_int window_width /. 2.0) -. (box_width /. 2.0))
-          (start_y +. (float_of_int i *. (box_height +. spacing)))
-          box_width box_height
-      in
-      let name, edit = text_box rect name_inputs.(i) edit_modes.(i) in
-      if edit && not edit_modes.(i) then (
-        for j = 0 to 3 do
-          edit_modes.(j) <- false
-        done;
-        edit_modes.(i) <- true);
-      name_inputs.(i) <- name
-    done;
-
-    (* START button *)
-    let button_width = 180.0 in
-    let button_height = 50.0 in
-    let button_x =
-      (float_of_int window_width /. 2.0) -. (button_width /. 2.0)
-    in
-    let button_y = start_y +. (4.0 *. (box_height +. spacing)) +. 10.0 in
-    let button_rect =
-      Rectangle.create button_x button_y button_width button_height
-    in
-    let label = "START" in
-    let label_font_size = 24 in
-    let label_text_width = measure_text label label_font_size in
-    let label_x =
-      button_x +. (button_width /. 2.0) -. (float_of_int label_text_width /. 2.0)
-    in
-    let label_y =
-      button_y +. (button_height /. 2.0) -. (float_of_int label_font_size /. 2.0)
-    in
-    draw_rectangle_rounded button_rect 0.2 10 Color.darkgray;
-    draw_text label (int_of_float label_x) (int_of_float label_y)
-      label_font_size Color.white;
-    if
-      check_collision_point_rec (get_mouse_position ()) button_rect
-      && is_mouse_button_pressed MouseButton.Left
-    then begin
-      final_names := Some name_inputs;
-      let created_players =
-        Array.mapi (fun i name -> Player.create name (i + 1)) name_inputs
-      in
-      init_done := true;
-      on_start_screen := false;
-      players := Some created_players;
-      for i = 0 to 3 do
-        edit_modes.(i) <- false
-      done
-    end;
-    Raygui.set_style (Button `Text_padding) 10
-    (* reset padding *)
-  end
-  else begin
-    draw_background "res/images/mahjong_pelt.jpg";
-    draw_discard gb.discard;
-    draw_player_hid gb.player_hid;
-    draw_player_exp gb.player_exp;
-    draw_player_name gb.player_names gb.current_player_index
+      sb.player_name_edit_mode.(i) <- false
+    done
   end;
 
-  end_drawing ();
-  {
-    gb with
-    player_name_inputs = name_inputs;
-    player_name_edit_mode = edit_modes;
-    player_names = !final_names;
-    init_done = !init_done;
-    on_start_screen = !on_start_screen;
-    players = !players;
-  }
+  (* done drawing: now show it *)
+  end_drawing ()
 
-let rec loop (gb : game_board) =
+let draw_all_game (gb : game_board) : unit =
+  (* must call to start drawing on window *)
+  begin_drawing ();
+  clear_background Color.white;
+
+  update_game_board gb;
+  draw_bg "res/images/mahjong_pelt.jpg";
+
+  let p = List.nth gb.player_lst gb.cur_player_id in
+  draw_discard gb.discard;
+  draw_player_name p;
+  draw_player_hid p;
+  draw_player_exp p;
+
+  (* only render draw button when player has not drawn in turn yet && chi & peng
+     have not been selected *)
+  if not gb.is_drawn then draw_draw_button p gb;
+
+  (* todo: need extra game logic == stretch - only render chi & peng buttons
+     when discarded tile allows for possible combo with player hand && draw &
+     the other action have not been selected*)
+  if not gb.is_chi then draw_chi_button p gb;
+  if not gb.is_peng then draw_peng_button p gb;
+  if gb.chi_fail then draw_chi_fail ();
+  if gb.peng_fail then draw_peng_fail ();
+
+  (* only render throw button when player has already drawn/chi/peng. updates
+     current player index & resets all boolean states tbh might not even need
+     throw button *)
+  if gb.is_drawn || gb.is_peng || gb.is_chi then
+    if draw_throw_button p then (
+      gb.cur_player_id <- (gb.cur_player_id + 1) mod 4;
+      (*hardcoded 4 players*)
+      gb.is_drawn <- false;
+      gb.is_peng <- false;
+      gb.is_chi <- false);
+
+  (* done drawing: now show it *)
+  end_drawing ()
+
+(** start loop: runs perpetually if user does not hit "start button" or close
+    window
+
+    returns array of player names *)
+let rec start_loop (sb : start_board) : string array =
+  match window_should_close () with
+  | true ->
+      close_window ();
+      sb.player_name_inputs
+      (* doesnt do anything here, but just need to satisfy return type *)
+  | false ->
+      if sb.on_start_screen then (
+        draw_all_start sb;
+        start_loop sb)
+      else sb.player_name_inputs
+
+(** game loop: runs perpetually if user does not exit window *)
+let rec game_loop (gb : game_board) =
   match window_should_close () with
   | true -> close_window ()
-  | false -> update_game_board gb |> draw_all |> loop
+  | false ->
+      draw_all_game gb;
+      game_loop gb
 
-let () = setup () |> loop
+let () = setup_start () |> start_loop |> setup_game |> game_loop

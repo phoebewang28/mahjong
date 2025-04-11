@@ -2,4 +2,5 @@
  (public_name mahjong)
  (package mahjong)
  (name gui)
- (libraries mahjong ANSITerminal raylib raygui))
+ (libraries mahjong ANSITerminal raylib raygui lwt.unix)
+  (preprocess (pps lwt_ppx)))
