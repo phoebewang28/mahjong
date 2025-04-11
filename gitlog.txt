@@ -1,0 +1,436 @@
+commit 95f26ac1fc3e7fd3fa6426f7609ed3682ee7f4fa
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Fri Mar 28 11:20:28 2025 -0400
+
+    Added description & youtube video:
+    
+    - Description in INSTALL.md
+    - Youtube video of terminal mahjong in YAML
+
+commit 6465b3bd04783788e636ee274b0433c01fabb8fc
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Fri Mar 28 04:34:35 2025 -0400
+
+    Corrected chi & peng functionality
+
+commit 7a8b004ab59ce42c43fe08e5ca54114e135ad227
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Fri Mar 28 03:49:33 2025 -0400
+
+    SPENT 5 HOURS REWRITING EVERYTHING TOGETHER USING LIVESHARE
+    
+    - integrated all compilation units together
+    - fixed incompatibilities between compilation units
+    - implemented driver/tui
+    
+    - works now
+    - thank god
+    - good luck
+    - sacrificed sleep, blood, sweat, and tears
+    
+    jia you team lao gan o ca ma jiang ! :)
+    Co-authored-by: Phoebe Wang <phoebewang28@users.noreply.github.com>
+    Co-authored-by: Caedy Lee <c-lee13@users.noreply.github.com>
+    Co-authored-by: Albert Li<ajl396@cornell.edu@users.noreply.github.com>
+    Co-authored-by: Elinor Tu<ejt74@cornell.edu@users.noreply.github.com>
+
+commit 1ffab4bcce2b4c14cd6f0a929df4d6e1b2cedd90
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Fri Mar 28 01:25:19 2025 -0400
+
+    Updated functionality for player moves:
+    
+    - Changed draw & throw to use fxn from Hidden_hand
+    - Updated chi & peng to get discarded tile internally instead of using an argument
+
+commit a00e5b7d0774d8fb467ea0aafe4f22ee2497fc1a
+Merge: 198eb08 0aee6e6
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Fri Mar 28 01:09:27 2025 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:pw483/mahjong
+
+commit 198eb08c2904f8e5e3ade1d0312f6a175ad4539d
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Fri Mar 28 01:06:50 2025 -0400
+
+    changed throw and draw to not take in tile
+    
+    - will find tile itself
+
+commit 0aee6e6ecb5cea930091a3cbdc6ab73de2fafcd0
+Author: ajl396 <ajl396@cornell.edu>
+Date:   Fri Mar 28 00:54:41 2025 -0400
+
+    Modified Hidden Hand
+    - Modified implementation and specification of remove
+
+commit 3e6b46925633f8c583a6dee0b4be3795252166c8
+Merge: 7e49421 12997d8
+Author: pw483 <pw483@cornell.edu>
+Date:   Fri Mar 28 00:53:37 2025 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:pw483/cs3110
+
+commit 7e49421fe2b79fae5159b98d8ec23391bfa15b6d
+Author: pw483 <pw483@cornell.edu>
+Date:   Fri Mar 28 00:53:30 2025 -0400
+
+    Deal Implemented
+
+commit 12997d8e2a091cc6c543c02163102c3344329075
+Author: ajl396 <ajl396@cornell.edu>
+Date:   Fri Mar 28 00:49:35 2025 -0400
+
+    Modify Hidden Hand
+    - Fixed specification
+
+commit 0cd98b36ecf5541e8db178133e735980f6e8e403
+Merge: 640c6cb d2962fe
+Author: pw483 <pw483@cornell.edu>
+Date:   Fri Mar 28 00:47:38 2025 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:pw483/cs3110
+
+commit 640c6cb9e47fc9bf27fdbce25280fc7862be8eea
+Author: pw483 <pw483@cornell.edu>
+Date:   Fri Mar 28 00:47:31 2025 -0400
+
+    Driver Initialization
+    
+    - create players
+
+commit d2962fe0b8e6790105f52bed214f5f13cf958eca
+Merge: 5218f13 c496205
+Author: ajl396 <ajl396@cornell.edu>
+Date:   Fri Mar 28 00:45:49 2025 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:pw483/mahjong
+
+commit 5218f131dad3e4112c060a7ddacb03fb2dedb89a
+Author: ajl396 <ajl396@cornell.edu>
+Date:   Fri Mar 28 00:45:26 2025 -0400
+
+    Modified Hidden Hand
+    - Changed type names
+    - Added new implementations for hand modification
+    - Added specifications to .mli file
+
+commit c496205f3078375b1b5f791b3570e9b41fe7bfdd
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Fri Mar 28 00:31:16 2025 -0400
+
+    Refactor tile and exposed_hand modules for improved validation and documentation
+
+commit 2346fc4c84c3ad3c21e746766628f9f748dd5fbb
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Fri Mar 28 00:28:53 2025 -0400
+
+    Added authors in AUTHORS.md
+
+commit a2d6fd8bfa9f1419e8963ea12d9e6225b41e05de
+Author: pw483 <pw483@cornell.edu>
+Date:   Fri Mar 28 00:20:57 2025 -0400
+
+    Name + Made Hidden Open
+    
+    - Need hidden to deal
+
+commit 9c339067a3f8633a33e8c3dc2374315a4350a2ce
+Merge: f3a92be 6dc82c8
+Author: pw483 <pw483@cornell.edu>
+Date:   Fri Mar 28 00:20:08 2025 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:pw483/cs3110
+
+commit f3a92be9b88d8d99ad31b9e50957e40e0b7aa16d
+Author: pw483 <pw483@cornell.edu>
+Date:   Fri Mar 28 00:20:03 2025 -0400
+
+    Implemented Deal
+
+commit 6dc82c89f2c2770a7ed6611c60bb610b42d13910
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Fri Mar 28 00:18:30 2025 -0400
+
+    Enhance documentation for exposed_hand functions with detailed examples
+
+commit 5b4f1941092436feedf9ff6abbf59645d73c125a
+Merge: aeaa726 d663b37
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Fri Mar 28 00:18:20 2025 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:pw483/mahjong
+
+commit aeaa7266aa1b0103a9818a03a120c56375fb1b09
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Fri Mar 28 00:15:51 2025 -0400
+
+    Updated implementation of string_of_tile:
+    
+    - Added raise conditions
+    - Altered to mimic tile_of_string edge case for DaPais
+
+commit d663b37348396e7bce66ece43ee661016a813391
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Fri Mar 28 00:12:06 2025 -0400
+
+    Update the documentation for exposed hand and tile
+
+commit c267ea1c23685d22702b1cad23919a01bb79aa15
+Merge: 419fa28 4d40b62
+Author: ajl396 <ajl396@cornell.edu>
+Date:   Fri Mar 28 00:10:01 2025 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:pw483/mahjong
+
+commit 419fa283ad1c05ff337fa873eaf19648cbf0495b
+Author: ajl396 <ajl396@cornell.edu>
+Date:   Fri Mar 28 00:01:23 2025 -0400
+
+    Add Hidden Hand
+    - Implemented getter and setter functions for the array
+    - Included Tile comparison function
+
+commit 4d40b62c8732aefeefe6691b9f12cb2fd476b7fd
+Merge: 5680b16 d936b16
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Thu Mar 27 23:57:28 2025 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:pw483/mahjong
+
+commit d936b1630a5840cacfaa93eb51fec3a487ee61e7
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Thu Mar 27 23:55:30 2025 -0400
+
+    deleted type player from tile.mli
+
+commit 5680b16d76b493da75371ee04f0c27965c9ba9dd
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Thu Mar 27 23:54:57 2025 -0400
+
+    Changed chi & peng signatures:
+    
+    - Updated chi & peng functions to return exposed_hand, conforming to signature of exposed_hand (which is a list, instead of previously assumed array)
+
+commit dce637d58252103076320cd658f60208b7f0837d
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Thu Mar 27 23:50:58 2025 -0400
+
+    Add player unit
+    
+    - add the function needed to create and get the current state of the player
+    
+    Co-authored-by: Phoebe Wang <phoebewang28@users.noreply.github.com>
+
+commit 12b265ca18ea2421200970469587758243923bcf
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Thu Mar 27 23:41:41 2025 -0400
+
+    Moved exposed_hand types into Tiles:
+    
+    - Updated signatures of Tiles to include exposed_hand types
+
+commit f5a92ae944698b510d4f8993e4c3f7e74eea6eb5
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Thu Mar 27 23:25:37 2025 -0400
+
+    Removed types from exposed tiles
+
+commit cc8aff297b6ee7666b3b61a4c6122b3ef927e9ce
+Author: Phoebe Wang <134721943+phoebewang28@users.noreply.github.com>
+Date:   Thu Mar 27 23:22:34 2025 -0400
+
+    Implemented Make Tile
+
+commit 943bc3e2fdac9813ce0797843d17883953c7ab43
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Thu Mar 27 23:14:46 2025 -0400
+
+    Change basic_types to tiles
+    
+    Co-authored-by: Caedy Lee <c-lee13@users.noreply.github.com>
+    Co-authored-by: Phoebe Wang <phoebewang28@users.noreply.github.com>
+
+commit 131cfd6dc52c816094b1e6e821f461a030621421
+Merge: d4ffa9f 93e21d7
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Thu Mar 27 23:15:08 2025 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:pw483/mahjong
+
+commit d4ffa9f7e8b1f94ba40405036e12799de3e86001
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Thu Mar 27 23:14:17 2025 -0400
+
+    Removed basic tiles
+
+commit 93e21d7b9dd959c360ae1900255dfaf0f103c5db
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Thu Mar 27 23:14:17 2025 -0400
+
+    changed basic_types to tile
+
+commit f61accaa3c0a3d497dc2f85f4ce6bc8a212bcade
+Merge: aa253f1 881e03a
+Author: Phoebe Wang <134721943+phoebewang28@users.noreply.github.com>
+Date:   Thu Mar 27 23:02:36 2025 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:pw483/cs3110
+
+commit aa253f1c45e55c5df717cb24d788407f9bc74ac3
+Author: Phoebe Wang <134721943+phoebewang28@users.noreply.github.com>
+Date:   Thu Mar 27 23:00:49 2025 -0400
+
+    First Tile Implementation
+    
+    - Tiles_Arr: initialization, shuffle
+    - Discarded: initialized
+    - Other functions from basic_types
+
+commit 59894dfe355ede72e5d1021a1e681d208339457c
+Author: Phoebe Wang <134721943+phoebewang28@users.noreply.github.com>
+Date:   Thu Mar 27 22:58:56 2025 -0400
+
+    Merge? A Little Confused Here...
+    
+    - Not sure why it says I changed these files when I didn't.
+
+commit 6b59c93d165627d037392a6e0dfc503020f8b93e
+Author: Phoebe Wang <134721943+phoebewang28@users.noreply.github.com>
+Date:   Thu Mar 27 22:57:00 2025 -0400
+
+    Dice Implementation
+    
+    - Random Roll
+
+commit 881e03a9c216974e0667fddbb30e7c622860553e
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Wed Mar 26 16:59:47 2025 -0400
+
+    implemented draw, throw, and choose_move
+    
+    - added a string_to_tile functionality in basic_types
+    - discuss how player should input choice/tiles (currently by typing into command line)
+    - added player and group to basic_types
+
+commit abace5e6922c7888279e2f068d8bb4831c971fc7
+Merge: e0d0551 a846ac7
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Wed Mar 26 15:45:26 2025 -0400
+
+    Merge pull request #1 from pw483/chi-peng
+    
+    Chi peng
+
+commit a846ac754e4cc29a423178a64628d7a28652264f
+Author: clee-13 <caedylee@gmail.com>
+Date:   Wed Mar 26 15:42:49 2025 -0400
+
+    Implement peng functionality:
+    
+    - Encapsulated chi & peng user prompts
+    - Added input checks to select_tiles
+    - Added some comments to exposed_hand -> should review later
+
+commit 44984d5c1ab2b5108babb51b70fbafc3e55b1f5b
+Author: clee-13 <caedylee@gmail.com>
+Date:   Wed Mar 26 15:07:41 2025 -0400
+
+    Implement Chi functionality:
+    
+    - Altered Basic_types signature & added fxns to get number & suit of tile
+    - Wrote Special_move siganture for chi & peng
+    - Implemented Chi functionality (assumes existence of fxns from other modules)
+
+commit e0d0551956cdc76b4b3825eca3ba5d158d9a95c7
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Mon Mar 24 18:05:59 2025 -0400
+
+    Basic funtionality of exposed_hand
+    
+    - Defined types needed
+    - Implemtnted chi(left, midddle, right), peng, gang
+    - Implemented to_string for tile, group, and exposed hand
+
+commit 401f79c41da92b1001dd71fbe47d14b4f8d21e56
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Sat Mar 22 23:38:34 2025 -0400
+
+    added AUTHORS.md file
+
+commit f1d5e1aaae943675d6548ebc3b39745a44f1e961
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Sat Mar 22 22:46:01 2025 -0400
+
+    added files for assignment startup
+
+commit 4770e1d3b8c9d86502de372848c8ff1f1859c765
+Merge: cd929bb 6f99fa4
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Sat Mar 22 22:41:10 2025 -0400
+
+    Merge github.coecis.cornell.edu:pw483/mahjong
+    Initial commit
+
+commit cd929bb6dacec6c775ae6caaae5fd17800c403d0
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Sat Mar 22 22:36:42 2025 -0400
+
+    Initial commit
+
+commit 6f99fa4e62272cc85ccb8240e05eed3ff78bcfda
+Author: pw483 <pw483@cornell.edu>
+Date:   Fri Mar 21 11:30:21 2025 -0400
+
+    'Documentation' Template
+    
+    gallery.YAML
+    - youtube link needed later
+    - name/desc updates? how do we feel...
+    
+    INSTALL.md
+    - update with necessary packages to install/run method
+
+commit 773d99acc2577d59afbb73dbdfab7e5b8292e0c4
+Author: ajl396 <ajl396@cornell.edu>
+Date:   Fri Mar 7 16:50:43 2025 -0500
+
+    Update README.md
+
+commit 7edba873b507c7eb53ecab603e28ef8b057077df
+Author: pw483 <pw483@cornell.edu>
+Date:   Fri Mar 7 11:48:39 2025 -0500
+
+    Update README
+
+commit f00bc2e7d69f3b52051c32bc584f820ba1a51b80
+Merge: 69de7ba 2c3659a
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Fri Mar 7 11:44:16 2025 -0500
+
+    updated README.md
+
+commit 69de7ba4ab0c755bebf6864647f15014f6dd1d82
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Fri Mar 7 11:42:57 2025 -0500
+
+    updated README.md
+
+commit 2c3659ad2f39dcc19faea219b6e740d24bad69ed
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Fri Mar 7 11:42:33 2025 -0500
+
+    add name and net id
+
+commit ccd8a72f9b9e636163e407cfd56a3652a5d15e41
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Fri Mar 7 11:39:36 2025 -0500
+
+    Update README.md
+
+commit 09d6a3161b973c2dfd812cbefeb93c603d228049
+Author: Phoebe Wang <17995+pw483@users.noreply.github.coecis.cornell.edu>
+Date:   Fri Mar 7 11:15:16 2025 -0500
+
+    Initial commit
