@@ -5,7 +5,7 @@ open Raygui
 open Mahjong
 open Lwt
 
-(* tiles might wanna be buttons, since we have to click to select it *)
+(* todo: tiles might wanna be buttons, since we have to click to select it *)
 
 type start_board = {
   mutable on_start_screen : bool;
@@ -43,8 +43,6 @@ let draw_chi_fail () : unit =
 let draw_peng_fail () : unit =
   draw_text "Peng was unsuccessful!" 200 200 30 Color.white
 
-(* todo: prob try combining into a list *)
-
 (* todo: game logic: must check if CAN chi first b4 rendering!! *)
 let draw_chi_button p gb =
   let rect =
@@ -78,18 +76,14 @@ let draw_peng_button p gb =
       (float_of_int window_height -. 300.)
       100.0 70.0
   in
-  (* note: button in raygui automatically accounts for user's mouse position &
-     when clicked *)
   let is_peng_clicked = Raygui.button rect "Peng Tile" in
   if is_peng_clicked then
     if Player_choice.chi p then (
       gb.is_peng <- true;
-      (* also disable other actions *)
       gb.is_chi <- true;
       gb.is_drawn <- true)
     else draw_peng_fail ()
 
-(** Effect: when player [p] clicks draw button, returns updated player hand *)
 let draw_draw_button p gb =
   let rect =
     Raylib.Rectangle.create
@@ -97,14 +91,11 @@ let draw_draw_button p gb =
       (float_of_int window_height -. 200.)
       100.0 70.0
   in
-  (* note: button in raygui automatically accounts for user's mouse position &
-     when clicked *)
   let is_draw_clicked = Raygui.button rect "Draw Tile" in
-  if is_draw_clicked then (* update player's hidden hand -> add card *)
+  if is_draw_clicked then (* update player's hidden hand *)
     (
     Player_choice.draw p;
     gb.is_peng <- true;
-    (* also disable other actions *)
     gb.is_chi <- true;
     gb.is_drawn <- true)
 
@@ -117,8 +108,6 @@ let draw_throw_button p : bool =
       (float_of_int window_height -. 500.)
       100.0 70.0
   in
-  (* note: button in raygui automatically accounts for user's mouse position &
-     when clicked *)
   let is_throw_clicked = Raygui.button rect "Throw Tile" in
   if is_throw_clicked then (
     Player_choice.throw p;
@@ -128,17 +117,22 @@ let draw_throw_button p : bool =
 (** [make_player id name] creates a player with the given [id] and [name]. *)
 let make_player id name = Player.create name id
 
-(** set up starting state of mahjong: all 4 players have tiles, no discards *)
+(** Initialize tiles *)
 let init_tiles () =
-  (* Initialize the players' hands with tiles from the shuffled deck *)
   Random.self_init ();
   let _ = Tile.init_tiles () in
   Tile.shuffle !Tile.tiles_arr
 
-(* should only be called ONCE *)
+(** Setup for the starting interface and game window, returning initialized
+    [start_board]
+
+    Note: should only be called ONCE -> an entire mahjong game should have a
+    single [start_board] *)
 let setup_start () : start_board =
-  init_window window_width window_height "OCaMahJong";
+  (* only called once: start board & game board uses same window *)
   set_config_flags [ ConfigFlags.Window_resizable ];
+  (* todo: fix resizing bug *)
+  init_window window_width window_height "OCaMahJong";
   set_target_fps 60;
   {
     player_name_inputs = [| "Player 1"; "Player 2"; "Player 3"; "Player 4" |];
@@ -146,18 +140,18 @@ let setup_start () : start_board =
     on_start_screen = true;
   }
 
-(** Initialization of game window
+(** Setup for game interface, returning initialized [game_board]
 
-    should only be called ONCE
+    Note: should only be called once
 
-    precondition: [name_arr] must already be initialized*)
+    Precondition: [name_arr] must already be initialized *)
 let setup_game name_arr : game_board =
-  init_tiles ();
+  assert (Array.length name_arr <> 0);
   (* tiles must be initialized b4 players created!! *)
-  let p_lst = create_players name_arr in
+  init_tiles ();
 
+  let p_lst = create_players name_arr in
   {
-    (* TODO: should split game boards *)
     player_lst = p_lst;
     cur_player_id = 0;
     (* starts /w 1st player*)
@@ -171,13 +165,13 @@ let setup_game name_arr : game_board =
     peng_fail = false;
   }
 
-(* todo should also prob put updating index here??? maybe not tho cuz need
-   condition *)
+(** Updates current [gb] with new fields after player's actions *)
 let update_game_board (gb : game_board) : unit =
   gb.player_hid <- Player.get_hidden (List.nth gb.player_lst gb.cur_player_id);
   gb.player_exp <- Player.get_exposed (List.nth gb.player_lst gb.cur_player_id);
   gb.discard <- Tile.tile_to_string (List.hd !Tile.discarded)
 
+(** [draw_bg f] draws background onto window screen using image in [filename] *)
 let draw_bg filename =
   let background = load_texture filename in
   let scale_x =
@@ -186,6 +180,7 @@ let draw_bg filename =
   let scale_y =
     float_of_int window_height /. float_of_int (Texture2D.height background)
   in
+  (* ensures that background fits full screen *)
   let max_scale = max scale_x scale_y in
   draw_texture_ex background (Vector2.create 0. 0.) 0. max_scale Color.white
 
@@ -212,6 +207,7 @@ let draw_player_name p : unit =
   let name_x = center_x - (measure_text name font_size / 2) in
   draw_text name name_x 100 font_size Color.white
 
+(** Draws all components involved in starting interface *)
 let draw_all_start (sb : start_board) : unit =
   (* must call to start drawing on window *)
   begin_drawing ();
@@ -233,8 +229,9 @@ let draw_all_start (sb : start_board) : unit =
         box_width box_height
     in
     let name, edit =
-      Raygui.text_box rect sb.player_name_inputs.(i) sb.player_name_edit_mode.(i)
-    in 
+      Raygui.text_box rect sb.player_name_inputs.(i)
+        sb.player_name_edit_mode.(i)
+    in
     if edit && not sb.player_name_edit_mode.(i) then (
       for j = 0 to 3 do
         sb.player_name_edit_mode.(j) <- false
@@ -247,16 +244,12 @@ let draw_all_start (sb : start_board) : unit =
   let button_width = 180.0 in
   let button_height = 50.0 in
   let button_x = (float_of_int window_width /. 2.0) -. (button_width /. 2.0) in
-  (* TODO: can simplify by using button object in raygui *)
   let button_y = start_y +. (4.0 *. (box_height +. spacing)) +. 10.0 in
   let button_rect =
     Rectangle.create button_x button_y button_width button_height
   in
   let is_start_clicked = Raygui.button button_rect "START" in
   if is_start_clicked then begin
-    (* start button pressed todo: might want to take out and put elsewhere?? or
-       pull back create players here -> same properties so shouldnt separate *)
-    (* todo: check if these variables are necessary *)
     sb.on_start_screen <- false;
     for i = 0 to 3 do
       sb.player_name_edit_mode.(i) <- false
@@ -266,8 +259,8 @@ let draw_all_start (sb : start_board) : unit =
   (* done drawing: now show it *)
   end_drawing ()
 
+(** Draws all components involved in game interface *)
 let draw_all_game (gb : game_board) : unit =
-  (* must call to start drawing on window *)
   begin_drawing ();
   clear_background Color.white;
 
@@ -286,43 +279,41 @@ let draw_all_game (gb : game_board) : unit =
 
   (* todo: need extra game logic == stretch - only render chi & peng buttons
      when discarded tile allows for possible combo with player hand && draw &
-     the other action have not been selected*)
+     the other action have not been selected *)
   if not gb.is_chi then draw_chi_button p gb;
   if not gb.is_peng then draw_peng_button p gb;
   if gb.chi_fail then draw_chi_fail ();
   if gb.peng_fail then draw_peng_fail ();
 
-  (* only render throw button when player has already drawn/chi/peng. updates
-     current player index & resets all boolean states tbh might not even need
-     throw button *)
+  (* only render throw button when player has already drawn/chi/peng.
+
+     updates current player index & resets all boolean states
+
+     tbh might not even need throw button *)
   if gb.is_drawn || gb.is_peng || gb.is_chi then
     if draw_throw_button p then (
-      gb.cur_player_id <- (gb.cur_player_id + 1) mod 4;
-      (*hardcoded 4 players*)
+      gb.cur_player_id <- (gb.cur_player_id + 1) mod List.length gb.player_lst;
       gb.is_drawn <- false;
       gb.is_peng <- false;
       gb.is_chi <- false);
 
-  (* done drawing: now show it *)
   end_drawing ()
 
-(** start loop: runs perpetually if user does not hit "start button" or close
-    window
+(** Runs perpetually if user does not hit "start button" or close window.
 
-    returns array of player names *)
+    If user hits "start", returns array of player names. *)
 let rec start_loop (sb : start_board) : string array =
   match window_should_close () with
   | true ->
       close_window ();
-      sb.player_name_inputs
-      (* doesnt do anything here, but just need to satisfy return type *)
+      exit 0 (* quit program *)
   | false ->
       if sb.on_start_screen then (
         draw_all_start sb;
         start_loop sb)
       else sb.player_name_inputs
 
-(** game loop: runs perpetually if user does not exit window *)
+(** Runs perpetually if user does not exit window *)
 let rec game_loop (gb : game_board) =
   match window_should_close () with
   | true -> close_window ()
