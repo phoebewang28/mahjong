@@ -5,80 +5,58 @@ open Raygui
 open Mahjong
 
 type game_board = {
-  player_hid : string; (* hidden hand of CURRENT player *)
-  player_exp : string;
-  discard : string; (*for now, just one*)
+  player_hid : string; (* hidden hand of current player *)
+  player_exp : string; (* exposed hand of current player *)
+  discard : string; (* discarded tile display *)
+  player_name_inputs : string array; (* name input fields for players *)
+  player_name_edit_mode : bool array; (* edit modes for each name box *)
+  player_names : string array option; (* finalized player names *)
+  init_done : bool; (* whether name input is completed *)
+  current_player_index : int; (* index of current player *)
+  on_start_screen : bool; (* true if showing the initial screen *)
 }
+(** [game_board] represents the state of the visible game interface. *)
 
 let window_width = 800
 let window_height = 600
-
-(** Center of the window *)
 let center_x = window_width / 2
-
 let center_y = window_height / 2
-(* let draw_draw_button : unit = let rect = Raylib.Rectangle.create
-   (float_of_int window_width -. 100.) (float_of_int window_height -. 200.) 40.0
-   20.0 in Raygui.button rect "Draw Tile" *)
 
-(** [make_player] initializes a player with a certain index *)
-let make_player id =
-  (* TODO: get player name *)
-  let player =
-    Player.create "Player placeholder name, testing for new branch" id
-  in
-  player
+(** [make_player id name] creates a player with the given [id] and [name]. *)
+let make_player id name = Player.create name id
 
-(** set up starting state of mahjong: all 4 players have tiles, no discards
-
-    returns value for player_hid & player_exp fields of game_board in a tuple *)
+(** Initializes player hands and the tile pool. *)
 let init_tiles () =
-  (* Initialize the players' hands with tiles from the shuffled deck *)
   Random.self_init ();
   let _ = Tile.init_tiles () in
   Tile.shuffle !Tile.tiles_arr;
-  let p1 = make_player 1 in
-  (* let p2 = make_player 2 in let p3 = make_player 3 in let p4 = make_player 4
-     in *)
+  let p1 = make_player 1 "Placeholder" in
   ( Hidden_hand.hidden_hand_to_string (Player.get_hidden p1),
     Exposed_hand.exposed_hand_to_string (Player.get_exposed p1) )
 
-(** type definition containing every object that is within game environment
-    (aka. on screen)
-
-    no need to draw player themselves cuz they're just mouse location
-
-    To be added:
-    - other players
-    - other discarded tiles (not just most recent)
-    - buttons : string list (change to use Raylib's button instead) *)
-
-(** Initialization of main window *)
+(** Initializes the game window and GUI state *)
 let setup () : game_board =
-  Raylib.init_window window_width window_height "OCaMahJong";
+  init_window window_width window_height "OCaMahJong";
   set_config_flags [ ConfigFlags.Window_resizable ];
-  (* allows for user to resize screen *)
   set_target_fps 60;
   let p_hid, p_exp = init_tiles () in
-  { player_hid = p_hid; player_exp = p_exp; discard = "discarded" }
-
-(** should be upated every time a player moves; if player hasn't chosen move, no
-    need to update yet *)
-let update_game_board (gb : game_board) : game_board =
   {
-    player_hid = gb.player_hid;
-    (* same rn, will update later once player can move in gui *)
-    player_exp = gb.player_exp;
-    discard = gb.discard;
+    player_hid = p_hid;
+    player_exp = p_exp;
+    discard = "discarded";
+    player_name_inputs = [| "Player 1"; "Player 2"; "Player 3"; "Player 4" |];
+    player_name_edit_mode = [| false; false; false; false |];
+    player_names = None;
+    init_done = false;
+    current_player_index = 0;
+    on_start_screen = true;
   }
 
-(** set background to green mahjong pelt
+(** Updates game state logic. Placeholder for now. *)
+let update_game_board (gb : game_board) : game_board = gb
 
-    Note: Texture2D are used to load sprites (e.g. images)*)
-let draw_bg () : unit =
-  let background = load_texture "res/images/mahjong_pelt.jpg" in
-
-  (* gets max scale to ensure that bg covers entirety of window *)
+let draw_start_bg () =
+  let background = load_texture "res/images/among-us.png" in
   let scale_x =
     float_of_int window_width /. float_of_int (Texture2D.width background)
   in
@@ -88,57 +66,119 @@ let draw_bg () : unit =
   let max_scale = max scale_x scale_y in
   draw_texture_ex background (Vector2.create 0. 0.) 0. max_scale Color.white
 
-let draw_discard dis : unit =
-  let font_size = 30 in
-  (* pos_x and pos_y parameters of [draw_text] is the TOP LEFT corner of
-     whatever you are drawing, so must translate position based on [dis]'s
-     dimensions
+let draw_game_bg () =
+  let background = load_texture "res/images/mahjong_pelt.jpg" in
+  let scale_x =
+    float_of_int window_width /. float_of_int (Texture2D.width background)
+  in
+  let scale_y =
+    float_of_int window_height /. float_of_int (Texture2D.height background)
+  in
+  let max_scale = max scale_x scale_y in
+  draw_texture_ex background (Vector2.create 0. 0.) 0. max_scale Color.white
 
-     no preset way of measuring height of string *)
+let draw_discard dis =
+  let font_size = 30 in
   let dis_x = center_x - (measure_text dis font_size / 2) in
   draw_text dis dis_x center_y font_size Color.red
 
-let draw_player_hid hid : unit =
+let draw_player_hid hid =
   let font_size = 15 in
-  (* center of bottom of screen *)
   let hid_x = center_x - (measure_text hid font_size / 2) in
-  (* 100 is hardcoded rn, will later change based on height of tile sprite *)
   draw_text hid hid_x (window_height - 100) font_size Color.white
 
-let draw_player_exp exp : unit =
+let draw_player_exp exp =
   let font_size = 15 in
-  (* above hidden hand *)
   let exp_x = center_x - (measure_text exp font_size / 2) in
-  (* 150 is hardcoded rn, will later change based on height of tile sprite *)
   draw_text exp exp_x (window_height - 150) font_size Color.white
 
-(** returns game_board so that next loop can update again *)
-let draw_all (gb : game_board) : game_board =
-  (* must call to start drawing on window *)
-  begin_drawing ();
+let draw_player_name_above_tile (names_opt : string array option) (idx : int) =
+  match names_opt with
+  | Some names ->
+      let name = names.(idx) in
+      let font_size = 20 in
+      let name_x = center_x - (measure_text name font_size / 2) in
+      draw_text name name_x (center_y - 50) font_size Color.black
+  | None -> ()
 
-  (* runs every game loop to ensure that no "traces" of objects are made *)
+(** Main GUI drawing logic *)
+let draw_all (gb : game_board) : game_board =
+  begin_drawing ();
   clear_background Color.white;
 
-  draw_bg ();
-  draw_discard gb.discard;
-  draw_player_hid gb.player_hid;
-  draw_player_exp gb.player_exp;
+  let name_inputs = Array.copy gb.player_name_inputs in
+  let edit_modes = Array.copy gb.player_name_edit_mode in
+  let final_names = ref gb.player_names in
+  let init_done = ref gb.init_done in
+  let on_start_screen = ref gb.on_start_screen in
 
-  (* done drawing: now show it *)
+  if !on_start_screen then begin
+    draw_start_bg ();
+
+    (* layout: vertically centered, input boxes centered horizontally *)
+    let box_width = 200.0 in
+    let box_height = 35.0 in
+    let spacing = 15.0 in
+    let total_height = (box_height +. spacing) *. 4.0 in
+    let start_y =
+      (float_of_int window_height /. 2.0) -. (total_height /. 2.0)
+    in
+
+    for i = 0 to 3 do
+      let rect =
+        Rectangle.create
+          ((float_of_int window_width /. 2.0) -. (box_width /. 2.0))
+          (start_y +. (float_of_int i *. (box_height +. spacing)))
+          box_width box_height
+      in
+      let name, edit = text_box rect name_inputs.(i) edit_modes.(i) in
+      if edit && not edit_modes.(i) then (
+        Array.iteri (fun j _ -> edit_modes.(j) <- false) edit_modes;
+        edit_modes.(i) <- true);
+      name_inputs.(i) <- name
+    done;
+
+    (* Start button: big, centered below input boxes *)
+    let button_width = 180.0 in
+    let button_height = 50.0 in
+    let button_rect =
+      Rectangle.create
+        ((float_of_int window_width /. 2.0) -. (button_width /. 2.0))
+        (start_y +. (4.0 *. (box_height +. spacing)) +. 10.0)
+        button_width button_height
+    in
+    if button button_rect "START" then begin
+      final_names := Some name_inputs;
+      init_done := true;
+      on_start_screen := false;
+      for i = 0 to 3 do
+        edit_modes.(i) <- false
+      done
+    end;
+    Raygui.set_style (Button `Text_padding) 10
+    (* reset *)
+  end
+  else begin
+    draw_game_bg ();
+    draw_discard gb.discard;
+    draw_player_hid gb.player_hid;
+    draw_player_exp gb.player_exp;
+    draw_player_name_above_tile gb.player_names gb.current_player_index
+  end;
+
   end_drawing ();
-
   {
-    player_hid = gb.player_hid;
-    player_exp = gb.player_exp;
-    discard = gb.discard;
+    gb with
+    player_name_inputs = name_inputs;
+    player_name_edit_mode = edit_modes;
+    player_names = !final_names;
+    init_done = !init_done;
+    on_start_screen = !on_start_screen;
   }
 
-(** Game loop: runs perpetually if user does not close window *)
 let rec loop (gb : game_board) =
   match window_should_close () with
   | true -> close_window ()
   | false -> update_game_board gb |> draw_all |> loop
 
-(* called when gui.exe is run from terminal *)
 let () = setup () |> loop
