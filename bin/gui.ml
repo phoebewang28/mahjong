@@ -4,10 +4,15 @@ open Raylib
 open Raygui
 open Mahjong
 
+(* tiles might wanna be buttons, since we have to click to select it *)
+
 type game_board = {
-  player_hid : string; (* hidden hand of CURRENT player *)
-  player_exp : string;
-  discard : string; (*for now, just one*)
+  mutable player_hid : Hidden_hand.hidden_hand; (* hidden hand of CURRENT player *)
+  mutable player_exp : Exposed_hand.exposed_hand;
+  mutable discard : string; (*for now, just one*)
+  mutable is_drawn : bool; (* state to track if drawn button is already clicked -> if true, will render draw; if false, will not *)
+  mutable is_chi : bool;
+  mutable is_peng : bool;
 }
 
 let window_width = 800
@@ -17,10 +22,51 @@ let window_height = 600
 let center_x = window_width / 2
 
 let center_y = window_height / 2
-(* 
-let draw_draw_button : unit =
-  let rect = Raylib.Rectangle.create (float_of_int window_width -. 100.) (float_of_int window_height -. 200.) 40.0 20.0 in
-  Raygui.button rect "Draw Tile" *)
+
+(* todo: prob try combining into a list *)
+
+(* todo: game logic: must check if CAN chi first b4 rendering!! *)
+let draw_chi_button p gb =
+  let rect = Raylib.Rectangle.create (float_of_int window_width -. 300.) (float_of_int window_height -. 400.) 100.0 70.0 in
+  (* note: button in raygui automatically accounts for user's mouse position & when clicked *)
+  let is_chi_clicked = Raygui.button rect "Chi Tile" in
+  if is_chi_clicked then 
+  (ignore(Player_choice.chi p);
+  gb.is_peng <- true; (* also disable other actions *)
+  gb.is_chi <- true;
+  gb.is_drawn <- true;)
+
+  
+let draw_peng_button p gb =
+  let rect = Raylib.Rectangle.create (float_of_int window_width -. 300.) (float_of_int window_height -. 300.) 100.0 70.0 in
+  (* note: button in raygui automatically accounts for user's mouse position & when clicked *)
+  let is_peng_clicked = Raygui.button rect "Peng Tile" in
+  if is_peng_clicked then 
+  (ignore(Player_choice.peng p);
+  gb.is_peng <- true; (* also disable other actions *)
+  gb.is_chi <- true;
+  gb.is_drawn <- true;
+  )
+
+(** Effect: when player [p] clicks draw button, returns updated player hand *)
+let draw_draw_button p gb =
+  let rect = Raylib.Rectangle.create (float_of_int window_width -. 300.) (float_of_int window_height -. 200.) 100.0 70.0 in
+  (* note: button in raygui automatically accounts for user's mouse position & when clicked *)
+  let is_draw_clicked = Raygui.button rect "Draw Tile" in
+  if is_draw_clicked then 
+    (* update player's hidden hand -> add card  *)
+  (Player_choice.draw p;
+  gb.is_peng <- true; (* also disable other actions *)
+  gb.is_chi <- true;
+  gb.is_drawn <- true;)
+    
+(** Effect: when player [p] clicks throw button, returns updated player hand. *)
+let draw_throw_button p =
+  let rect = Raylib.Rectangle.create (float_of_int window_width -. 300.) (float_of_int window_height -. 500.) 100.0 70.0 in
+  (* note: button in raygui automatically accounts for user's mouse position & when clicked *)
+  let is_throw_clicked = Raygui.button rect "Throw Tile" in
+  if is_throw_clicked then 
+  Player_choice.throw p
 
 
 (** [make_player] initializes a player with a certain index *)
@@ -30,53 +76,43 @@ let make_player id =
   player
 
 
-(** set up starting state of mahjong: all 4 players have tiles, no discards 
+(* returns only one player for now *)
+let init_players () : Player.player = 
+    let p1 = make_player 1 in
+    (* let p2 = make_player 2 in
+    let p3 = make_player 3 in
+    let p4 = make_player 4 in  *)
+    p1
 
-returns value for player_hid & player_exp fields of game_board in a tuple *)
+
+(** set up starting state of mahjong: all 4 players have tiles, no discards  *)
 let init_tiles () = 
     (* Initialize the players' hands with tiles from the shuffled deck *)
     Random.self_init ();
     let _ = Tile.init_tiles () in
-    Tile.shuffle !Tile.tiles_arr;
-    let p1 = make_player 1 in
-    (* let p2 = make_player 2 in
-    let p3 = make_player 3 in
-    let p4 = make_player 4 in *)
-    ((Hidden_hand.hidden_hand_to_string (Player.get_hidden p1)), (Exposed_hand.exposed_hand_to_string (Player.get_exposed p1)))
-
-
-
-(** type definition containing every object that is within game environment
-    (aka. on screen)
-
-    no need to draw player themselves cuz they're just mouse location
-
-    To be added:
-    - other players
-    - other discarded tiles (not just most recent)
-    - buttons : string list (change to use Raylib's button instead) *)
+    Tile.shuffle !Tile.tiles_arr
 
 (** Initialization of main window *)
-let setup () : game_board =
+let setup () : (game_board * Player.player) =
   Raylib.init_window window_width window_height "OCaMahJong";
   set_config_flags [ ConfigFlags.Window_resizable ];
   (* allows for user to resize screen *)
   set_target_fps 60;
-  let (p_hid, p_exp) = init_tiles () in
-  {
-    player_hid = p_hid;
-    player_exp = p_exp;
-    discard = "discarded";
-  }
+  init_tiles ();
+  let p1 = init_players () in 
+  ({
+    player_hid = Player.get_hidden p1;
+    player_exp = Player.get_exposed p1;
+    discard = "";
+    is_drawn = false;
+    is_chi = false;
+    is_peng = false;
+  }, p1)
 
-(** should be upated every time a player moves; if player hasn't chosen move, no
-    need to update yet *)
-let update_game_board (gb : game_board) : game_board =
-  {
-    player_hid = gb.player_hid; (* same rn, will update later once player can move in gui *)
-    player_exp = gb.player_exp;
-    discard = gb.discard;
-  }
+let update_game_board (gb : game_board) (p : Player.player) : unit =
+  gb.player_hid <- Player.get_hidden p;
+  gb.player_exp <- Player.get_exposed p;
+  gb.discard <- Tile.tile_to_string (List.hd !Tile.discarded)
 
 (** set background to green mahjong pelt
 
@@ -104,22 +140,24 @@ let draw_discard dis : unit =
   let dis_x = center_x - (measure_text dis font_size / 2) in
   draw_text dis dis_x center_y font_size Color.red
 
-let draw_player_hid hid : unit =
+let draw_player_hid p : unit =
+  let hid = Hidden_hand.hidden_hand_to_string (Player.get_hidden p) in
   let font_size = 15 in
   (* center of bottom of screen *)
   let hid_x = center_x - (measure_text hid font_size / 2) in
   (* 100 is hardcoded rn, will later change based on height of tile sprite *)
   draw_text hid hid_x (window_height - 100) font_size Color.white
 
-let draw_player_exp exp : unit =
+let draw_player_exp p : unit =
+  let exp = Exposed_hand.exposed_hand_to_string (Player.get_exposed p) in
   let font_size = 15 in
   (* above hidden hand *)
   let exp_x = center_x - (measure_text exp font_size / 2) in
   (* 150 is hardcoded rn, will later change based on height of tile sprite *)
   draw_text exp exp_x (window_height - 150) font_size Color.white
 
-(** returns game_board so that next loop can update again *)
-let draw_all (gb : game_board) : game_board =
+
+let draw_all (gb : game_board) (p : Player.player) : unit =
   (* must call to start drawing on window *)
   begin_drawing ();
 
@@ -128,23 +166,34 @@ let draw_all (gb : game_board) : game_board =
 
   draw_bg ();
   draw_discard gb.discard;
-  draw_player_hid gb.player_hid;
-  draw_player_exp gb.player_exp;
+  draw_player_hid p;
+  draw_player_exp p;
+
+  (* only render draw button when player has not drawn in turn yet && chi & peng have not been selected *)
+  (if not gb.is_drawn then draw_draw_button p gb);
+
+  (* todo: need extra game logic == stretch
+  - only render chi & peng buttons when discarded tile allows for possible combo with player hand && draw & the other action have not been selected*)
+  (if not gb.is_chi then draw_chi_button p gb);
+  (if not gb.is_peng then draw_peng_button p gb);
+
+  (* only render throw button when player has already drawn/chi/peng
+  
+  tbh might not even need throw button *)
+  (if gb.is_drawn || gb.is_peng || gb.is_chi then draw_throw_button p);
+  (* todo: toggle to next player *)
 
   (* done drawing: now show it *)
-  end_drawing ();
-
-  {
-    player_hid = gb.player_hid;
-    player_exp = gb.player_exp;
-    discard = gb.discard;
-  }
+  end_drawing ()
 
 (** Game loop: runs perpetually if user does not close window *)
-let rec loop (gb : game_board) =
+let rec loop (gb, p) =
   match window_should_close () with
   | true -> close_window ()
-  | false -> update_game_board gb |> draw_all |> loop
+  | false -> 
+      update_game_board gb p; 
+      draw_all gb p;
+      loop (gb, p)
 
 (* called when gui.exe is run from terminal *)
 let () = setup () |> loop

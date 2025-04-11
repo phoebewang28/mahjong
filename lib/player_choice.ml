@@ -64,8 +64,7 @@ let draw (player : player) : unit =
   (* update current index *)
   curr_index := !curr_index + 1;
   print_endline
-    ("Tile added at index: " ^ string_of_int (get_tile hidden_hand tile));
-  throw player
+    ("Tile added at index: " ^ string_of_int (get_tile hidden_hand tile))
 
 (** Effect: [comp_tiles t1 t2] returns
 
@@ -195,7 +194,9 @@ let rec choose_move player =
   (* type out the move the player wants to do*)
   let choice_tile = Str.split (Str.regexp " ") choice in
   (match List.hd choice_tile with
-  | "draw" -> draw player
+  | "draw" -> 
+      draw player;
+      throw player
   | "chi" ->
       if chi player then (
         print_player_hid_exp player;
