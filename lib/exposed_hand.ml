@@ -18,5 +18,24 @@ let exposed_hand_to_string (e : exposed_hand) : string =
          Printf.sprintf "%s %s" (tile_to_string t) (group_to_string g))
        !e)
 
+let get_tiles (e : exposed_hand) : tile list =
+  List.flatten
+    (List.map
+       (fun (g, t) ->
+         match group_to_string g with
+         | "Shun" ->
+             let n = get_num t in
+             if n <= 7 then
+               [
+                 make_tile n (get_tao t);
+                 make_tile (n + 1) (get_tao t);
+                 make_tile (n + 2) (get_tao t);
+               ]
+             else []
+         | "San" -> [ t; t; t ]
+         | "Si" -> [ t; t; t; t ]
+         | _ -> [])
+       !e)
+
 (** [empty_exposed_hand] is an empty exposed hand. *)
 let empty_exposed_hand () : exposed_hand = ref []

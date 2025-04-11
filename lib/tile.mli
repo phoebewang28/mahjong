@@ -101,3 +101,13 @@ val compare_tile : tile -> tile -> int
     - Precondition: both tiles must be valid tiles *)
 
 val fake_tile : tile
+
+val tile_to_key : tile -> string
+(** [tile_to_key t] returns a string representation of tile [t] for use as a key
+    in a dictionary
+    - Example: if [t] is a tile with number 5 and suit "Tiao", then
+      [tile_to_key t] returns "5 Tiao"
+    - Example: if [t] is a tile with suit "Dong"(the number will be set to 0 as
+      default), then [tile_to_key t] returns "Dong" *)
+
+val tile_list_to_keys : tile list -> string list

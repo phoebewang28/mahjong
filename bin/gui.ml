@@ -4,9 +4,82 @@ open Raylib
 open Raygui
 open Mahjong
 
+(* Tile image handling *)
+let tile_image_table : (string, Texture2D.t) Hashtbl.t = Hashtbl.create 50
+
+let tile_keys =
+  [
+    "1tong";
+    "2tong";
+    "3tong";
+    "4tong";
+    "5tong";
+    "6tong";
+    "7tong";
+    "8tong";
+    "9tong";
+    "1wan";
+    "2wan";
+    "3wan";
+    "4wan";
+    "5wan";
+    "6wan";
+    "7wan";
+    "8wan";
+    "9wan";
+    "1tiao";
+    "2tiao";
+    "3tiao";
+    "4tiao";
+    "5tiao";
+    "6tiao";
+    "7tiao";
+    "8tiao";
+    "9tiao";
+    "dong";
+    "nan";
+    "xi";
+    "bei";
+    "zhong";
+    "fa";
+    "bai";
+  ]
+
+let load_tile_images () =
+  List.iter
+    (fun key ->
+      let path = Printf.sprintf "res/images/tile/%s.png" key in
+      let tex = load_texture path in
+      Hashtbl.add tile_image_table key tex;
+      print_endline (Printf.sprintf "Loaded %s" key))
+    tile_keys
+
+let get_tile_texture key = Hashtbl.find_opt tile_image_table key
+
+(* let draw_tile_list_from_keys keys x0 y0 = let spacing = 42 in List.iteri (fun
+   i key -> match get_tile_texture key with | Some tex -> draw_texture tex (x0 +
+   (i * spacing)) y0 Color.white | None -> draw_text "?" (x0 + (i * spacing)) y0
+   20 Color.red) keys *)
+let draw_tile_list_from_keys keys x0 y0 =
+  let scale = 0.04 in
+  let x = ref (float_of_int x0) in
+  List.iter
+    (fun key ->
+      match get_tile_texture key with
+      | Some tex ->
+          let tex_w = float_of_int (Texture2D.width tex) *. scale in
+          draw_texture_ex tex
+            (Vector2.create !x (float_of_int y0))
+            0.0 scale Color.white;
+          x := !x +. tex_w
+      | None ->
+          draw_text "?" (int_of_float !x) y0 20 Color.red;
+          x := !x +. 40.0)
+    keys
+
 type game_board = {
-  player_hid : string;
-  player_exp : string;
+  player_hid : Tile.tile list;
+  player_exp : Tile.tile list;
   discard : string;
   player_name_inputs : string array;
   player_name_edit_mode : bool array;
@@ -32,14 +105,15 @@ let init_tiles () =
   let _ = Tile.init_tiles () in
   Tile.shuffle !Tile.tiles_arr;
   let p1 = make_player 1 "Placeholder" in
-  ( Hidden_hand.hidden_hand_to_string (Player.get_hidden p1),
-    Exposed_hand.exposed_hand_to_string (Player.get_exposed p1) )
+  ( Hidden_hand.get_tiles (Player.get_hidden p1),
+    Exposed_hand.get_tiles (Player.get_exposed p1) )
 
 (** Initializes the game window and GUI state *)
 let setup () : game_board =
   init_window window_width window_height "OCaMahJong";
   set_config_flags [ ConfigFlags.Window_resizable ];
   set_target_fps 60;
+  load_tile_images ();
   let p_hid, p_exp = init_tiles () in
   {
     player_hid = p_hid;
@@ -73,15 +147,23 @@ let draw_discard dis =
   let dis_x = center_x - (measure_text dis font_size / 2) in
   draw_text dis dis_x center_y font_size Color.red
 
-let draw_player_hid hid =
-  let font_size = 15 in
-  let hid_x = center_x - (measure_text hid font_size / 2) in
-  draw_text hid hid_x (window_height - 100) font_size Color.white
+(* let draw_player_hid hid = let font_size = 15 in let hid_x = center_x -
+   (measure_text hid font_size / 2) in draw_text hid hid_x (window_height - 100)
+   font_size Color.white
 
-let draw_player_exp exp =
-  let font_size = 15 in
-  let exp_x = center_x - (measure_text exp font_size / 2) in
-  draw_text exp exp_x (window_height - 150) font_size Color.white
+   let draw_player_exp exp = let font_size = 15 in let exp_x = center_x -
+   (measure_text exp font_size / 2) in draw_text exp exp_x (window_height - 150)
+   font_size Color.white *)
+let draw_player_hid tiles =
+  let keys = Tile.tile_list_to_keys tiles in
+  Printf.printf "there are %d intotal\n" (List.length keys);
+  List.iter print_endline keys;
+  draw_tile_list_from_keys keys (center_x - 350) (window_height - 100)
+
+let draw_player_exp tiles =
+  let keys = Tile.tile_list_to_keys tiles in
+  List.iter print_endline keys;
+  draw_tile_list_from_keys keys (center_x - 200) (window_height - 160)
 
 let draw_player_name (names_opt : string array option) (idx : int) =
   match names_opt with

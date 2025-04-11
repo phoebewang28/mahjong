@@ -34,4 +34,7 @@ val exposed_hand_to_string : exposed_hand -> string
       then the string returned is "1 Tong KeZi, 2 Tiao ShunZi".
     - Precondition: [h] must be a valid exposed_hand. *)
 
+val get_tiles : exposed_hand -> Tile.tile list
+(** [get_tiles h] returns a list of tiles in the exposed hand [h]. *)
+
 val empty_exposed_hand : unit -> exposed_hand
