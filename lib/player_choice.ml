@@ -9,7 +9,7 @@ let rec select_tiles (lb, ub) hidden_hand : tile =
     let t1 = int_of_string (String.trim (Stdlib.read_line ())) in
     if t1 >= lb && t1 <= ub then get hidden_hand t1
     else (
-      ANSITerminal.printf [ yellow ]
+      ANSITerminal.printf [ blue ]
         "At least one tile selected does not fall within valid bounds\n\
          Please reselect: ";
       select_tiles (lb, ub) hidden_hand)
