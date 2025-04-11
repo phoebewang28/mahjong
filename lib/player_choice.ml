@@ -200,13 +200,15 @@ let rec choose_move player =
       if chi player then (
         print_player_hid_exp player;
         throw player)
-      else choose_move player
-        (* if legal, allows throw, if not re-prompt player to choose move *)
+      else print_endline "Cannot chi, please choose again\n";
+      choose_move player
+      (* if legal, allows throw, if not re-prompt player to choose move *)
   | "peng" ->
       if peng player then (
         print_player_hid_exp player;
         throw player)
-      else choose_move player
+      else print_endline "Cannot peng, please choose again\n";
+      choose_move player
   | _ -> choose_move player);
   print_player_hid_exp player
 (* player input wrong, repeatedly asks player until right input*)
