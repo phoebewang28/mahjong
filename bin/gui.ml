@@ -19,8 +19,7 @@ type game_board = {
          render draw; if false, will not *)
   mutable is_chi : bool;
   mutable is_peng : bool;
-  mutable chi_fail : bool;
-  mutable peng_fail : bool;
+      (* mutable chi_fail : bool; mutable peng_fail : bool; *)
 }
 
 let window_width = 800
@@ -56,14 +55,14 @@ let draw_chi_button p gb =
       (* also disable other actions *)
       gb.is_chi <- true;
       gb.is_drawn <- true)
-    else (
-      gb.chi_fail <- true;
-      (* i dont know how to do promise oof
+    else draw_chi_fail ()
+(* gb.chi_fail <- true; *)
+(* i dont know how to do promise oof
       
       Lwt.async (fun () ->
           Lwt_unix.sleep 0.5 >>= fun () ->
           gb.chi_fail <- false;
-          Lwt.return_unit)) *))
+          Lwt.return_unit)) *)
 
 let draw_peng_button p gb =
   let rect =
@@ -81,7 +80,7 @@ let draw_peng_button p gb =
       (* also disable other actions *)
       gb.is_chi <- true;
       gb.is_drawn <- true)
-    else draw_text "Chi was unsuccessful!" 200 200 30 Color.white
+    else draw_peng_fail ()
 
 (** Effect: when player [p] clicks draw button, returns updated player hand *)
 let draw_draw_button p gb =
@@ -157,8 +156,7 @@ let setup () : game_board =
     is_drawn = false;
     is_chi = false;
     is_peng = false;
-    chi_fail = false;
-    peng_fail = false;
+    (* chi_fail = false; peng_fail = false; *)
   }
 
 let update_game_board (gb : game_board) : unit =
@@ -238,8 +236,9 @@ let draw_all (gb : game_board) : unit =
      the other action have not been selected*)
   if not gb.is_chi then draw_chi_button p gb;
   if not gb.is_peng then draw_peng_button p gb;
-  if gb.chi_fail then draw_chi_fail ();
-  if gb.peng_fail then draw_peng_fail ();
+
+  (* if gb.chi_fail then draw_chi_fail (); if gb.peng_fail then draw_peng_fail
+     (); *)
 
   (* only render throw button when player has already drawn/chi/peng.
 
