@@ -34,7 +34,7 @@ let throw (player : player) : unit =
   ANSITerminal.printf [ yellow ] "\nPlayer %d: *%s* is discarding tile [%s]!\n"
     (Player.get_index player) (Player.get_name player)
     (Tile.tile_to_string tile);
-  discarded := make_tile (get_num tile) (get_tao tile) :: !discarded;
+  discarded := tile :: !discarded;
   Hidden_hand.remove hid tile
 
 let draw (player : player) : unit =
@@ -140,14 +140,14 @@ let rec choose_move player =
       if chi player then (
         print_player_hid_exp player;
         throw player)
-      else ANSITerminal.printf [ red ] "Cannot chi, please choose again\n";
-      choose_move player
+      else begin ANSITerminal.printf [ red ] "Cannot chi, please choose again\n";
+      choose_move player end
       (* if legal, allows throw, if not re-prompt player to choose move *)
   | "peng" ->
       if peng player then (
         print_player_hid_exp player;
         throw player)
-      else print_endline "Cannot peng, please choose again\n";
-      choose_move player
+      else begin print_endline "Cannot peng, please choose again\n";
+      choose_move player end
   | _ -> choose_move player);
   print_player_hid_exp player

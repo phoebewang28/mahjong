@@ -42,7 +42,7 @@ let () =
   ANSITerminal.printf [ yellow ] "Please enter your 4 player names:\n";
 
   let _ = Tile.init_tiles () in
-  Tile.shuffle !Tile.tiles_arr;
+  (* Tile.shuffle !Tile.tiles_arr; *)
   let player1 = make_player 1 in
   let player2 = make_player 2 in
   let player3 = make_player 3 in
