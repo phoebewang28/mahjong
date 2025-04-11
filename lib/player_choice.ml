@@ -113,6 +113,25 @@ let prompt_selection_2 hid =
     "Please choose 2 tiles from your hand: Enter number from 0 - %d: " (len - 1);
   select_tiles_2 (0, len - 1) hid
 
+let chi_check (hand : hidden_hand) : bool =
+  let dis = List.hd !discarded in
+  let pair_check t1 t2 =
+    try
+      let _ = get_tile_index hand t1 in
+      let _ = get_tile_index hand t2 in
+      true
+    with Invalid_argument _ -> false
+  in
+  let tilel2 = make_tile (get_num dis - 2) (get_tao dis) in
+  let tilel1 = make_tile (get_num dis - 1) (get_tao dis) in
+  let tileu2 = make_tile (get_num dis + 2) (get_tao dis) in
+  let tileu1 = make_tile (get_num dis + 1) (get_tao dis) in
+  if
+    pair_check tilel2 tilel1 || pair_check tilel1 tileu1
+    || pair_check tileu1 tileu2
+  then true
+  else false
+
 let chi (player : player) : bool =
   let hid = get_hidden player in
   let ex = get_exposed player in
@@ -140,14 +159,18 @@ let rec choose_move player =
       if chi player then (
         print_player_hid_exp player;
         throw player)
-      else begin ANSITerminal.printf [ red ] "Cannot chi, please choose again\n";
-      choose_move player end
-      (* if legal, allows throw, if not re-prompt player to choose move *)
+      else begin
+        ANSITerminal.printf [ red ] "Cannot chi, please choose again\n";
+        choose_move player
+        (* if legal, allows throw, if not re-prompt player to choose move *)
+      end
   | "peng" ->
       if peng player then (
         print_player_hid_exp player;
         throw player)
-      else begin print_endline "Cannot peng, please choose again\n";
-      choose_move player end
+      else begin
+        print_endline "Cannot peng, please choose again\n";
+        choose_move player
+      end
   | _ -> choose_move player);
   print_player_hid_exp player
