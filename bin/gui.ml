@@ -86,6 +86,7 @@ type game_board = {
   mutable player_lst : Player.player list;
   mutable cur_player_id : int; (* index of current player: 0,1,2,3 *)
   mutable player_hid : Hidden_hand.hidden_hand;
+      (* hidden hand of CURRENT player *)
   mutable player_exp : Exposed_hand.exposed_hand;
   mutable discard : string;
   mutable is_drawn : bool;
@@ -93,11 +94,6 @@ type game_board = {
   mutable is_peng : bool;
   mutable chi_fail : bool;
   mutable peng_fail : bool;
-  mutable player_name_inputs : string array;
-  mutable player_name_edit_mode : bool array;
-  mutable player_names : string array option;
-  mutable init_done : bool;
-  mutable on_start_screen : bool;
 }
 
 let window_width = 800
@@ -132,6 +128,11 @@ let draw_chi_button p gb =
       gb.is_chi <- true;
       gb.is_drawn <- true)
     else draw_chi_fail ()
+(* gb.chi_fail <- true; *)
+(* i dont know how to do promise oof
+
+   Lwt.async (fun () -> Lwt_unix.sleep 0.5 >>= fun () -> gb.chi_fail <- false;
+   Lwt.return_unit)) *)
 
 let draw_peng_button p gb =
   let rect =
@@ -157,6 +158,7 @@ let draw_draw_button p gb =
   in
   let is_draw_clicked = Raygui.button rect "Draw Tile" in
   if is_draw_clicked then (
+    (* update player's hidden hand *)
     Player_choice.draw p;
     gb.is_peng <- true;
     gb.is_chi <- true;
@@ -228,11 +230,6 @@ let setup_game name_arr : game_board =
     is_peng = false;
     chi_fail = false;
     peng_fail = false;
-    player_name_inputs = name_arr;
-    player_name_edit_mode = [| false; false; false; false |];
-    player_names = Some name_arr;
-    init_done = true;
-    on_start_screen = false;
   }
 
 (** Updates current [gb] with new fields after player's actions *)
@@ -240,7 +237,8 @@ let update_game_board (gb : game_board) : unit =
   gb.player_hid <- Player.get_hidden (List.nth gb.player_lst gb.cur_player_id);
   gb.player_exp <- Player.get_exposed (List.nth gb.player_lst gb.cur_player_id);
   gb.discard <-
-    (if List.length !Tile.discarded > 0 then
+  (* start from > 1 cuz 3110 Tong is always gonna be first *)
+    (if List.length !Tile.discarded > 1 then
        Tile.tile_to_string (List.hd !Tile.discarded)
      else "")
 
