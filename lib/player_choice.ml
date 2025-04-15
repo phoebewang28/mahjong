@@ -46,8 +46,7 @@ let draw (player : player) : unit =
   add hidden_hand tile;
   curr_index := !curr_index + 1;
   ANSITerminal.printf [ blue ] "Tile added at index: %d\n"
-    (get_tile_index hidden_hand tile);
-  throw player
+    (get_tile_index hidden_hand tile)
 
 let comp_tiles t1 t2 = get_num t1 - get_num t2
 
@@ -166,7 +165,9 @@ let rec choose_move player =
   let choice = read_line () in
   let choice_tile = Str.split (Str.regexp " ") choice in
   (match List.hd choice_tile with
-  | "draw" -> draw player
+  | "draw" ->
+      draw player;
+      throw player
   | "chi" ->
       if chi player then (
         print_player_hid_exp player;
