@@ -122,14 +122,7 @@ let draw_chi_button p gb =
      when clicked *)
   let is_chi_clicked = Raygui.button rect "Chi Tile" in
   if is_chi_clicked then
-    if Player_choice.chi p then (
-      Tile.discarded := [];
-
-      gb.is_peng <- true;
-      (* also disable other actions *)
-      gb.is_chi <- true;
-      gb.is_drawn <- true)
-    else draw_chi_fail ()
+    if Player_choice.chi p then gb.is_chi <- true else draw_chi_fail ()
 (* gb.chi_fail <- true; *)
 (* i dont know how to do promise oof
 
@@ -145,12 +138,7 @@ let draw_peng_button p gb =
   in
   let is_peng_clicked = Raygui.button rect "Peng Tile" in
   if is_peng_clicked then
-    if Player_choice.chi p then (
-      Tile.discarded := [];
-      gb.is_peng <- true;
-      gb.is_chi <- true;
-      gb.is_drawn <- true)
-    else draw_peng_fail ()
+    if Player_choice.peng p then gb.is_peng <- true else draw_peng_fail ()
 
 let draw_draw_button p gb =
   let rect =
@@ -163,8 +151,6 @@ let draw_draw_button p gb =
   if is_draw_clicked then (
     (* update player's hidden hand *)
     Player_choice.draw p;
-    gb.is_peng <- true;
-    gb.is_chi <- true;
     gb.is_drawn <- true)
 
 (** Effect: when player [p] clicks throw button, returns true if thrown is
@@ -240,8 +226,15 @@ let update_game_board (gb : game_board) : unit =
   gb.player_hid <- Player.get_hidden (List.nth gb.player_lst gb.cur_player_id);
   gb.player_exp <- Player.get_exposed (List.nth gb.player_lst gb.cur_player_id);
   gb.discard <-
-    (* start from > 1 cuz 3110 Tong is always gonna be first *)
-    (if List.length !Tile.discarded > 1 then Some (List.hd !Tile.discarded)
+    (if
+       gb.is_peng || gb.is_chi
+       (* because most recently discarded is taken out of center, prevents it
+          from rendering *)
+     then None
+     else if List.length !Tile.discarded > 0 then
+       let dis = List.hd !Tile.discarded in
+       if Tile.tile_to_string dis = "3110 Fake" then None
+       else Some (List.hd !Tile.discarded)
      else None)
 
 (** [draw_bg f] draws background onto window screen using image in [filename] *)
@@ -360,29 +353,27 @@ let draw_all_game (gb : game_board) : unit =
   draw_player_hid p;
   draw_player_exp p;
 
-  (* only render draw button when player has not drawn in turn yet && chi & peng
-     have not been selected *)
-  if not gb.is_drawn then draw_draw_button p gb;
+  (* only render draw/chi/peng button when player has not selected ANY of
+     drawn/chi/peng actions. If any one selected, all buttons disabled -> only
+     THROW enabled.*)
+  if (not gb.is_drawn) && (not gb.is_chi) && not gb.is_peng then (
+    draw_draw_button p gb;
+    draw_chi_button p gb;
+    draw_peng_button p gb)
+  else if
+    (* draws throw button & swaps to next player if throw successful *)
+    draw_throw_button p
+  then (
+    gb.cur_player_id <- (gb.cur_player_id + 1) mod List.length gb.player_lst;
+    gb.is_drawn <- false;
+    gb.is_peng <- false;
+    gb.is_chi <- false);
 
   (* todo: need extra game logic == stretch - only render chi & peng buttons
      when discarded tile allows for possible combo with player hand && draw &
      the other action have not been selected *)
-  if not gb.is_chi then draw_chi_button p gb;
-  if not gb.is_peng then draw_peng_button p gb;
   if gb.chi_fail then draw_chi_fail ();
   if gb.peng_fail then draw_peng_fail ();
-
-  (* only render throw button when player has already drawn/chi/peng.
-
-     updates current player index & resets all boolean states
-
-     tbh might not even need throw button *)
-  if gb.is_drawn || gb.is_peng || gb.is_chi then
-    if draw_throw_button p then (
-      gb.cur_player_id <- (gb.cur_player_id + 1) mod List.length gb.player_lst;
-      gb.is_drawn <- false;
-      gb.is_peng <- false;
-      gb.is_chi <- false);
 
   end_drawing ()
 
