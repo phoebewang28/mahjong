@@ -1,4 +1,6 @@
 (library
  (name mahjong)
+ (instrumentation
+  (backend bisect_ppx))
  (libraries str ANSITerminal)
  (modules player tile hidden_hand player_choice exposed_hand dice))

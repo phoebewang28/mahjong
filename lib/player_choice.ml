@@ -182,7 +182,10 @@ let rec choose_move player =
         print_player_hid_exp player;
         throw player)
       else begin
-        print_endline "Cannot peng, please choose again\n";
+        print_endline
+          ("Cannot peng the last discard: "
+          ^ tile_to_string (List.hd !discarded)
+          ^ ", please choose again\n");
         choose_move player
       end
   | _ -> choose_move player);
