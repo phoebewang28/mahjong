@@ -3,11 +3,12 @@ open Str
 open Player
 open Hidden_hand
 
-let throw (player : player) thrown =
+let throw (player : player) id =
   let hid = get_hidden player in
-  discarded := thrown :: !discarded;
-  Hidden_hand.remove hid thrown;
-  thrown
+  let tile = Hidden_hand.get hid id in
+  discarded := tile :: !discarded;
+  Hidden_hand.remove hid tile;
+  tile
 
 let draw (player : player) =
   let hidden_hand = get_hidden player in
@@ -35,7 +36,7 @@ let print_player_exp player =
   Exposed_hand.exposed_hand_to_string (Player.get_exposed player)
 
 let chi_update t1 t2 dis ex hid : bool =
-  if not (get_tao t1 = get_tao t2 || get_tao t2 = get_tao dis) then false
+  if not (get_tao t1 = get_tao t2 && get_tao t2 = get_tao dis) then false
   else
     let sorted = List.sort comp_tiles [ t1; t2; dis ] in
     if not (is_consec sorted) then false
@@ -46,8 +47,8 @@ let chi_update t1 t2 dis ex hid : bool =
       true)
 
 let peng_update t1 t2 dis ex hid : bool =
-  if not (get_tao t1 = get_tao t2 || get_tao t2 = get_tao dis) then false
-  else if not (get_num t1 = get_num t2 || get_num t2 = get_num dis) then false
+  if not (get_tao t1 = get_tao t2 && get_tao t2 = get_tao dis) then false
+  else if not (get_num t1 = get_num t2 && get_num t2 = get_num dis) then false
   else (
     Hidden_hand.remove hid t1;
     Hidden_hand.remove hid t2;
@@ -103,26 +104,14 @@ let peng_check (hand : hidden_hand) : bool =
   in
   if count_tiles (get_tiles hand) 0 >= 2 then true else false
 
-let chi (player : player) t1 t2 : bool =
-  let hid = get_hidden player in
-  let ex = get_exposed player in
-  let dis = List.hd !discarded in
-  chi_update t1 t2 dis ex hid
-
-let chi_with_index (player : player) id1 id2 : bool =
+let chi (player : player) id1 id2 : bool =
   let hid = get_hidden player in
   let ex = get_exposed player in
   let dis = List.hd !discarded in
   chi_update (Hidden_hand.get hid id1) (Hidden_hand.get hid id2) dis ex hid
 
-let peng_with_index (player : player) id1 id2 : bool =
+let peng (player : player) id1 id2 : bool =
   let hid = get_hidden player in
   let ex = get_exposed player in
   let dis = List.hd !discarded in
   peng_update (Hidden_hand.get hid id1) (Hidden_hand.get hid id2) dis ex hid
-
-let peng (player : player) t1 t2 : bool =
-  let hid = get_hidden player in
-  let ex = get_exposed player in
-  let dis = List.hd !discarded in
-  peng_update t1 t2 dis ex hid

@@ -341,7 +341,8 @@ let throw_reset p gb : unit =
   assert gb.is_throwing;
   if gb.clicked_tiles.(0) <> -1 then (
     (* activates throw functionality, <> -1 means player has selected tile *)
-    Player_choice.throw_with_index p gb.clicked_tiles.(0);
+    let _ = Player_choice.throw p gb.clicked_tiles.(0) in
+    ();
     (* reset all fields once throw is successful *)
     gb.cur_player_id <- (gb.cur_player_id + 1) mod List.length gb.player_lst;
     gb.is_drawn <- false;
@@ -356,7 +357,7 @@ let chi_from_clicked p gb : unit =
   assert (gb.clicked_tiles.(0) <> -1 && gb.clicked_tiles.(1) <> -1);
   if
     (* both tiles selected for chiing *)
-    Player_choice.chi_with_index p gb.clicked_tiles.(0) gb.clicked_tiles.(1)
+    Player_choice.chi p gb.clicked_tiles.(0) gb.clicked_tiles.(1)
   then
     (*successful chi -> taken out into exposed hand, should engage throwing
       now *)
@@ -371,7 +372,7 @@ let peng_from_clicked p gb : unit =
   assert (gb.clicked_tiles.(0) <> -1 && gb.clicked_tiles.(1) <> -1);
   if
     (* both tiles selected for penging *)
-    Player_choice.peng_with_index p gb.clicked_tiles.(0) gb.clicked_tiles.(1)
+    Player_choice.peng p gb.clicked_tiles.(0) gb.clicked_tiles.(1)
   then gb.is_throwing <- true
   else gb.is_penging <- false;
   gb.clicked_tiles.(0) <- -1;
@@ -404,9 +405,9 @@ let draw_all_game (gb : game_board) : unit =
         if Player_choice.chi_check gb.player_hid then draw_chi_button p gb;
         if Player_choice.peng_check gb.player_hid then draw_peng_button p gb)
   else if gb.is_throwing then throw_reset p gb
-    (* this is_throwing clause MUST come BEFORE the others!! cuz other clauses and
-       is_throwing can be true simultaneously, o/w throw_reset is never gonna
-       run *)
+    (* this is_throwing clause MUST come BEFORE the others!! cuz other clauses
+       and is_throwing can be true simultaneously, o/w throw_reset is never
+       gonna run *)
   else if gb.is_drawn then
     (* chi button clicked -> no buttons render *)
     gb.is_throwing <- true

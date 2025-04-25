@@ -1,14 +1,14 @@
 open Mahjong
 open ANSITerminal
 
-(** [print_hand] nicely prints out game information: tiles in [player]'s hand,
-    exposed and hidden *)
-
+(** prints separators between players *)
 let print_spacing player =
   ANSITerminal.printf [ cyan ] "%s\n" (String.make 100 '-');
   ANSITerminal.printf [ yellow ] "Player %d: %s\n" (Player.get_index player)
     (Player.get_name player)
 
+(** [print_hand] nicely prints out game information: tiles in [player]'s hand,
+    exposed and hidden *)
 let print_hand player =
   ANSITerminal.printf [ magenta ] "Hidden tiles:\n";
   ANSITerminal.printf [ green ] "%s\n"
@@ -18,57 +18,62 @@ let print_hand player =
   ANSITerminal.printf [ green ] "%s\n"
     (Exposed_hand.exposed_hand_to_string (Player.get_exposed player))
 
-let rec select_tiles (lb, ub) hidden_hand =
-  try
-    let t1 = int_of_string (String.trim (Stdlib.read_line ())) in
-    if t1 >= lb && t1 <= ub then Hidden_hand.get hidden_hand t1
-    else (
-      ANSITerminal.printf [ blue ]
-        "At least one tile selected does not fall within valid bounds\n\
-         Please reselect: ";
-      select_tiles (lb, ub) hidden_hand)
-  with
-  | Failure e when e = "int_of_string" ->
-      ANSITerminal.printf [ yellow ]
-        "Tiles selected are invalid.\nPlease reselect: ";
-      select_tiles (lb, ub) hidden_hand
-  | Failure e ->
-      ANSITerminal.printf [ yellow ] "%s" e;
-      select_tiles (lb, ub) hidden_hand
-
-let prompt_selection hid =
+(** prompts user for input, num decides if they choose 1 or 2 numbers. returns
+    tuple of the numbers selected. if only 1 needs to be selected, the other
+    value is -1*)
+let rec prompt_ind hid num : int * int =
   let len = Hidden_hand.get_size hid in
-  ANSITerminal.printf [ yellow ]
-    "Please discard 1 child: Enter number from 0 - %d: " (len - 1);
-  select_tiles (0, len - 1) hid
+  if num = 1 then (
+    ANSITerminal.printf [ yellow ]
+      "Please discard 1 child: Enter number from 0 - %d: " (len - 1);
+    try
+      let ind = int_of_string (String.trim (Stdlib.read_line ())) in
+      if ind >= 0 && ind <= len - 1 then (ind, -1)
+      else (
+        ANSITerminal.printf [ blue ]
+          "At least one tile selected does not fall within valid bounds\n\
+           Please reselect: ";
+        prompt_ind hid 1)
+    with
+    | Failure e when e = "int_of_string" ->
+        ANSITerminal.printf [ yellow ]
+          "Tiles selected are invalid.\nPlease reselect: ";
+        prompt_ind hid 1
+    | Failure e ->
+        ANSITerminal.printf [ yellow ] "%s" e;
+        prompt_ind hid 1)
+  else if num = 2 then (
+    ANSITerminal.printf [ blue ]
+      "Please choose 2 tiles from your hand: Enter number from 0 - %d: "
+      (len - 1);
+    try
+      let ind1 = Stdlib.read_int () in
+      let ind2 = Stdlib.read_int () in
+      if (ind1 >= 0 && ind1 <= len - 1) && ind2 >= 0 && ind2 <= len - 1 then
+        (ind1, ind2)
+      else (
+        ANSITerminal.printf [ red ]
+          "At least one tile selected does not fall within valid bounds\n\
+           Please reselect: ";
+        prompt_ind hid 2)
+    with
+    | Failure e when e = "int_of_string" ->
+        ANSITerminal.printf [ red ]
+          "Tiles selected are invalid.\nPlease reselect: ";
+        prompt_ind hid 2
+    | Failure e ->
+        ANSITerminal.printf [ red ] "%s" e;
+        prompt_ind hid 2)
+  else invalid_arg "num must be 1 or 2"
 
-let rec select_tiles_2 (lb, ub) hid =
-  try
-    let t1 = Stdlib.read_int () in
-    let t2 = Stdlib.read_int () in
-    if (t1 >= lb && t1 <= ub) && t2 >= lb && t2 <= ub then
-      (Hidden_hand.get hid t1, Hidden_hand.get hid t2)
-    else (
-      ANSITerminal.printf [ red ]
-        "At least one tile selected does not fall within valid bounds\n\
-         Please reselect: ";
-      select_tiles_2 (lb, ub) hid)
-  with
-  | Failure e when e = "int_of_string" ->
-      ANSITerminal.printf [ red ]
-        "Tiles selected are invalid.\nPlease reselect: ";
-      select_tiles_2 (lb, ub) hid
-  | Failure e ->
-      ANSITerminal.printf [ red ] "%s" e;
-      select_tiles_2 (lb, ub) hid
-
-let prompt_selection_2 hid =
-  let len = Hidden_hand.get_size hid in
-  ANSITerminal.printf [ blue ]
-    "Please choose 2 tiles from your hand: Enter number from 0 - %d: " (len - 1);
-  select_tiles_2 (0, len - 1) hid
-
+(** lets player choose their move *)
 let rec choose_move player =
+  let invalid_choice move msg =
+    begin
+      ANSITerminal.printf [ red ] "Cannot %s, %s\n" move msg;
+      choose_move player
+    end
+  in
   ANSITerminal.printf [ blue ] "Last Discard: %s\n\n"
     (Tile.tile_to_string (List.hd !Tile.discarded));
   ANSITerminal.printf [ yellow ]
@@ -80,7 +85,7 @@ let rec choose_move player =
       let drawn = Player_choice.draw player in
       ANSITerminal.printf [ green ] "You drew %s\n" (Tile.tile_to_string drawn);
       print_hand player;
-      let t = prompt_selection (Player.get_hidden player) in
+      let t, _ = prompt_ind (Player.get_hidden player) 1 in
       let thrown = Player_choice.throw player t in
       ANSITerminal.printf [ green ] "You threw %s\n"
         (Tile.tile_to_string thrown);
@@ -88,34 +93,31 @@ let rec choose_move player =
   | "chi" ->
       if Player_choice.chi_check (Player.get_hidden player) then (
         print_hand player;
-        let t1, t2 = prompt_selection_2 (Player.get_hidden player) in
-        let _ = Player_choice.chi player t1 t2 in
-        print_hand player;
-        let t = prompt_selection (Player.get_hidden player) in
-        let thrown = Player_choice.throw player t in
-        ANSITerminal.printf [ green ] "You threw %s\n"
-          (Tile.tile_to_string thrown);
-        ())
-      else begin
-        ANSITerminal.printf [ red ] "Cannot chi, please choose again\n";
-        choose_move player
-        (* if legal, allows throw, if not re-prompt player to choose move *)
-      end
+        let t1, t2 = prompt_ind (Player.get_hidden player) 2 in
+        if not (Player_choice.chi player t1 t2) then
+          invalid_choice "chi" "please choose valid tiles"
+        else (
+          print_hand player;
+          let t, _ = prompt_ind (Player.get_hidden player) 1 in
+          let thrown = Player_choice.throw player t in
+          ANSITerminal.printf [ green ] "You threw %s\n"
+            (Tile.tile_to_string thrown);
+          ()))
+      else invalid_choice "chi" "please choose again"
   | "peng" ->
       if Player_choice.peng_check (Player.get_hidden player) then (
         print_hand player;
-        let t1, t2 = prompt_selection_2 (Player.get_hidden player) in
-        let _ = Player_choice.peng player t1 t2 in
-        print_hand player;
-        let t = prompt_selection (Player.get_hidden player) in
-        let thrown = Player_choice.throw player t in
-        ANSITerminal.printf [ green ] "You threw %s\n"
-          (Tile.tile_to_string thrown);
-        ())
-      else begin
-        ANSITerminal.printf [ red ] "Cannot peng, please choose again\n";
-        choose_move player
-      end
+        let t1, t2 = prompt_ind (Player.get_hidden player) 2 in
+        if not (Player_choice.peng player t1 t2) then
+          invalid_choice "peng" "please choose valid tiles"
+        else (
+          print_hand player;
+          let t, _ = prompt_ind (Player.get_hidden player) 1 in
+          let thrown = Player_choice.throw player t in
+          ANSITerminal.printf [ green ] "You threw %s\n"
+            (Tile.tile_to_string thrown);
+          ()))
+      else invalid_choice "peng" "please choose again"
   | _ -> choose_move player);
   print_hand player
 
