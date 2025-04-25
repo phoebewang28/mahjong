@@ -12,9 +12,13 @@ val draw : player -> tile
 val throw : player -> elem -> tile
 (* From player hand, let player choose which tile they want to discard *)
 
-(* val choose_move : player -> unit *)
-(* Asking for user input (e.g. option #1: draw, option #2: chi; option #3: pong)
-   Call corresponding functions below *)
+(** For GUI usage, after tile in GUI has been clicked.
+[id] rep. index of tile that player desire to throw *)
+val throw_with_index : player -> int -> unit
+
+(** For GUI usage, after tile in GUI has been clicked.
+[id] rep. index of tile that player desire to throw *)
+val throw_with_index : player -> int -> unit
 
 
 val chi_check : hidden_hand -> bool
@@ -34,6 +38,9 @@ val peng_check : hidden_hand -> bool
        Side effect: removes legal set from player's hidden hand [hid]
    
        Valid chi: 3 consecutive numbers of the same type of tile. *)
+
+
+val chi_with_index : player -> int -> int -> bool
    
    val peng : player -> elem -> elem -> bool
    (** [peng hid ex] takes in hidden hand [hid] of player, and exposed hand [ex] of
@@ -46,3 +53,5 @@ val peng_check : hidden_hand -> bool
        Side effect: removes legal set from player's hidden hand [hid]
    
        Valid peng: 3 IDENTICAL tiles (by structural equality) *)
+
+val peng_with_index : player -> int -> int -> bool
