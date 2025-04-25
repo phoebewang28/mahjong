@@ -1,4 +1,4 @@
-let localhost_5000 = Unix.ADDR_INET (Unix.inet_addr_loopback, 5000)
+let localhost_5000 = Unix.ADDR_INET (Unix.inet_addr_any, 5000)
 
 let string_of_sockaddr = function
   | Unix.ADDR_UNIX s -> s

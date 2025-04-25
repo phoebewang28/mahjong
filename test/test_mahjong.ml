@@ -54,6 +54,17 @@ let compare_tiles_test expected_val exp_bool tile1 tile2 =
     ("compare_tiles test: " ^ Tile.tile_to_string tile1 ^ " vs "
    ^ Tile.tile_to_string tile2)
 
+let draw_next_tile_test expected_tile player curr =
+  "draw test " ^ Tile.tile_to_string expected_tile >:: fun _ ->
+  Tile.curr_index := curr;
+  let drawn = Player_choice.draw player in
+  assert_equal expected_tile drawn ~printer:Tile.tile_to_string
+
+let player_choice_tests =
+  let player = Utilities.player in
+  [ draw_next_tile_test (Tile.string_to_tile "1 Tong") player 0 ]
+  @ [ draw_next_tile_test (Tile.string_to_tile "2 Tong") player 4 ]
+
 (**Tests for the [Player.create] function.*)
 
 let create_player_test p_name p_index =
@@ -144,6 +155,6 @@ let tile_tests =
 let tests =
   "test suite"
   >::: [ ("a trivial test" >:: fun _ -> assert_equal 0 0) ]
-       @ tile_tests @ player_tests
+       @ tile_tests @ player_tests @ player_choice_tests
 
 let _ = run_test_tt_main tests
