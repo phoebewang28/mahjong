@@ -38,8 +38,11 @@ val peng_check : hidden_hand -> bool
        Side effect: removes legal set from player's hidden hand [hid]
    
        Valid chi: 3 consecutive numbers of the same type of tile. *)
+
+
+val chi_with_index : player -> int -> int -> bool
    
-   val peng : player -> bool
+val peng : player -> bool
    (** [peng hid ex] takes in hidden hand [hid] of player, and exposed hand [ex] of
        player.
    
@@ -50,3 +53,5 @@ val peng_check : hidden_hand -> bool
        Side effect: removes legal set from player's hidden hand [hid]
    
        Valid peng: 3 IDENTICAL tiles (by structural equality) *)
+
+val peng_with_index : player -> int -> int -> bool

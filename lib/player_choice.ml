@@ -37,7 +37,6 @@ let throw (player : player) : unit =
   discarded := tile :: !discarded;
   Hidden_hand.remove hid tile
 
-
 let throw_with_index (player : player) id : unit =
   let hid = get_hidden player in
   let tile = Hidden_hand.get hid id in
@@ -131,15 +130,20 @@ let chi_check (hand : hidden_hand) : bool =
       true
     with Invalid_argument _ -> false
   in
-  let tilel2 = make_tile (get_num dis - 2) (get_tao dis) in
-  let tilel1 = make_tile (get_num dis - 1) (get_tao dis) in
-  let tileu2 = make_tile (get_num dis + 2) (get_tao dis) in
-  let tileu1 = make_tile (get_num dis + 1) (get_tao dis) in
-  if
-    pair_check tilel2 tilel1 || pair_check tilel1 tileu1
-    || pair_check tileu1 tileu2
-  then true
-  else false
+  let dis_num = get_num dis in
+  if dis_num < 0 || dis_num > 9 then false
+  else
+    try
+      let tilel2 = make_tile (dis_num - 2) (get_tao dis) in
+      let tilel1 = make_tile (dis_num - 1) (get_tao dis) in
+      let tileu2 = make_tile (dis_num + 2) (get_tao dis) in
+      let tileu1 = make_tile (dis_num + 1) (get_tao dis) in
+      if
+        pair_check tilel2 tilel1 || pair_check tilel1 tileu1
+        || pair_check tileu1 tileu2 
+      then true
+      else false
+    with Tile.InvalidTile _ -> false
 
 let peng_check (hand : hidden_hand) : bool =
   let counter = ref 0 in
@@ -159,6 +163,18 @@ let chi (player : player) : bool =
   let sel = prompt_selection_2 hid in
   let dis = List.hd !discarded in
   chi_update (fst sel) (snd sel) dis ex hid
+
+let chi_with_index (player : player) id1 id2 : bool =
+  let hid = get_hidden player in
+  let ex = get_exposed player in
+  let dis = List.hd !discarded in
+  chi_update (Hidden_hand.get hid id1) (Hidden_hand.get hid id2) dis ex hid
+
+let peng_with_index (player : player) id1 id2 : bool = 
+  let hid = get_hidden player in
+  let ex = get_exposed player in
+  let dis = List.hd !discarded in
+  peng_update (Hidden_hand.get hid id1) (Hidden_hand.get hid id2) dis ex hid
 
 let peng (player : player) : bool =
   let hid = get_hidden player in

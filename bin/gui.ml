@@ -21,12 +21,14 @@ type game_board = {
   mutable player_exp : Exposed_hand.exposed_hand;
   mutable discard : Tile.tile option;
   mutable is_drawn : bool;
-  mutable is_chi : bool;
-  mutable is_peng : bool;
+  mutable is_chiing : bool;
+  mutable is_penging : bool;
   mutable is_throwing : bool;
   mutable chi_fail : bool;
   mutable peng_fail : bool;
-  mutable clicked_tile : int;
+  clicked_tiles : int array;
+      (* invariant: array of 2, both set to -1 when nothing clicked, 2nd element
+         only not -1 when chi/peng*)
 }
 
 (* Tile image handling *)
@@ -101,7 +103,11 @@ let draw_tile_list_from_keys keys x0 y0 (gb : game_board) =
           x := !x +. tex_w;
           (* gb.is_throwing ensures clicked_tile field only updated if player is
              in throwing state, ignores o/w*)
-          if is_tile_clicked && gb.is_throwing then gb.clicked_tile <- id
+          if is_tile_clicked then
+            if gb.is_throwing then gb.clicked_tiles.(0) <- id
+            else if gb.is_chiing || gb.is_penging then
+              if gb.clicked_tiles.(0) = -1 then gb.clicked_tiles.(0) <- id
+              else if gb.clicked_tiles.(1) = -1 then gb.clicked_tiles.(1) <- id
           (* get index of tile *)
       | None ->
           draw_text " " (int_of_float !x) y0 20 Color.red;
@@ -133,13 +139,7 @@ let draw_chi_button p gb =
   (* note: button in raygui automatically accounts for user's mouse position &
      when clicked *)
   let is_chi_clicked = Raygui.button rect "Chi Tile" in
-  if is_chi_clicked then
-    if Player_choice.chi p then gb.is_chi <- true else draw_chi_fail ()
-(* gb.chi_fail <- true; *)
-(* i dont know how to do promise oof
-
-   Lwt.async (fun () -> Lwt_unix.sleep 0.5 >>= fun () -> gb.chi_fail <- false;
-   Lwt.return_unit)) *)
+  if is_chi_clicked then gb.is_chiing <- true
 
 let draw_peng_button p gb =
   let rect =
@@ -149,8 +149,7 @@ let draw_peng_button p gb =
       100.0 70.0
   in
   let is_peng_clicked = Raygui.button rect "Peng Tile" in
-  if is_peng_clicked then
-    if Player_choice.peng p then gb.is_peng <- true else draw_peng_fail ()
+  if is_peng_clicked then gb.is_penging <- true
 
 let draw_draw_button p gb =
   let rect =
@@ -212,12 +211,12 @@ let setup_game name_arr : game_board =
     player_exp = Player.get_exposed first_player;
     discard = None;
     is_drawn = false;
-    is_chi = false;
-    is_peng = false;
+    is_chiing = false;
+    is_penging = false;
     is_throwing = false;
     chi_fail = false;
     peng_fail = false;
-    clicked_tile = -1;
+    clicked_tiles = [| -1; -1 |];
     (* -1: no tile selected *)
   }
 
@@ -226,10 +225,9 @@ let update_game_board (gb : game_board) : unit =
   gb.player_hid <- Player.get_hidden (List.nth gb.player_lst gb.cur_player_id);
   gb.player_exp <- Player.get_exposed (List.nth gb.player_lst gb.cur_player_id);
   gb.discard <-
-    (if
-       gb.is_peng || gb.is_chi
-       (* because most recently discarded is taken out of center, prevents it
-          from rendering *)
+    (if gb.is_penging || gb.is_chiing
+     (* because most recently discarded is taken out of center, prevents it from
+        rendering *)
      then None
      else if List.length !Tile.discarded > 0 then
        let dis = List.hd !Tile.discarded in
@@ -339,6 +337,46 @@ let draw_all_start (sb : start_board) : unit =
   (* done drawing: now show it *)
   end_drawing ()
 
+let throw_reset p gb : unit =
+  assert gb.is_throwing;
+  if gb.clicked_tiles.(0) <> -1 then (
+    (* activates throw functionality, <> -1 means player has selected tile *)
+    Player_choice.throw_with_index p gb.clicked_tiles.(0);
+    (* reset all fields once throw is successful *)
+    gb.cur_player_id <- (gb.cur_player_id + 1) mod List.length gb.player_lst;
+    gb.is_drawn <- false;
+    gb.is_penging <- false;
+    gb.is_chiing <- false;
+    gb.clicked_tiles.(0) <- -1;
+    assert (gb.clicked_tiles.(0) = -1 && gb.clicked_tiles.(1) = -1);
+    gb.is_throwing <- false)
+
+let chi_from_clicked p gb : unit =
+  assert gb.is_chiing;
+  assert (gb.clicked_tiles.(0) <> -1 && gb.clicked_tiles.(1) <> -1);
+  if
+    (* both tiles selected for chiing *)
+    Player_choice.chi_with_index p gb.clicked_tiles.(0) gb.clicked_tiles.(1)
+  then
+    (*successful chi -> taken out into exposed hand, should engage throwing
+      now *)
+    gb.is_throwing <- true
+  else gb.is_chiing <- false;
+  (* deactivate is_chiing cuz failed *)
+  gb.clicked_tiles.(0) <- -1;
+  gb.clicked_tiles.(1) <- -1
+
+let peng_from_clicked p gb : unit =
+  assert gb.is_penging;
+  assert (gb.clicked_tiles.(0) <> -1 && gb.clicked_tiles.(1) <> -1);
+  if
+    (* both tiles selected for penging *)
+    Player_choice.peng_with_index p gb.clicked_tiles.(0) gb.clicked_tiles.(1)
+  then gb.is_throwing <- true
+  else gb.is_penging <- false;
+  gb.clicked_tiles.(0) <- -1;
+  gb.clicked_tiles.(1) <- -1
+
 (** Draws all components involved in game interface *)
 let draw_all_game (gb : game_board) : unit =
   begin_drawing ();
@@ -353,32 +391,42 @@ let draw_all_game (gb : game_board) : unit =
   draw_player_hid p gb;
   draw_player_exp p gb;
 
-  (* only render draw/chi/peng button when player has not selected ANY of
+  (* (* only render draw/chi/peng button when player has not selected ANY of
      drawn/chi/peng actions. If any one selected, all buttons disabled -> only
-     THROW enabled.*)
+     THROW enabled.*) if (not gb.is_drawn) && (not gb.is_chiing ) && not
+     gb.is_penging then ( draw_draw_button p gb; (* only render chi & peng buttons
+     when discarded tile allows for possible combo with player hand && draw &
+     the other action have not been selected *) (* ensure that there IS a
+     discard!! *) match gb.discard with | None -> () | Some _ -> if
+     Player_choice.chi_check gb.player_hid then draw_chi_button p gb; if
+     Player_choice.peng_check gb.player_hid then draw_peng_button p gb) else (
+     gb.is_throwing <- true; if gb.clicked_tile <> -1 then ( (* activates throw
+     functionality, <> -1 means player has selected tile *)
+     Player_choice.throw_with_index p gb.clicked_tile; (* reset all fields once
+     throw is successful *) gb.cur_player_id <- (gb.cur_player_id + 1) mod
+     List.length gb.player_lst; gb.is_drawn <- false; gb.is_penging <- false;
+     gb.is_chiing <- false; gb.clicked_tile <- -1; gb.is_throwing <- false)); *)
 
-  if (not gb.is_drawn) && (not gb.is_chi) && not gb.is_peng then (
+  (* all buttons rendering *)
+  if (not gb.is_drawn) && (not gb.is_chiing) && not gb.is_penging then (
     draw_draw_button p gb;
     draw_chi_button p gb;
+    (* sets gb.is_chiing to true: wait for player to select 2 tiles b4 engaging
+       throwing *)
     draw_peng_button p gb)
-  else (
-    gb.is_throwing <- true;
-    if gb.clicked_tile <> -1 then (
-      (* activates throw functionality, <> -1 means player has selected tile *)
-      Player_choice.throw_with_index p gb.clicked_tile;
-      (* reset all fields once throw is successful *)
-      gb.cur_player_id <- (gb.cur_player_id + 1) mod List.length gb.player_lst;
-      gb.is_drawn <- false;
-      gb.is_peng <- false;
-      gb.is_chi <- false;
-      gb.clicked_tile <- -1;
-      gb.is_throwing <- false));
-
-  (* todo: need extra game logic == stretch - only render chi & peng buttons
-     when discarded tile allows for possible combo with player hand && draw &
-     the other action have not been selected *)
-  if gb.chi_fail then draw_chi_fail ();
-  if gb.peng_fail then draw_peng_fail ();
+  else if gb.is_throwing then throw_reset p gb
+    (* this clause MUST come BEFORE the others!! cuz other clauses and
+       is_throwing can be true simultaneously, o/w throw_reset is never gonna
+       run *)
+  else if gb.is_drawn then
+    (* chi button clicked -> no buttons render *)
+    gb.is_throwing <- true
+  else if gb.is_chiing then (
+    if gb.clicked_tiles.(0) <> -1 && gb.clicked_tiles.(1) <> -1 then
+      chi_from_clicked p gb)
+  else if gb.is_penging then
+    if gb.clicked_tiles.(0) <> -1 && gb.clicked_tiles.(1) <> -1 then
+      peng_from_clicked p gb;
 
   end_drawing ()
 
