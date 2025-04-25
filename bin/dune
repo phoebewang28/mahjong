@@ -2,11 +2,23 @@
  (public_name mahjong-text)
  (package mahjong)
  (name main)
+ (modules main)
  (libraries mahjong ANSITerminal))
 
 (executable
  (public_name mahjong-gui)
  (package mahjong)
  (name gui)
+ (modules gui)
  (libraries mahjong raylib raygui lwt.unix)
-  (preprocess (pps lwt_ppx)))
+ (preprocess
+  (pps lwt_ppx)))
+
+(executable
+ (name server)
+ (public_name server)
+ (package mahjong)
+ (modules server)
+ (libraries lwt.unix)
+ (preprocess
+  (pps lwt_ppx)))

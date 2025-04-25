@@ -148,10 +148,10 @@ let draw_draw_button p gb =
       100.0 70.0
   in
   let is_draw_clicked = Raygui.button rect "Draw Tile" in
-  if is_draw_clicked then (
+  if is_draw_clicked then
     (* update player's hidden hand *)
-    Player_choice.draw p;
-    gb.is_drawn <- true)
+    let _ = Player_choice.draw p in
+    gb.is_drawn <- true
 
 (** Effect: when player [p] clicks throw button, returns true if thrown is
     completed. *)
