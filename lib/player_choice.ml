@@ -37,6 +37,15 @@ let throw (player : player) : unit =
   discarded := tile :: !discarded;
   Hidden_hand.remove hid tile
 
+let throw_with_index (player : player) id : unit =
+  let hid = get_hidden player in
+  let tile = Hidden_hand.get hid id in
+  ANSITerminal.printf [ yellow ] "\nPlayer %d: *%s* is discarding tile [%s]!\n"
+    (Player.get_index player) (Player.get_name player)
+    (Tile.tile_to_string tile);
+  discarded := tile :: !discarded;
+  Hidden_hand.remove hid tile
+
 let draw (player : player) =
   let hidden_hand = get_hidden player in
   let tile = Array.get !tiles_arr !curr_index in
@@ -122,27 +131,43 @@ let chi_check (hand : hidden_hand) : bool =
       true
     with Invalid_argument _ -> false
   in
-  let tilel2 = make_tile (get_num dis - 2) (get_tao dis) in
-  let tilel1 = make_tile (get_num dis - 1) (get_tao dis) in
-  let tileu2 = make_tile (get_num dis + 2) (get_tao dis) in
-  let tileu1 = make_tile (get_num dis + 1) (get_tao dis) in
-  if
-    pair_check tilel2 tilel1 || pair_check tilel1 tileu1
-    || pair_check tileu1 tileu2
-  then true
-  else false
+  let dis_num = get_num dis in
+  if dis_num < 1 || dis_num > 9 then false
+  else
+    (* array: [| l2 (dis_num -2), l1 (dis_num - 1), u2 (dis_num + 2), u1
+       (dis_num + 1)||] 
+       
+       Necessary tests: l2 & l1, l1 & u1 (aka. discard in the middle), u1 & u2 *)
+    let combo_arr = [| None; None; None; None |] in
+    if dis_num - 2 >= 1 then
+      combo_arr.(0) <- Some (make_tile (dis_num - 2) (get_tao dis));
+    if dis_num - 1 >= 1 then
+      combo_arr.(1) <- Some (make_tile (dis_num - 1) (get_tao dis));
+    if dis_num + 2 <= 9 then
+      combo_arr.(2) <- Some (make_tile (dis_num + 2) (get_tao dis));
+    if dis_num + 1 <= 9 then
+      combo_arr.(3) <- Some (make_tile (dis_num + 1) (get_tao dis));  
+    (* Array.iter (fun x -> match x with 
+    | None -> print_endline "None; "
+    | Some t -> print_endline (Tile.tile_to_string t)) combo_arr;
+    print_newline (); *)
+    match combo_arr with
+    | [| Some l2; Some l1; Some u2; Some u1|] -> pair_check l2 l1 || pair_check l1 u1 || pair_check u2 u1
+    | [| None; Some l1; Some u2; Some u1|] -> pair_check l1 u1 || pair_check u2 u1
+    | [| None; None; Some u2; Some u1|] -> pair_check u2 u1
+    | [| Some l2; Some l1; None; Some u1|] -> pair_check l2 l1 || pair_check l1 u1
+    | [| Some l2; Some l1; None; None|] -> pair_check l2 l1 
+    | _ -> false 
 
 let peng_check (hand : hidden_hand) : bool =
-  let counter = ref 0 in
   let dis = List.hd !discarded in
-  let rec count_tiles h =
+  let rec count_tiles h acc =
     match h with
-    | [] -> 0
+    | [] -> acc
     | h :: t ->
-        if h = dis then counter := !counter + 1;
-        count_tiles t
+        if h = dis then count_tiles t (acc + 1) else count_tiles t acc
   in
-  if count_tiles (get_tiles hand) >= 2 then true else false
+  if count_tiles (get_tiles hand) 0 >= 2 then true else false
 
 let chi (player : player) : bool =
   let hid = get_hidden player in
@@ -150,6 +175,18 @@ let chi (player : player) : bool =
   let sel = prompt_selection_2 hid in
   let dis = List.hd !discarded in
   chi_update (fst sel) (snd sel) dis ex hid
+
+let chi_with_index (player : player) id1 id2 : bool =
+  let hid = get_hidden player in
+  let ex = get_exposed player in
+  let dis = List.hd !discarded in
+  chi_update (Hidden_hand.get hid id1) (Hidden_hand.get hid id2) dis ex hid
+
+let peng_with_index (player : player) id1 id2 : bool =
+  let hid = get_hidden player in
+  let ex = get_exposed player in
+  let dis = List.hd !discarded in
+  peng_update (Hidden_hand.get hid id1) (Hidden_hand.get hid id2) dis ex hid
 
 let peng (player : player) : bool =
   let hid = get_hidden player in
