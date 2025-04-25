@@ -157,7 +157,7 @@ let tile_tests =
    0 0 hand (Exposed_hand.empty_exposed_hand ()) in let result = Ying.complete p
    in assert_equal expected result ~printer:string_of_bool *)
 
-let hh_tiles =
+let hh1_tiles =
   [
     Tile.string_to_tile "1 Wan";
     Tile.string_to_tile "1 Wan";
@@ -175,6 +175,24 @@ let hh_tiles =
     Tile.string_to_tile "7 Tiao";
   ]
 
+let hh2_tiles =
+  [
+    Tile.string_to_tile "1 Wan";
+    Tile.string_to_tile "2 Wan";
+    Tile.string_to_tile "2 Wan";
+    Tile.string_to_tile "2 Wan";
+    Tile.string_to_tile "3 Wan";
+    Tile.string_to_tile "4 Wan";
+    Tile.string_to_tile "4 Wan";
+    Tile.string_to_tile "4 Wan";
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "8 Wan";
+    Tile.string_to_tile "8 Wan";
+    Tile.string_to_tile "8 Wan";
+  ]
+
 let complete_test name tiles expected =
   name >:: fun _ ->
   let hand = Hidden_hand.make_hidden_hand tiles in
@@ -183,12 +201,10 @@ let complete_test name tiles expected =
       (Exposed_hand.empty_exposed_hand ())
   in
 
-  (* 打印当前手牌 *)
   Printf.printf "[DEBUG] Hand: %s\n"
     (String.concat " | "
        (List.map Tile.tile_to_string (Hidden_hand.get_tiles hand)));
 
-  (* 枚举所有可能的 pair 尝试 *)
   let hidden_tiles = Hidden_hand.get_tiles hand in
   let unique_tiles = List.sort_uniq Tile.compare_tile hidden_tiles in
   List.iter
@@ -208,12 +224,16 @@ let complete_test name tiles expected =
 
   assert_equal expected result ~printer:string_of_bool
 
-let tests =
-  "test suite"
-  >::: [ ("a trivial test" >:: fun _ -> assert_equal 0 0) ]
+let complete_test_list =
+  [ complete_test "test1" hh1_tiles true ]
+  @ [ complete_test "test2" hh2_tiles true ]
+  @ [ complete_test "test3" [] false ]
+  @
+  (* Empty hand should not complete *)
+  [ complete_test "test4" [ Tile.string_to_tile "1 Wan" ] false ]
+(* Single tile should not complete *)
 
-       @ tile_tests
-       @ [ complete_test "test" hh_tiles true ]
-       @ tile_tests @ player_tests @ player_choice_tests
+let tests =
+  "test suite" >::: tile_tests @ tile_tests @ player_tests @ complete_test_list
 
 let _ = run_test_tt_main tests
