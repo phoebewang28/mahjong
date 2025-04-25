@@ -159,10 +159,10 @@ let draw_draw_button p gb =
       100.0 70.0
   in
   let is_draw_clicked = Raygui.button rect "Draw Tile" in
-  if is_draw_clicked then (
+  if is_draw_clicked then
     (* update player's hidden hand *)
-    Player_choice.draw p;
-    gb.is_drawn <- true)
+    let _ = Player_choice.draw p in
+    gb.is_drawn <- true
 
 (** [make_player id name] creates a player with the given [id] and [name]. *)
 let make_player id name = Player.create name id

@@ -4,7 +4,7 @@ open Hidden_hand
 open Exposed_hand
 
 (* TODO: update comments!! *)
-val draw : player -> unit
+val draw : player -> tile
 (** [draw hid tile] adds the next tile in available tiles to player's hidden
     hand [hid].
 

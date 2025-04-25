@@ -23,3 +23,10 @@ val get_hidden : player -> hidden_hand
 
 val get_exposed : player -> exposed_hand
 (** [get_exposed p] returns the exposed tiles of player [p] *)
+
+
+val make_player : string -> int -> int -> hidden_hand -> exposed_hand -> player
+
+val winner : player -> player list -> int -> unit
+(** [winner p player_list bet] updates all players' money given a winner and win
+    type.*)
