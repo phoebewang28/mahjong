@@ -46,8 +46,7 @@ let draw (player : player) : unit =
   add hidden_hand tile;
   curr_index := !curr_index + 1;
   ANSITerminal.printf [ blue ] "Tile added at index: %d\n"
-    (get_tile_index hidden_hand tile);
-  throw player
+    (get_tile_index hidden_hand tile)
 
 let comp_tiles t1 t2 = get_num t1 - get_num t2
 
@@ -113,6 +112,37 @@ let prompt_selection_2 hid =
     "Please choose 2 tiles from your hand: Enter number from 0 - %d: " (len - 1);
   select_tiles_2 (0, len - 1) hid
 
+let chi_check (hand : hidden_hand) : bool =
+  let dis = List.hd !discarded in
+  let pair_check t1 t2 =
+    try
+      let _ = get_tile_index hand t1 in
+      let _ = get_tile_index hand t2 in
+      true
+    with Invalid_argument _ -> false
+  in
+  let tilel2 = make_tile (get_num dis - 2) (get_tao dis) in
+  let tilel1 = make_tile (get_num dis - 1) (get_tao dis) in
+  let tileu2 = make_tile (get_num dis + 2) (get_tao dis) in
+  let tileu1 = make_tile (get_num dis + 1) (get_tao dis) in
+  if
+    pair_check tilel2 tilel1 || pair_check tilel1 tileu1
+    || pair_check tileu1 tileu2
+  then true
+  else false
+
+let peng_check (hand : hidden_hand) : bool =
+  let counter = ref 0 in
+  let dis = List.hd !discarded in
+  let rec count_tiles h =
+    match h with
+    | [] -> 0
+    | h :: t ->
+        if h = dis then counter := !counter + 1;
+        count_tiles t
+  in
+  if count_tiles (get_tiles hand) >= 2 then true else false
+
 let chi (player : player) : bool =
   let hid = get_hidden player in
   let ex = get_exposed player in
@@ -135,19 +165,28 @@ let rec choose_move player =
   let choice = read_line () in
   let choice_tile = Str.split (Str.regexp " ") choice in
   (match List.hd choice_tile with
-  | "draw" -> draw player
+  | "draw" ->
+      draw player;
+      throw player
   | "chi" ->
       if chi player then (
         print_player_hid_exp player;
         throw player)
-      else begin ANSITerminal.printf [ red ] "Cannot chi, please choose again\n";
-      choose_move player end
-      (* if legal, allows throw, if not re-prompt player to choose move *)
+      else begin
+        ANSITerminal.printf [ red ] "Cannot chi, please choose again\n";
+        choose_move player
+        (* if legal, allows throw, if not re-prompt player to choose move *)
+      end
   | "peng" ->
       if peng player then (
         print_player_hid_exp player;
         throw player)
-      else begin print_endline "Cannot peng, please choose again\n";
-      choose_move player end
+      else begin
+        print_endline
+          ("Cannot peng the last discard: "
+          ^ tile_to_string (List.hd !discarded)
+          ^ ", please choose again\n");
+        choose_move player
+      end
   | _ -> choose_move player);
   print_player_hid_exp player

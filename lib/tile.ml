@@ -109,40 +109,43 @@ let group_to_string (g : group) : string =
   | San -> "KeZi"
   | Si -> "Gang"
 
+let string_to_suit str =
+  match str with
+  | "Tong" -> Tong
+  | "Wan" -> Wan
+  | "Tiao" -> Tiao
+  | "Dong" -> DaPai Dong
+  | "Nan" -> DaPai Nan
+  | "Xi" -> DaPai Xi
+  | "Bei" -> DaPai Bei
+  | "Zhong" -> DaPai Zhong
+  | "Fa" -> DaPai Fa
+  | "Bai" -> DaPai Bai
+  | "Fake" -> Fake
+  | _ -> raise (InvalidTile (str ^ " is not a valid suit string"))
+
 (* Edge case: DaPai -> no number in front, list of length 1 created *)
 let string_to_tile str =
   try
     let t = Str.split (Str.regexp " ") str in
-    (* list of number, followed by tile type *)
     if List.length t = 2 then (* normal tile (not Da Pai) *)
       let n = int_of_string (List.hd t) in
-      if n < 1 || n > 9 then
+      let tao = string_to_suit (List.hd (List.tl t)) in
+      if
+        n < 1 || n > 9
+        ||
+        match tao with
+        | DaPai _ -> true
+        | _ -> false
+      then
         raise
           (InvalidTile
              (str ^ " is an invalid string, cannot convert to Tile type!"))
-      else
-        match List.hd (List.tl t) with
-        (* gets the tile type *)
-        | "Tong" -> { num = n; tao = Tong }
-        | "Wan" -> { num = n; tao = Wan }
-        | "Tiao" -> { num = n; tao = Tiao }
-        | _ ->
-            raise
-              (InvalidTile
-                 (str ^ " is an invalid string, cannot convert to Tile type!"))
+      else { num = n; tao }
     else if List.length t = 1 then (* Da Pai *)
-      match List.hd t with
-      | "Dong" -> { num = 0; tao = DaPai Dong }
-      | "Nan" -> { num = 0; tao = DaPai Nan }
-      | "Xi" -> { num = 0; tao = DaPai Xi }
-      | "Bei" -> { num = 0; tao = DaPai Bei }
-      | "Zhong" -> { num = 0; tao = DaPai Zhong }
-      | "Fa" -> { num = 0; tao = DaPai Fa }
-      | "Bai" -> { num = 0; tao = DaPai Bai }
-      | _ ->
-          raise
-            (InvalidTile
-               (str ^ " is an invalid string, cannot convert to Tile type!"))
+      match string_to_suit (List.hd t) with
+      | DaPai x -> { num = 0; tao = DaPai x }
+      | _ -> raise (InvalidTile (str ^ " is not a valid DaPai string"))
     else
       raise
         (InvalidTile
@@ -196,3 +199,22 @@ let compare_tile t1 t2 =
 
 let fake_tile = { num = 3110; tao = Fake }
 (* used to represent a tile that doesn't exist, for testing purposes *)
+
+let tile_to_key (t : tile) : string =
+  match t.tao with
+  | Tong -> Printf.sprintf "%dtong" t.num
+  | Wan -> Printf.sprintf "%dwan" t.num
+  | Tiao -> Printf.sprintf "%dtiao" t.num
+  | DaPai dp -> (
+      match dp with
+      | Dong -> "dong"
+      | Nan -> "nan"
+      | Xi -> "xi"
+      | Bei -> "bei"
+      | Zhong -> "zhong"
+      | Fa -> "fa"
+      | Bai -> "bai")
+  | Fake -> "fake"
+
+let tile_list_to_keys (tiles : tile list) : string list =
+  List.sort compare_tile tiles |> List.map tile_to_key

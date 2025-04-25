@@ -3,6 +3,7 @@ open Player
 open Hidden_hand
 open Exposed_hand
 
+(* TODO: update comments!! *)
 val draw : player -> unit
 (** [draw hid tile] adds the next tile in available tiles to player's hidden
     hand [hid].
@@ -14,6 +15,13 @@ val throw : player -> unit
 val choose_move : player -> unit
 (* Asking for user input (e.g. option #1: draw, option #2: chi; option #3: pong)
    Call corresponding functions below *)
+
+
+val chi_check : hidden_hand -> bool
+(** [chi_check hand] returns true if a player's [hand] can chi *)
+
+val peng_check : hidden_hand -> bool
+(** [peng_check hand] returns true if a player's [hand] can peng *)
 
    val chi : player -> bool
    (** [chi hid ex] takes in hidden hand [hid] of player, and exposed hand [ex] of
