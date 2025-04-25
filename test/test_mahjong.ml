@@ -152,11 +152,6 @@ let tile_tests =
     (* qtest (make_tile_test 1) 100; *)
   ]
 
-(* let complete_test name tiles expected = name >:: fun _ -> let hand =
-   Hidden_hand.make_hidden_hand tiles in let p = Player.make_player "TestPlayer"
-   0 0 hand (Exposed_hand.empty_exposed_hand ()) in let result = Ying.complete p
-   in assert_equal expected result ~printer:string_of_bool *)
-
 let hh1_tiles =
   [
     Tile.string_to_tile "1 Wan";
