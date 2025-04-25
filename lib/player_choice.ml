@@ -97,12 +97,10 @@ let chi_check (hand : hidden_hand) : bool =
 let peng_check (hand : hidden_hand) : bool =
   let dis = List.hd !discarded in
   let rec count_tiles h acc =
-  let rec count_tiles h acc =
     match h with
     | [] -> acc
     | h :: t -> if h = dis then count_tiles t (acc + 1) else count_tiles t acc
   in
-  if count_tiles (get_tiles hand) 0 >= 2 then true else false
   if count_tiles (get_tiles hand) 0 >= 2 then true else false
 
 let chi (player : player) t1 t2 : bool =
@@ -111,7 +109,6 @@ let chi (player : player) t1 t2 : bool =
   let dis = List.hd !discarded in
   chi_update t1 t2 dis ex hid
 
-let peng (player : player) t1 t2 : bool =
 let chi_with_index (player : player) id1 id2 : bool =
   let hid = get_hidden player in
   let ex = get_exposed player in
@@ -124,7 +121,7 @@ let peng_with_index (player : player) id1 id2 : bool =
   let dis = List.hd !discarded in
   peng_update (Hidden_hand.get hid id1) (Hidden_hand.get hid id2) dis ex hid
 
-let peng (player : player) : bool =
+let peng (player : player) t1 t2 : bool =
   let hid = get_hidden player in
   let ex = get_exposed player in
   let dis = List.hd !discarded in
