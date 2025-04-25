@@ -278,6 +278,24 @@ let hh7_tiles =
     Tile.string_to_tile "Bai";
   ]
 
+let hh8_tiles =
+  [
+    Tile.string_to_tile "3 Wan";
+    Tile.string_to_tile "4 Wan";
+    Tile.string_to_tile "4 Wan";
+    Tile.string_to_tile "4 Wan";
+    Tile.string_to_tile "4 Wan";
+    Tile.string_to_tile "5 Wan";
+    Tile.string_to_tile "5 Wan";
+    Tile.string_to_tile "6 Wan";
+    Tile.string_to_tile "6 Wan";
+    Tile.string_to_tile "6 Wan";
+    Tile.string_to_tile "6 Wan";
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "9 Wan";
+  ]
+
 let complete_test name tiles expected =
   name >:: fun _ ->
   let hand = Hidden_hand.make_hidden_hand tiles in
@@ -324,6 +342,7 @@ let complete_test_list =
   @ [ complete_test "test5" hh5_tiles true ]
   @ [ complete_test "test6" hh6_tiles true ]
   @ [ complete_test "test7" hh7_tiles true ]
+  @ [ complete_test "test8" hh8_tiles true ]
 
 let tests =
   "test suite" >::: tile_tests @ tile_tests @ player_tests @ complete_test_list
