@@ -39,3 +39,5 @@ let get_tiles (e : exposed_hand) : tile list =
 
 (** [empty_exposed_hand] is an empty exposed hand. *)
 let empty_exposed_hand () : exposed_hand = ref []
+
+let exposed_hand_count (e : exposed_hand) : int = List.length !e

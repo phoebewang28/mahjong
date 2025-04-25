@@ -87,8 +87,66 @@ let tile_tests =
     (* qtest (make_tile_test 1) 100; *)
   ]
 
+(* let complete_test name tiles expected = name >:: fun _ -> let hand =
+   Hidden_hand.make_hidden_hand tiles in let p = Player.make_player "TestPlayer"
+   0 0 hand (Exposed_hand.empty_exposed_hand ()) in let result = Ying.complete p
+   in assert_equal expected result ~printer:string_of_bool *)
+
+let hh_tiles =
+  [
+    Tile.string_to_tile "1 Wan";
+    Tile.string_to_tile "1 Wan";
+    Tile.string_to_tile "2 Wan";
+    Tile.string_to_tile "3 Wan";
+    Tile.string_to_tile "4 Wan";
+    Tile.string_to_tile "5 Wan";
+    Tile.string_to_tile "6 Wan";
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "3 Tong";
+    Tile.string_to_tile "4 Tong";
+    Tile.string_to_tile "5 Tong";
+    Tile.string_to_tile "7 Tiao";
+    Tile.string_to_tile "7 Tiao";
+    Tile.string_to_tile "7 Tiao";
+  ]
+
+let complete_test name tiles expected =
+  name >:: fun _ ->
+  let hand = Hidden_hand.make_hidden_hand tiles in
+  let p =
+    Player.make_player "TestPlayer" 0 0 hand
+      (Exposed_hand.empty_exposed_hand ())
+  in
+
+  (* 打印当前手牌 *)
+  Printf.printf "[DEBUG] Hand: %s\n"
+    (String.concat " | "
+       (List.map Tile.tile_to_string (Hidden_hand.get_tiles hand)));
+
+  (* 枚举所有可能的 pair 尝试 *)
+  let hidden_tiles = Hidden_hand.get_tiles hand in
+  let unique_tiles = List.sort_uniq Tile.compare_tile hidden_tiles in
+  List.iter
+    (fun t ->
+      let count =
+        List.length
+          (List.filter (fun x -> Tile.compare_tile x t = 0) hidden_tiles)
+      in
+      if count >= 2 then
+        Printf.printf "[DEBUG] Trying pair candidate: %s (x%d)\n"
+          (Tile.tile_to_string t) count)
+    unique_tiles;
+
+  let result = Ying.complete p in
+
+  Printf.printf "[DEBUG] Result: %b (Expected: %b)\n\n" result expected;
+
+  assert_equal expected result ~printer:string_of_bool
+
 let tests =
   "test suite"
-  >::: [ ("a trivial test" >:: fun _ -> assert_equal 0 0) ] @ tile_tests
+  >::: [ ("a trivial test" >:: fun _ -> assert_equal 0 0) ]
+       @ tile_tests
+       @ [ complete_test "test" hh_tiles true ]
 
 let _ = run_test_tt_main tests
