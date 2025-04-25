@@ -193,6 +193,42 @@ let hh2_tiles =
     Tile.string_to_tile "8 Wan";
   ]
 
+let hh3_tiles =
+  [
+    Tile.string_to_tile "1 Tiao";
+    Tile.string_to_tile "1 Tiao";
+    Tile.string_to_tile "1 Tiao";
+    Tile.string_to_tile "3 Tiao";
+    Tile.string_to_tile "3 Tiao";
+    Tile.string_to_tile "3 Tiao";
+    Tile.string_to_tile "3 Tiao";
+    Tile.string_to_tile "4 Tiao";
+    Tile.string_to_tile "5 Tiao";
+    Tile.string_to_tile "7 Tiao";
+    Tile.string_to_tile "7 Tiao";
+    Tile.string_to_tile "7 Tiao";
+    Tile.string_to_tile "8 Tiao";
+    Tile.string_to_tile "9 Tiao";
+  ]
+
+let hh4_tiles =
+  [
+    Tile.string_to_tile "1 Tiao";
+    Tile.string_to_tile "1 Tiao";
+    Tile.string_to_tile "1 Tiao";
+    Tile.string_to_tile "1 Tiao";
+    Tile.string_to_tile "2 Tiao";
+    Tile.string_to_tile "2 Tiao";
+    Tile.string_to_tile "2 Tiao";
+    Tile.string_to_tile "3 Tiao";
+    Tile.string_to_tile "4 Tiao";
+    Tile.string_to_tile "4 Tiao";
+    Tile.string_to_tile "4 Tiao";
+    Tile.string_to_tile "5 Tiao";
+    Tile.string_to_tile "6 Tiao";
+    Tile.string_to_tile "7 Tiao";
+  ]
+
 let hh5_tiles =
   [
     Tile.string_to_tile "3 Tong";
@@ -263,7 +299,12 @@ let complete_test name tiles expected =
 let complete_test_list =
   [ complete_test "test1" hh1_tiles true ]
   @ [ complete_test "test2" hh2_tiles true ]
+    (* Empty hand should not complete *)
   @ [ complete_test "test3" [] false ]
+  (* Single tile should not complete *)
+  @ [ complete_test "test4" [ Tile.string_to_tile "1 Wan" ] false ]
+  @ [ complete_test "test5" hh3_tiles true ]
+  @ [ complete_test "test6" hh4_tiles true ]
   (* Empty hand should not complete *)
   @ [ complete_test "test4" [ Tile.string_to_tile "1 Wan" ] false ]
   (* Single tile should not complete *)
