@@ -44,9 +44,7 @@ let draw (player : player) =
     (Player.get_index player) (Player.get_name player)
     (Tile.tile_to_string tile);
   add hidden_hand tile;
-  print_endline (string_of_int !curr_index);
   curr_index := !curr_index + 1;
-  print_endline (string_of_int !curr_index);
   ANSITerminal.printf [ blue ] "Tile added at index: %d\n"
     (get_tile_index hidden_hand tile);
   tile
