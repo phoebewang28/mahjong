@@ -10,6 +10,9 @@ type player = {
   mutable exposed : exposed_hand;
 }
 
+let make_player n i m hh eh =
+  { name = n; index = i; money = m; hidden = hh; exposed = eh }
+
 let create name index =
   let player =
     {
@@ -34,3 +37,10 @@ let get_money p = p.money
 let get_name p = p.name
 let get_hidden p = p.hidden
 let get_exposed p = p.exposed
+let set_money amt p = p.money <- amt
+
+let winner p player_list bet =
+  set_money (get_money p + (4 * bet)) p;
+  (* print_endline (string_of_int (get_money p)); *)
+  List.iter (fun a -> set_money (get_money a - bet) a) player_list
+(* print_endline (string_of_int (get_money (List.nth player_list 2))) *)

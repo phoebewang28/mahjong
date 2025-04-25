@@ -54,6 +54,60 @@ let compare_tiles_test expected_val exp_bool tile1 tile2 =
     ("compare_tiles test: " ^ Tile.tile_to_string tile1 ^ " vs "
    ^ Tile.tile_to_string tile2)
 
+(**Tests for the [Player.create] function.*)
+
+let create_player_test p_name p_index =
+  let player = Player.create p_name p_index in
+  [
+    ( p_name ^ " name test" >:: fun _ ->
+      assert_equal (Player.get_name player) p_name ~printer:(fun x -> x) );
+    ( p_name ^ " index test" >:: fun _ ->
+      assert_equal (Player.get_index player) p_index ~printer:string_of_int );
+    ( p_name ^ " money init test" >:: fun _ ->
+      assert_equal (Player.get_money player) 1500 ~printer:string_of_int );
+  ]
+
+(**Tests for the [Player.winner] function.*)
+
+let player_win_test (p : Player.player) (players : Player.player list) bet =
+  let original_money = Hashtbl.create 4 in
+  List.iter
+    (fun a ->
+      Hashtbl.replace original_money (Player.get_name a) (Player.get_money a))
+    players;
+  Hashtbl.iter
+    (fun key value -> Printf.printf "%s: %d\n" key value)
+    original_money;
+  Player.winner p players bet;
+  Player.get_name p ^ " wins out of "
+  ^ String.concat ", " (List.map Player.get_name players)
+  >:: fun _ ->
+  assert_equal
+    (Hashtbl.find original_money (Player.get_name p) + (3 * bet))
+    (Player.get_money p) ~printer:string_of_int;
+
+  (*to debug*)
+  (* print_endline (string_of_int (Player.get_money p)); print_endline
+     (string_of_int (Hashtbl.find original_money (Player.get_name p) + (3 *
+     bet))); print_endline "-----"; List.iter (fun a -> print_endline
+     (string_of_int (Hashtbl.find original_money (Player.get_name a) - bet));
+     print_endline (string_of_int (Player.get_money a))) (List.filter (fun a ->
+     a <> p) players); *)
+  List.iter
+    (fun a ->
+      assert_equal
+        (Hashtbl.find original_money (Player.get_name a) - bet)
+        (Player.get_money a) ~printer:string_of_int)
+    (List.filter (fun a -> a <> p) players)
+
+let ocahmahjong_team = List.map (fun (a, b) -> Player.create a b) players_string
+
+let player_tests =
+  List.flatten
+    (List.map (fun (a, b) -> create_player_test a b) Utilities.players_string)
+  @ [ player_win_test (List.hd ocahmahjong_team) ocahmahjong_team 10 ]
+(* @ [ player_win_test (List.hd ocahmahjong_team) ocahmahjong_team 10 ] *)
+
 let tile_tests =
   (*Tests that will be applied on various selected tiles, refer to
     Utilities.ml*)
@@ -89,6 +143,7 @@ let tile_tests =
 
 let tests =
   "test suite"
-  >::: [ ("a trivial test" >:: fun _ -> assert_equal 0 0) ] @ tile_tests
+  >::: [ ("a trivial test" >:: fun _ -> assert_equal 0 0) ]
+       @ tile_tests @ player_tests
 
 let _ = run_test_tt_main tests
