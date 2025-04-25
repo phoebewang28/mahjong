@@ -12,15 +12,6 @@ let is_shu t =
   | "Wan" | "Tong" | "Tiao" -> true
   | _ -> false
 
-let can_form_sequence tiles t =
-  let n1 = Tile.get_num t in
-  let suit = Tile.get_tao t in
-  if (not (is_shu t)) || n1 > 7 then false
-  else
-    let t2 = Tile.make_tile (n1 + 1) suit in
-    let t3 = Tile.make_tile (n1 + 2) suit in
-    List.mem t2 tiles && List.mem t3 tiles
-
 let rec remove_tiles tiles ts =
   match ts with
   | [] -> tiles
@@ -49,17 +40,6 @@ let rec try_make_melds tiles n =
           else false
         in
         attempt_triple || attempt_sequence
-
-let remove_yan tiles n =
-  let rec try_pairs = function
-    | [] -> false
-    | t1 :: t2 :: rest when t1 = t2 ->
-        let remaining = remove_n tiles t1 2 in
-        if try_make_melds remaining n then true
-        else try_pairs (List.filter (fun x -> x <> t1) rest)
-    | _ :: rest -> try_pairs rest
-  in
-  try_pairs tiles
 
 let complete (p : Player.player) : bool =
   let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
