@@ -31,6 +31,8 @@ let create name index =
 (* let deal player = player.hidden <- init_hidden_hand (Array.to_list (Array.sub
    !Tile.tiles_arr !Tile.curr_index 13)); Tile.curr_index := !Tile.curr_index +
    13 *)
+let make_player n i m hh eh =
+  { name = n; index = i; money = m; hidden = hh; exposed = eh }
 
 let get_index p = p.index
 let get_money p = p.money
