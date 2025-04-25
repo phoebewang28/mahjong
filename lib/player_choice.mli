@@ -12,6 +12,10 @@ val draw : player -> unit
 val throw : player -> unit
 (* From player hand, let player choose which tile they want to discard *)
 
+(** For GUI usage, after tile in GUI has been clicked.
+[id] rep. index of tile that player desire to throw *)
+val throw_with_index : player -> int -> unit
+
 val choose_move : player -> unit
 (* Asking for user input (e.g. option #1: draw, option #2: chi; option #3: pong)
    Call corresponding functions below *)

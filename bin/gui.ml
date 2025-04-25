@@ -13,6 +13,22 @@ type start_board = {
   mutable player_name_edit_mode : bool array;
 }
 
+type game_board = {
+  mutable player_lst : Player.player list;
+  mutable cur_player_id : int; (* index of current player: 0,1,2,3 *)
+  mutable player_hid : Hidden_hand.hidden_hand;
+      (* hidden hand of CURRENT player *)
+  mutable player_exp : Exposed_hand.exposed_hand;
+  mutable discard : Tile.tile option;
+  mutable is_drawn : bool;
+  mutable is_chi : bool;
+  mutable is_peng : bool;
+  mutable is_throwing : bool;
+  mutable chi_fail : bool;
+  mutable peng_fail : bool;
+  mutable clicked_tile : int;
+}
+
 (* Tile image handling *)
 let tile_image_table : (string, Texture2D.t) Hashtbl.t = Hashtbl.create 50
 
@@ -65,36 +81,32 @@ let load_tile_images () =
 
 let get_tile_texture key = Hashtbl.find_opt tile_image_table key
 
-let draw_tile_list_from_keys keys x0 y0 =
+(* draw tiles as buttons *)
+let draw_tile_list_from_keys keys x0 y0 (gb : game_board) =
   let scale = 0.04 in
   let x = ref (float_of_int x0) in
-  List.iter
-    (fun key ->
+  List.iteri
+    (fun id key ->
       match get_tile_texture key with
       | Some tex ->
+          (* get texture dimensions *)
           let tex_w = float_of_int (Texture2D.width tex) *. scale in
+          let tex_h = float_of_int (Texture2D.height tex) *. scale in
+          let rect = Raylib.Rectangle.create !x (float_of_int y0) tex_w tex_h in
+          let is_tile_clicked = Raygui.button rect "" in
+          (* overlay texture on top of button -> in same bounds *)
           draw_texture_ex tex
             (Vector2.create !x (float_of_int y0))
             0.0 scale Color.white;
-          x := !x +. tex_w
+          x := !x +. tex_w;
+          (* gb.is_throwing ensures clicked_tile field only updated if player is
+             in throwing state, ignores o/w*)
+          if is_tile_clicked && gb.is_throwing then gb.clicked_tile <- id
+          (* get index of tile *)
       | None ->
           draw_text " " (int_of_float !x) y0 20 Color.red;
           x := !x +. 40.0)
     keys
-
-type game_board = {
-  mutable player_lst : Player.player list;
-  mutable cur_player_id : int; (* index of current player: 0,1,2,3 *)
-  mutable player_hid : Hidden_hand.hidden_hand;
-      (* hidden hand of CURRENT player *)
-  mutable player_exp : Exposed_hand.exposed_hand;
-  mutable discard : Tile.tile option;
-  mutable is_drawn : bool;
-  mutable is_chi : bool;
-  mutable is_peng : bool;
-  mutable chi_fail : bool;
-  mutable peng_fail : bool;
-}
 
 let window_width = 800
 let window_height = 600
@@ -153,21 +165,6 @@ let draw_draw_button p gb =
     Player_choice.draw p;
     gb.is_drawn <- true)
 
-(** Effect: when player [p] clicks throw button, returns true if thrown is
-    completed. *)
-let draw_throw_button p : bool =
-  let rect =
-    Raylib.Rectangle.create
-      (float_of_int window_width -. 300.)
-      (float_of_int window_height -. 500.)
-      100.0 70.0
-  in
-  let is_throw_clicked = Raygui.button rect "Throw Tile" in
-  if is_throw_clicked then (
-    Player_choice.throw p;
-    true)
-  else false
-
 (** [make_player id name] creates a player with the given [id] and [name]. *)
 let make_player id name = Player.create name id
 
@@ -217,8 +214,11 @@ let setup_game name_arr : game_board =
     is_drawn = false;
     is_chi = false;
     is_peng = false;
+    is_throwing = false;
     chi_fail = false;
     peng_fail = false;
+    clicked_tile = -1;
+    (* -1: no tile selected *)
   }
 
 (** Updates current [gb] with new fields after player's actions *)
@@ -267,19 +267,19 @@ let draw_discard_tile (tile_opt : Tile.tile option) =
       | None -> draw_text " " (int_of_float x) (int_of_float y) 30 Color.red)
   | None -> ()
 
-let draw_player_hid p : unit =
+let draw_player_hid p gb : unit =
   let hidden_hand = Player.get_hidden p in
   let tiles = Hidden_hand.get_tiles hidden_hand in
   let keys = Tile.tile_list_to_keys tiles in
-  draw_tile_list_from_keys keys (center_x - 350) (window_height - 100)
+  draw_tile_list_from_keys keys (center_x - 350) (window_height - 100) gb
 
-let draw_player_exp p : unit =
+let draw_player_exp p gb : unit =
   let exposed_hand = Player.get_exposed p in
   let tiles = Exposed_hand.get_tiles exposed_hand in
   let keys = Tile.tile_list_to_keys tiles in
   Printf.printf "Exposed hand keys:\n";
   List.iter (fun k -> Printf.printf " - %s\n" k) keys;
-  draw_tile_list_from_keys keys (center_x - 300) (window_height - 200)
+  draw_tile_list_from_keys keys (center_x - 300) (window_height - 200) gb
 
 let draw_player_name p : unit =
   let font_size = 40 in
@@ -350,24 +350,29 @@ let draw_all_game (gb : game_board) : unit =
   let p = List.nth gb.player_lst gb.cur_player_id in
   draw_discard_tile gb.discard;
   draw_player_name p;
-  draw_player_hid p;
-  draw_player_exp p;
+  draw_player_hid p gb;
+  draw_player_exp p gb;
 
   (* only render draw/chi/peng button when player has not selected ANY of
      drawn/chi/peng actions. If any one selected, all buttons disabled -> only
      THROW enabled.*)
+
   if (not gb.is_drawn) && (not gb.is_chi) && not gb.is_peng then (
     draw_draw_button p gb;
     draw_chi_button p gb;
     draw_peng_button p gb)
-  else if
-    (* draws throw button & swaps to next player if throw successful *)
-    draw_throw_button p
-  then (
-    gb.cur_player_id <- (gb.cur_player_id + 1) mod List.length gb.player_lst;
-    gb.is_drawn <- false;
-    gb.is_peng <- false;
-    gb.is_chi <- false);
+  else (
+    gb.is_throwing <- true;
+    if gb.clicked_tile <> -1 then (
+      (* activates throw functionality, <> -1 means player has selected tile *)
+      Player_choice.throw_with_index p gb.clicked_tile;
+      (* reset all fields once throw is successful *)
+      gb.cur_player_id <- (gb.cur_player_id + 1) mod List.length gb.player_lst;
+      gb.is_drawn <- false;
+      gb.is_peng <- false;
+      gb.is_chi <- false;
+      gb.clicked_tile <- -1;
+      gb.is_throwing <- false));
 
   (* todo: need extra game logic == stretch - only render chi & peng buttons
      when discarded tile allows for possible combo with player hand && draw &
