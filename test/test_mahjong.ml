@@ -60,6 +60,11 @@ let draw_next_tile_test expected_tile player curr =
   let drawn = Player_choice.draw player in
   assert_equal expected_tile drawn ~printer:Tile.tile_to_string
 
+(* let throw_test expected_tile player = QCheck.Test.make ~count:100
+   ~name:("test throw " ^ Tile.tile_to_string expected_tile)
+   Utilities.arbitrary_tile (fun (row, col) -> let plant = Plants.seed row col
+   in seed_exists plant = Option.is_some plant) *)
+
 let player_choice_tests =
   let player = Utilities.player in
   [ draw_next_tile_test (Tile.string_to_tile "1 Tong") player 0 ]
@@ -326,6 +331,8 @@ let complete_test_list =
   @ [ complete_test "test7" hh7_tiles true ]
 
 let tests =
-  "test suite" >::: tile_tests @ tile_tests @ player_tests @ complete_test_list
+  "test suite"
+  >::: tile_tests @ tile_tests @ player_tests @ player_choice_tests
+       @ complete_test_list
 
 let _ = run_test_tt_main tests

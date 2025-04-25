@@ -9,10 +9,10 @@ val draw : player -> tile
     hand [hid].
 
     Precondition: Assumes [hid] is sorted! (And must resort after drawing!!) *)
-val throw : player -> unit
+val throw : player -> elem -> tile
 (* From player hand, let player choose which tile they want to discard *)
 
-val choose_move : player -> unit
+(* val choose_move : player -> unit *)
 (* Asking for user input (e.g. option #1: draw, option #2: chi; option #3: pong)
    Call corresponding functions below *)
 
@@ -23,7 +23,7 @@ val chi_check : hidden_hand -> bool
 val peng_check : hidden_hand -> bool
 (** [peng_check hand] returns true if a player's [hand] can peng *)
 
-   val chi : player -> bool
+   val chi : player -> elem -> elem -> bool
    (** [chi hid ex] takes in hidden hand [hid] of player, and exposed hand [ex] of
        player.
    
@@ -35,7 +35,7 @@ val peng_check : hidden_hand -> bool
    
        Valid chi: 3 consecutive numbers of the same type of tile. *)
    
-   val peng : player -> bool
+   val peng : player -> elem -> elem -> bool
    (** [peng hid ex] takes in hidden hand [hid] of player, and exposed hand [ex] of
        player.
    
