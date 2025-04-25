@@ -391,31 +391,20 @@ let draw_all_game (gb : game_board) : unit =
   draw_player_hid p gb;
   draw_player_exp p gb;
 
-  (* (* only render draw/chi/peng button when player has not selected ANY of
-     drawn/chi/peng actions. If any one selected, all buttons disabled -> only
-     THROW enabled.*) if (not gb.is_drawn) && (not gb.is_chiing ) && not
-     gb.is_penging then ( draw_draw_button p gb; (* only render chi & peng buttons
-     when discarded tile allows for possible combo with player hand && draw &
-     the other action have not been selected *) (* ensure that there IS a
-     discard!! *) match gb.discard with | None -> () | Some _ -> if
-     Player_choice.chi_check gb.player_hid then draw_chi_button p gb; if
-     Player_choice.peng_check gb.player_hid then draw_peng_button p gb) else (
-     gb.is_throwing <- true; if gb.clicked_tile <> -1 then ( (* activates throw
-     functionality, <> -1 means player has selected tile *)
-     Player_choice.throw_with_index p gb.clicked_tile; (* reset all fields once
-     throw is successful *) gb.cur_player_id <- (gb.cur_player_id + 1) mod
-     List.length gb.player_lst; gb.is_drawn <- false; gb.is_penging <- false;
-     gb.is_chiing <- false; gb.clicked_tile <- -1; gb.is_throwing <- false)); *)
+  (* only render draw/chi/peng button when player has not selected ANY of
+     drawn/chi/peng actions. *)
 
   (* all buttons rendering *)
   if (not gb.is_drawn) && (not gb.is_chiing) && not gb.is_penging then (
     draw_draw_button p gb;
-    draw_chi_button p gb;
-    (* sets gb.is_chiing to true: wait for player to select 2 tiles b4 engaging
-       throwing *)
-    draw_peng_button p gb)
+    (* ensure that there IS a discard!! *)
+    match gb.discard with
+    | None -> ()
+    | Some _ ->
+        if Player_choice.chi_check gb.player_hid then draw_chi_button p gb;
+        if Player_choice.peng_check gb.player_hid then draw_peng_button p gb)
   else if gb.is_throwing then throw_reset p gb
-    (* this clause MUST come BEFORE the others!! cuz other clauses and
+    (* this is_throwing clause MUST come BEFORE the others!! cuz other clauses and
        is_throwing can be true simultaneously, o/w throw_reset is never gonna
        run *)
   else if gb.is_drawn then
