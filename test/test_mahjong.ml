@@ -224,6 +224,42 @@ let hh4_tiles =
     Tile.string_to_tile "7 Tiao";
   ]
 
+let hh5_tiles =
+  [
+    Tile.string_to_tile "3 Tong";
+    Tile.string_to_tile "3 Tong";
+    Tile.string_to_tile "3 Tong";
+    Tile.string_to_tile "4 Tong";
+    Tile.string_to_tile "4 Tong";
+    Tile.string_to_tile "4 Tong";
+    Tile.string_to_tile "4 Tong";
+    Tile.string_to_tile "6 Tong";
+    Tile.string_to_tile "8 Tong";
+    Tile.string_to_tile "8 Tong";
+    Tile.string_to_tile "9 Tong";
+    Tile.string_to_tile "9 Tong";
+    Tile.string_to_tile "9 Tong";
+    Tile.string_to_tile "5 Tong";
+  ]
+
+let hh6_tiles =
+  [
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "3 Tong";
+    Tile.string_to_tile "4 Tong";
+    Tile.string_to_tile "4 Tong";
+    Tile.string_to_tile "5 Tong";
+    Tile.string_to_tile "5 Tong";
+    Tile.string_to_tile "6 Tong";
+    Tile.string_to_tile "7 Tong";
+    Tile.string_to_tile "7 Tong";
+    Tile.string_to_tile "7 Tong";
+    Tile.string_to_tile "9 Tong";
+    Tile.string_to_tile "9 Tong";
+  ]
+
 let complete_test name tiles expected =
   name >:: fun _ ->
   let hand = Hidden_hand.make_hidden_hand tiles in
@@ -264,6 +300,11 @@ let complete_test_list =
   @ [ complete_test "test4" [ Tile.string_to_tile "1 Wan" ] false ]
   @ [ complete_test "test5" hh3_tiles true ]
   @ [ complete_test "test6" hh4_tiles true ]
+  (* Empty hand should not complete *)
+  @ [ complete_test "test4" [ Tile.string_to_tile "1 Wan" ] false ]
+  (* Single tile should not complete *)
+  @ [ complete_test "test5" hh5_tiles true ]
+  @ [ complete_test "test6" hh6_tiles true ]
 
 let tests =
   "test suite" >::: tile_tests @ tile_tests @ player_tests @ complete_test_list
