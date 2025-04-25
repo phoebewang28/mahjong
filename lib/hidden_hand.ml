@@ -15,7 +15,7 @@ type hidden_hand = {
 (* let compare_elem e1 e2 = match (e1, e2) with | None, None -> 0 | None, _ -> 1
    | _, None -> -1 | Some t1, Some t2 -> compare_tile t1 t2 *)
 
-let force_RI hand = Array.sort compare_tile hand
+let sort hand = Array.sort compare_tile hand
 
 let init_hidden_hand tiles =
   let size = List.length tiles in
@@ -27,7 +27,7 @@ let init_hidden_hand tiles =
         acc + 1)
       0 tiles
   in
-  force_RI hand;
+  sort hand;
   { hand; size }
 
 let get hh idx = hh.hand.(idx)
@@ -47,7 +47,7 @@ let add hh t =
   (* extend the array by one tile, fill with fake tile *)
   (* add the new tile to the end of the hand *)
   (* index at hh.size is None *)
-  force_RI hh.hand;
+  sort hh.hand;
   hh.size <- hh.size + 1
 
 let remove hh tile =
@@ -55,7 +55,7 @@ let remove hh tile =
   | None -> raise (Invalid_argument "Tile does not exist")
   | Some idx ->
       hh.hand.(idx) <- fake_tile;
-      force_RI hh.hand;
+      sort hh.hand;
       hh.size <- hh.size - 1
 
 let replace hh tile idx =
