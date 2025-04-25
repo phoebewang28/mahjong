@@ -46,7 +46,7 @@ let throw_with_index (player : player) id : unit =
   discarded := tile :: !discarded;
   Hidden_hand.remove hid tile
 
-let draw (player : player) : unit =
+let draw (player : player) =
   let hidden_hand = get_hidden player in
   let tile = Array.get !tiles_arr !curr_index in
   ANSITerminal.printf [ blue ] "\nPlayer %d: *%s* is drawing tile [%s]!\n"
