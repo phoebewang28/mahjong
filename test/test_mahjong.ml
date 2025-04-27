@@ -141,9 +141,100 @@ let tile_tests =
     (* qtest (make_tile_test 1) 100; *)
   ]
 
+let suit = Tile.string_to_suit "Tong"
+let tile1 = Tile.make_tile 1 suit
+let tile2 = Tile.make_tile 2 suit
+let tile3 = Tile.make_tile 3 suit
+let tile4 = Tile.make_tile 4 suit
+let tile5 = Tile.make_tile 5 suit
+
+let eh_chi_test tiles =
+  let hand = Exposed_hand.empty_exposed_hand () in
+  "chi test" >:: fun _ ->
+  List.iter (fun a -> Exposed_hand.chi a hand) tiles;
+  (*tiles and groups are in reverse order*)
+  let groups = List.rev !(Exposed_hand.get_hand hand) in
+  List.iter2
+    (fun tile group ->
+      assert_equal
+        (Printf.sprintf "%s ShunZi" (Tile.tile_to_string tile))
+        (Tile.tile_to_string (snd group)
+        ^ " "
+        ^ Tile.group_to_string (fst group))
+        ~printer:(fun x -> x))
+    tiles groups
+
+let eh_gang_test tiles =
+  let hand = Exposed_hand.empty_exposed_hand () in
+  "gang test" >:: fun _ ->
+  List.iter (fun a -> Exposed_hand.ming_gang a hand) tiles;
+  (*tiles and groups are in reverse order*)
+  let groups = List.rev !(Exposed_hand.get_hand hand) in
+  List.iter2
+    (fun tile group ->
+      assert_equal
+        (Printf.sprintf "%s Gang" (Tile.tile_to_string tile))
+        (Tile.tile_to_string (snd group)
+        ^ " "
+        ^ Tile.group_to_string (fst group))
+        ~printer:(fun x -> x))
+    tiles groups
+
+let eh_peng_test tiles =
+  let hand = Exposed_hand.empty_exposed_hand () in
+  "peng test" >:: fun _ ->
+  List.iter (fun a -> Exposed_hand.peng a hand) tiles;
+  (*tiles and groups are in reverse order*)
+  let groups = List.rev !(Exposed_hand.get_hand hand) in
+  List.iter2
+    (fun tile group ->
+      assert_equal
+        (Printf.sprintf "%s KeZi" (Tile.tile_to_string tile))
+        (Tile.tile_to_string (snd group)
+        ^ " "
+        ^ Tile.group_to_string (fst group))
+        ~printer:(fun x -> x))
+    tiles groups
+
+let eh_get_tiles_test func tiles expected_tiles =
+  let hand = Exposed_hand.empty_exposed_hand () in
+  "get_tiles test" >:: fun _ ->
+  List.iter (fun a -> func a hand) tiles;
+  let actual_tiles = Exposed_hand.get_tiles hand in
+  assert_equal
+    (List.map Tile.tile_to_string expected_tiles)
+    (List.map Tile.tile_to_string actual_tiles)
+    ~printer:(String.concat ", ")
+
+let exposed_hand_test =
+  [
+    ( "empty exposed hand test" >:: fun _ ->
+      assert_equal
+        (Exposed_hand.exposed_hand_to_string
+           (Exposed_hand.empty_exposed_hand ()))
+        ""
+        ~printer:(fun x -> x) );
+    eh_chi_test [ tile1 ];
+    eh_chi_test [ tile1; tile2 ];
+    eh_peng_test [ tile3 ];
+    eh_peng_test [ tile3; tile4 ];
+    eh_gang_test [ tile2 ];
+    eh_gang_test [ tile4 ];
+    eh_get_tiles_test Exposed_hand.chi [ tile1 ] [ tile1; tile2; tile3 ];
+    eh_get_tiles_test Exposed_hand.peng [ tile1 ] [ tile1; tile1; tile1 ];
+    eh_get_tiles_test Exposed_hand.chi [ tile1; tile2 ]
+      [ tile2; tile3; tile4; tile1; tile2; tile3 ];
+    eh_get_tiles_test Exposed_hand.peng [ tile3; tile4 ]
+      [ tile4; tile4; tile4; tile3; tile3; tile3 ];
+    eh_get_tiles_test Exposed_hand.ming_gang [ tile1 ]
+      [ tile1; tile1; tile1; tile1 ];
+    eh_get_tiles_test Exposed_hand.ming_gang [ tile3; tile4 ]
+      [ tile4; tile4; tile4; tile4; tile3; tile3; tile3; tile3 ];
+  ]
+
 let tests =
   "test suite"
   >::: [ ("a trivial test" >:: fun _ -> assert_equal 0 0) ]
-       @ tile_tests @ player_tests
+       @ tile_tests @ player_tests @ exposed_hand_test
 
 let _ = run_test_tt_main tests

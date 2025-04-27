@@ -11,6 +11,8 @@ let peng (t : tile) (e : exposed_hand) : unit = e := (make_group "San", t) :: !e
 let ming_gang (t : tile) (e : exposed_hand) : unit =
   e := (make_group "Si", t) :: !e
 
+let get_hand e = e
+
 let exposed_hand_to_string (e : exposed_hand) : string =
   String.concat ", "
     (List.map
