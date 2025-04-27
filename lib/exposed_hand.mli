@@ -43,3 +43,9 @@ val get_tiles : exposed_hand -> Tile.tile list
 (** [get_tiles h] returns a list of tiles in the exposed hand [h]. *)
 
 val empty_exposed_hand : unit -> exposed_hand
+
+val exposed_hand_count : exposed_hand -> int
+(** [exposed_hand_count h] returns the number of groups in the exposed hand [h].
+*)
+val get_groups : exposed_hand -> group list
+(** [get_groups h] returns a list of groups in the exposed hand [h]. *)
