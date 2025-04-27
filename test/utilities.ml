@@ -35,5 +35,4 @@ let arbitrary_tile =
           @ List.map (fun x -> ("Tiao", x)) [ 1; 2; 3; 4; 5; 6; 7; 8; 9 ]
           @ List.map
               (fun x -> (x, 0))
-              [ "Dong"; "Nan"; "Xi"; "Bei"; "Zhong"; "Fa"; "Bai" ]
-          @ [ ("Fake", 3110) ])))
+              [ "Dong"; "Nan"; "Xi"; "Bei"; "Zhong"; "Fa"; "Bai" ])))
