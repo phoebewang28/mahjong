@@ -1,0 +1,2 @@
+Note: to count line count, use the following line: 
+cloc --by-file --include-lang=OCaml . --exclude-list-file=.clocignore

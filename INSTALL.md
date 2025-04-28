@@ -19,6 +19,8 @@ cd <repository-name>
 opam update
 opam upgrade
 opam install raylib raygui ounit2 containers
+lwt_ppx
+ANSITerminal
 ```
 
 ## Running the Game
