@@ -6,8 +6,8 @@ open QCheck
 let tile_test fn expected_val print name =
   name >:: fun _ -> assert_equal fn expected_val ~printer:print
 
-(**Tests for any exception of type InvalidTile, the other way was forcing me to
-   have universal error messages.*)
+(**Tests for any exception of type [InvalidTile], the other way was forcing me
+   to have universal error messages.*)
 let tile_test_raise name fn tile =
   name >:: fun _ ->
   try
@@ -17,12 +17,25 @@ let tile_test_raise name fn tile =
   | Tile.InvalidTile _ -> ()
   | e -> raise e
 
-(**Tests get_num function.*)
+(**Tests [get_num] function.*)
 let tile_num_test tile expected_val =
   tile_test (Tile.get_num tile) expected_val string_of_int
     ("get_num test: " ^ Tile.tile_to_string tile)
 
-(**Tests get_tao function.*)
+(**Tests for the [shuffle] function.*)
+let shuffle_test name tiles =
+  name >:: fun _ ->
+  let original_tiles = Array.copy tiles in
+  Tile.shuffle tiles;
+  assert_equal
+    (Array.sort Tile.compare_tile tiles;
+     tiles)
+    (Array.sort Tile.compare_tile original_tiles;
+     original_tiles)
+    ~printer:(fun arr ->
+      String.concat ", " (Array.to_list (Array.map Tile.tile_to_string arr)))
+
+(**Tests [get_tao] function.*)
 let tile_suit_test tile (expected_val : string) =
   tile_test expected_val
     (Tile.suit_to_string (Tile.get_tao tile))
@@ -85,8 +98,8 @@ let player_choice_tests =
   @ [ draw_next_tile_test (Tile.string_to_tile "2 Tong") player 4 ]
 (* @ [ draw_hh_size_test player ] @ [ draw_curr_ind_test player ] *)
 
-(**Tests for the [Player.create] function.*)
-
+(**Tests for the [Player.create] function. These check if the name, index, and
+   money accessor functions work properly.*)
 let create_player_test p_name p_index =
   let player = Player.create p_name p_index in
   [
@@ -170,6 +183,9 @@ let tile_tests =
       (Tile.make_tile 0 (Tile.string_to_suit "Bei"))
       (Tile.make_tile 0 (Tile.string_to_suit "Bei"));
     (* qtest (make_tile_test 1) 100; *)
+    shuffle_test "shuffle test 1" (Tile.init_tiles ());
+    shuffle_test "shuffle test 2" (Tile.init_tiles ());
+    shuffle_test "shuffle test 3" (Tile.init_tiles ());
   ]
 
 let hh1_tiles =
@@ -415,6 +431,7 @@ let complete_test_list =
   @ [ complete_test "test7" hh7_tiles true ]
   @ [ complete_test "test8" hh8_tiles true ]
 
+(*initialized some variables to be used in the exposed hand tests*)
 let suit = Tile.string_to_suit "Tong"
 let tile1 = Tile.make_tile 1 suit
 let tile2 = Tile.make_tile 2 suit
@@ -422,6 +439,8 @@ let tile3 = Tile.make_tile 3 suit
 let tile4 = Tile.make_tile 4 suit
 let tile5 = Tile.make_tile 5 suit
 
+(** [eh_chi_test tiles] is a test helper function that applies peng to [tiles]
+    and checks if the resulting exposed hand is as expected. *)
 let eh_chi_test tiles =
   let hand = Exposed_hand.empty_exposed_hand () in
   "chi test" >:: fun _ ->
@@ -438,6 +457,8 @@ let eh_chi_test tiles =
         ~printer:(fun x -> x))
     tiles groups
 
+(** [eh_gang_test tiles] is a test helper function that applies ming_gang to
+    [tiles] and checks if the resulting exposed hand is as expected. *)
 let eh_gang_test tiles =
   let hand = Exposed_hand.empty_exposed_hand () in
   "gang test" >:: fun _ ->
@@ -454,6 +475,8 @@ let eh_gang_test tiles =
         ~printer:(fun x -> x))
     tiles groups
 
+(** [eh_peng_test tiles] is a test helper function that applies peng to [tiles]
+    and checks if the resulting exposed hand is as expected. *)
 let eh_peng_test tiles =
   let hand = Exposed_hand.empty_exposed_hand () in
   "peng test" >:: fun _ ->
@@ -470,6 +493,9 @@ let eh_peng_test tiles =
         ~printer:(fun x -> x))
     tiles groups
 
+(** [eh_get_tiles_test func tiles expected_tiles] is a test helper function that
+    applies [func] (either gang, chi, or peng) to [tiles] and checks if the
+    result matches [expected_tiles]. *)
 let eh_get_tiles_test func tiles expected_tiles =
   let hand = Exposed_hand.empty_exposed_hand () in
   "get_tiles test" >:: fun _ ->

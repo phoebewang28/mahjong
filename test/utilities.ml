@@ -19,7 +19,19 @@ let test_tiles =
   ]
 
 let test_bad_tiles =
-  [ "10 Tong"; "0 Wan"; "Tiao"; "0 Nan"; "2 Zhong"; "6 Bei"; "0 Fa"; "Dragon" ]
+  [
+    "0 Tong";
+    "0 Wan";
+    "0 Tiao";
+    "10 Tong";
+    "0 Wan";
+    "Tiao";
+    "0 Nan";
+    "2 Zhong";
+    "6 Bei";
+    "0 Fa";
+    "Dragon";
+  ]
 
 let players_string = [ ("Caedy", 1); ("Albert", 2); ("Elinor", 3); ("Jess", 4) ]
 let player = Player.create "test" 0
