@@ -18,6 +18,22 @@ let test_tiles =
     (Tile.string_to_tile "Zhong", "Zhong", 0, "Zhong");
   ]
 
+(* let test_hand_has_peng_chi = Hidden_hand.make_hidden_hand [
+   Tile.string_to_tile "1 Tong"; Tile.string_to_tile "1 Tong";
+   Tile.string_to_tile "1 Tong"; Tile.string_to_tile "2 Tong";
+   Tile.string_to_tile "3 Tong"; Tile.string_to_tile "7 Wan";
+   Tile.string_to_tile "8 Wan"; Tile.string_to_tile "9 Wan"; Tile.string_to_tile
+   "Nan"; Tile.string_to_tile "Xi"; Tile.string_to_tile "Xi";
+   Tile.string_to_tile "Bei"; Tile.string_to_tile "Bei"; ]
+
+   let test_hand_no_peng_chi = Hidden_hand.make_hidden_hand [
+   Tile.string_to_tile "1 Tong"; Tile.string_to_tile "2 Wan";
+   Tile.string_to_tile "3 Tiao"; Tile.string_to_tile "3 Tong";
+   Tile.string_to_tile "3 Tong"; Tile.string_to_tile "Dong"; Tile.string_to_tile
+   "Dong"; Tile.string_to_tile "Nan"; Tile.string_to_tile "Nan";
+   Tile.string_to_tile "Xi"; Tile.string_to_tile "Xi"; Tile.string_to_tile
+   "Bei"; Tile.string_to_tile "Bei"; ] *)
+
 let test_bad_tiles =
   [
     "0 Tong";
@@ -35,6 +51,7 @@ let test_bad_tiles =
 
 let players_string = [ ("Caedy", 1); ("Albert", 2); ("Elinor", 3); ("Jess", 4) ]
 let player = Player.create "test" 0
+let test_player hh eh = Player.make_player "test" 0 10 hh eh
 
 (* use for qcheck *)
 let arbitrary_tile =
@@ -48,3 +65,183 @@ let arbitrary_tile =
           @ List.map
               (fun x -> (x, 0))
               [ "Dong"; "Nan"; "Xi"; "Bei"; "Zhong"; "Fa"; "Bai" ])))
+
+let hh1_tiles =
+  [
+    Tile.string_to_tile "1 Wan";
+    Tile.string_to_tile "1 Wan";
+    Tile.string_to_tile "2 Wan";
+    Tile.string_to_tile "3 Wan";
+    Tile.string_to_tile "4 Wan";
+    Tile.string_to_tile "5 Wan";
+    Tile.string_to_tile "6 Wan";
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "3 Tong";
+    Tile.string_to_tile "4 Tong";
+    Tile.string_to_tile "5 Tong";
+    Tile.string_to_tile "7 Tiao";
+    Tile.string_to_tile "7 Tiao";
+    Tile.string_to_tile "7 Tiao";
+  ]
+
+let hh2_tiles =
+  [
+    Tile.string_to_tile "1 Wan";
+    Tile.string_to_tile "2 Wan";
+    Tile.string_to_tile "2 Wan";
+    Tile.string_to_tile "2 Wan";
+    Tile.string_to_tile "3 Wan";
+    Tile.string_to_tile "4 Wan";
+    Tile.string_to_tile "4 Wan";
+    Tile.string_to_tile "4 Wan";
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "8 Wan";
+    Tile.string_to_tile "8 Wan";
+    Tile.string_to_tile "8 Wan";
+  ]
+
+let hh3_tiles =
+  [
+    Tile.string_to_tile "1 Tiao";
+    Tile.string_to_tile "1 Tiao";
+    Tile.string_to_tile "1 Tiao";
+    Tile.string_to_tile "3 Tiao";
+    Tile.string_to_tile "3 Tiao";
+    Tile.string_to_tile "3 Tiao";
+    Tile.string_to_tile "3 Tiao";
+    Tile.string_to_tile "4 Tiao";
+    Tile.string_to_tile "5 Tiao";
+    Tile.string_to_tile "7 Tiao";
+    Tile.string_to_tile "7 Tiao";
+    Tile.string_to_tile "7 Tiao";
+    Tile.string_to_tile "8 Tiao";
+    Tile.string_to_tile "9 Tiao";
+  ]
+
+let hh4_tiles =
+  [
+    Tile.string_to_tile "1 Tiao";
+    Tile.string_to_tile "1 Tiao";
+    Tile.string_to_tile "1 Tiao";
+    Tile.string_to_tile "1 Tiao";
+    Tile.string_to_tile "2 Tiao";
+    Tile.string_to_tile "2 Tiao";
+    Tile.string_to_tile "2 Tiao";
+    Tile.string_to_tile "3 Tiao";
+    Tile.string_to_tile "4 Tiao";
+    Tile.string_to_tile "4 Tiao";
+    Tile.string_to_tile "4 Tiao";
+    Tile.string_to_tile "5 Tiao";
+    Tile.string_to_tile "6 Tiao";
+    Tile.string_to_tile "7 Tiao";
+  ]
+
+let hh5_tiles =
+  [
+    Tile.string_to_tile "3 Tong";
+    Tile.string_to_tile "3 Tong";
+    Tile.string_to_tile "3 Tong";
+    Tile.string_to_tile "4 Tong";
+    Tile.string_to_tile "4 Tong";
+    Tile.string_to_tile "4 Tong";
+    Tile.string_to_tile "4 Tong";
+    Tile.string_to_tile "6 Tong";
+    Tile.string_to_tile "8 Tong";
+    Tile.string_to_tile "8 Tong";
+    Tile.string_to_tile "9 Tong";
+    Tile.string_to_tile "9 Tong";
+    Tile.string_to_tile "9 Tong";
+    Tile.string_to_tile "5 Tong";
+  ]
+
+let hh6_tiles =
+  [
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "3 Tong";
+    Tile.string_to_tile "4 Tong";
+    Tile.string_to_tile "4 Tong";
+    Tile.string_to_tile "5 Tong";
+    Tile.string_to_tile "5 Tong";
+    Tile.string_to_tile "6 Tong";
+    Tile.string_to_tile "7 Tong";
+    Tile.string_to_tile "7 Tong";
+    Tile.string_to_tile "7 Tong";
+    Tile.string_to_tile "9 Tong";
+    Tile.string_to_tile "9 Tong";
+  ]
+
+let hh7_tiles =
+  [
+    Tile.string_to_tile "5 Tong";
+    Tile.string_to_tile "5 Tong";
+    Tile.string_to_tile "5 Tong";
+    Tile.string_to_tile "6 Tong";
+    Tile.string_to_tile "7 Tong";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Fa";
+    Tile.string_to_tile "Fa";
+    Tile.string_to_tile "Fa";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+  ]
+
+let hh8_tiles =
+  [
+    Tile.string_to_tile "3 Wan";
+    Tile.string_to_tile "4 Wan";
+    Tile.string_to_tile "4 Wan";
+    Tile.string_to_tile "4 Wan";
+    Tile.string_to_tile "4 Wan";
+    Tile.string_to_tile "5 Wan";
+    Tile.string_to_tile "5 Wan";
+    Tile.string_to_tile "6 Wan";
+    Tile.string_to_tile "6 Wan";
+    Tile.string_to_tile "6 Wan";
+    Tile.string_to_tile "6 Wan";
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "9 Wan";
+  ]
+
+let hh9_tiles =
+  [
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "2 Tong";
+    Tile.string_to_tile "3 Tong";
+    Tile.string_to_tile "4 Tong";
+    Tile.string_to_tile "4 Tong";
+    Tile.string_to_tile "5 Tong";
+    Tile.string_to_tile "5 Tong";
+    Tile.string_to_tile "6 Tong";
+    Tile.string_to_tile "7 Tong";
+    Tile.string_to_tile "7 Tong";
+    Tile.string_to_tile "7 Tong";
+    Tile.string_to_tile "9 Tong";
+    Tile.string_to_tile "9 Tong";
+  ]
+
+let pinghu_hand =
+  [
+    Tile.string_to_tile "1 Wan";
+    Tile.string_to_tile "2 Wan";
+    Tile.string_to_tile "3 Wan";
+    Tile.string_to_tile "4 Wan";
+    Tile.string_to_tile "5 Wan";
+    Tile.string_to_tile "6 Wan";
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "8 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "2 Tiao";
+    Tile.string_to_tile "3 Tiao";
+    Tile.string_to_tile "4 Tiao";
+    Tile.string_to_tile "5 Tong";
+    Tile.string_to_tile "5 Tong";
+  ]

@@ -73,12 +73,21 @@ let draw_next_tile_test expected_tile player curr =
   let drawn = Player_choice.draw player in
   assert_equal expected_tile drawn ~printer:Tile.tile_to_string
 
-let draw_hh_size_test player =
-  "hidden hand size changes after draw test" >:: fun _ ->
-  let size_before = Hidden_hand.get_size (Player.get_hidden player) in
-  let _ = Player_choice.draw player in
-  let size_after = Hidden_hand.get_size (Player.get_hidden player) in
-  assert_equal (size_before + 1) size_after ~printer:string_of_int
+let hh_size_test move player =
+  match move with
+  | "draw" ->
+      "hidden hand size changes after draw test" >:: fun _ ->
+      let size_before = Hidden_hand.get_size (Player.get_hidden player) in
+      let _ = Player_choice.draw player in
+      let size_after = Hidden_hand.get_size (Player.get_hidden player) in
+      assert_equal (size_before + 1) size_after ~printer:string_of_int
+  | "throw" ->
+      "hidden hand size changes after throw test" >:: fun _ ->
+      let size_before = Hidden_hand.get_size (Player.get_hidden player) in
+      let _ = Player_choice.throw player 0 in
+      let size_after = Hidden_hand.get_size (Player.get_hidden player) in
+      assert_equal (size_before - 1) size_after ~printer:string_of_int
+  | _ -> "test only draw and throw" >:: fun _ -> assert_equal 0 1
 
 let draw_curr_ind_test player =
   "curr_index increments by 1 after draw" >:: fun _ ->
@@ -86,17 +95,100 @@ let draw_curr_ind_test player =
   let _ = Player_choice.draw player in
   let ind_after = !Tile.curr_index in
   assert_equal (ind_before + 1) ind_after ~printer:string_of_int
-(* let throw_test expected_tile player = *)
 
-(* QCheck.Test.make ~count:100 ~name:("test throw " ^ Tile.tile_to_string
-   expected_tile) Utilities.arbitrary_tile (fun (row, col) -> let plant =
-   Plants.seed row col in seed_exists plant = Option.is_some plant) *)
+let throw_discarded_test player id =
+  "the last discarded tile is the one just thrown" >:: fun _ ->
+  let thrown = Player_choice.throw player id in
+  let dis_after = List.hd !Tile.discarded in
+  assert_equal thrown dis_after ~printer:Tile.tile_to_string
+
+let chi_check_qcheck_test =
+  QCheck_runner.to_ounit2_test
+    (let arbitrary_hand =
+       QCheck.list_of_size (QCheck.int_range 13 14).gen Utilities.arbitrary_tile
+     in
+     QCheck.Test.make ~count:100
+       ~name:"tests chi_check with a randomly generated hand" arbitrary_hand
+       (fun x ->
+         let result =
+           Player_choice.chi_check (Hidden_hand.make_hidden_hand x)
+         in
+         result))
+
+let chi_peng_check_test move expected hand =
+  Tile.discarded :=
+    Tile.make_tile 1 (Tile.string_to_suit "Tong") :: !Tile.discarded;
+  match move with
+  | "chi" ->
+      "tests if chi_check works properly " ^ string_of_bool expected
+      >:: fun _ -> assert_equal (Player_choice.chi_check hand) expected
+  | "peng" ->
+      "tests if peng works properly " ^ string_of_bool expected >:: fun _ ->
+      assert_equal (Player_choice.peng_check hand) expected
+  | _ -> "use chi or peng only" >:: fun _ -> assert_equal 0 1
+
+let chi_test player t1 t2 expected =
+  "test chi function" ^ string_of_int t1 ^ string_of_int t2 >:: fun _ ->
+  assert_equal (Player_choice.chi player t1 t2) expected
+
+let peng_test player t1 t2 expected =
+  "test peng function" >:: fun _ ->
+  assert_equal (Player_choice.peng player t1 t2) expected
 
 let player_choice_tests =
   let player = Utilities.player in
-  [ draw_next_tile_test (Tile.string_to_tile "1 Tong") player 0 ]
-  @ [ draw_next_tile_test (Tile.string_to_tile "2 Tong") player 4 ]
-(* @ [ draw_hh_size_test player ] @ [ draw_curr_ind_test player ] *)
+  [
+    draw_next_tile_test (Tile.string_to_tile "1 Tong") player 0;
+    draw_next_tile_test (Tile.string_to_tile "2 Tong") player 4;
+  ]
+  @ [ hh_size_test "draw" player ]
+  @ [ hh_size_test "throw" player ]
+  @ [ draw_curr_ind_test player ]
+  @ [ throw_discarded_test player 0; throw_discarded_test player 1 ]
+  @ [
+      chi_peng_check_test "chi" true
+        (Hidden_hand.make_hidden_hand Utilities.hh9_tiles);
+    ]
+  @ [
+      chi_peng_check_test "chi" false
+        (Hidden_hand.make_hidden_hand Utilities.hh5_tiles);
+    ]
+  @ [
+      chi_peng_check_test "peng" true
+        (Hidden_hand.make_hidden_hand Utilities.hh6_tiles);
+    ]
+  @ [
+      chi_peng_check_test "peng" false
+        (Hidden_hand.make_hidden_hand Utilities.pinghu_hand);
+    ]
+  @ [
+      chi_test
+        (Utilities.test_player
+           (Hidden_hand.make_hidden_hand Utilities.hh9_tiles)
+           (Exposed_hand.empty_exposed_hand ()))
+        2 3 true;
+    ]
+  @ [
+      chi_test
+        (Utilities.test_player
+           (Hidden_hand.make_hidden_hand Utilities.hh7_tiles)
+           (Exposed_hand.empty_exposed_hand ()))
+        0 1 false;
+    ]
+  @ [
+      peng_test
+        (Utilities.test_player
+           (Hidden_hand.make_hidden_hand Utilities.hh6_tiles)
+           (Exposed_hand.empty_exposed_hand ()))
+        0 1 true;
+    ]
+  @ [
+      peng_test
+        (Utilities.test_player
+           (Hidden_hand.make_hidden_hand Utilities.hh6_tiles)
+           (Exposed_hand.empty_exposed_hand ()))
+        10 11 false;
+    ]
 
 (**Tests for the [Player.create] function. These check if the name, index, and
    money accessor functions work properly.*)
@@ -188,150 +280,6 @@ let tile_tests =
     shuffle_test "shuffle test 3" (Tile.init_tiles ());
   ]
 
-let hh1_tiles =
-  [
-    Tile.string_to_tile "1 Wan";
-    Tile.string_to_tile "1 Wan";
-    Tile.string_to_tile "2 Wan";
-    Tile.string_to_tile "3 Wan";
-    Tile.string_to_tile "4 Wan";
-    Tile.string_to_tile "5 Wan";
-    Tile.string_to_tile "6 Wan";
-    Tile.string_to_tile "7 Wan";
-    Tile.string_to_tile "3 Tong";
-    Tile.string_to_tile "4 Tong";
-    Tile.string_to_tile "5 Tong";
-    Tile.string_to_tile "7 Tiao";
-    Tile.string_to_tile "7 Tiao";
-    Tile.string_to_tile "7 Tiao";
-  ]
-
-let hh2_tiles =
-  [
-    Tile.string_to_tile "1 Wan";
-    Tile.string_to_tile "2 Wan";
-    Tile.string_to_tile "2 Wan";
-    Tile.string_to_tile "2 Wan";
-    Tile.string_to_tile "3 Wan";
-    Tile.string_to_tile "4 Wan";
-    Tile.string_to_tile "4 Wan";
-    Tile.string_to_tile "4 Wan";
-    Tile.string_to_tile "7 Wan";
-    Tile.string_to_tile "7 Wan";
-    Tile.string_to_tile "7 Wan";
-    Tile.string_to_tile "8 Wan";
-    Tile.string_to_tile "8 Wan";
-    Tile.string_to_tile "8 Wan";
-  ]
-
-let hh3_tiles =
-  [
-    Tile.string_to_tile "1 Tiao";
-    Tile.string_to_tile "1 Tiao";
-    Tile.string_to_tile "1 Tiao";
-    Tile.string_to_tile "3 Tiao";
-    Tile.string_to_tile "3 Tiao";
-    Tile.string_to_tile "3 Tiao";
-    Tile.string_to_tile "3 Tiao";
-    Tile.string_to_tile "4 Tiao";
-    Tile.string_to_tile "5 Tiao";
-    Tile.string_to_tile "7 Tiao";
-    Tile.string_to_tile "7 Tiao";
-    Tile.string_to_tile "7 Tiao";
-    Tile.string_to_tile "8 Tiao";
-    Tile.string_to_tile "9 Tiao";
-  ]
-
-let hh4_tiles =
-  [
-    Tile.string_to_tile "1 Tiao";
-    Tile.string_to_tile "1 Tiao";
-    Tile.string_to_tile "1 Tiao";
-    Tile.string_to_tile "1 Tiao";
-    Tile.string_to_tile "2 Tiao";
-    Tile.string_to_tile "2 Tiao";
-    Tile.string_to_tile "2 Tiao";
-    Tile.string_to_tile "3 Tiao";
-    Tile.string_to_tile "4 Tiao";
-    Tile.string_to_tile "4 Tiao";
-    Tile.string_to_tile "4 Tiao";
-    Tile.string_to_tile "5 Tiao";
-    Tile.string_to_tile "6 Tiao";
-    Tile.string_to_tile "7 Tiao";
-  ]
-
-let hh5_tiles =
-  [
-    Tile.string_to_tile "3 Tong";
-    Tile.string_to_tile "3 Tong";
-    Tile.string_to_tile "3 Tong";
-    Tile.string_to_tile "4 Tong";
-    Tile.string_to_tile "4 Tong";
-    Tile.string_to_tile "4 Tong";
-    Tile.string_to_tile "4 Tong";
-    Tile.string_to_tile "6 Tong";
-    Tile.string_to_tile "8 Tong";
-    Tile.string_to_tile "8 Tong";
-    Tile.string_to_tile "9 Tong";
-    Tile.string_to_tile "9 Tong";
-    Tile.string_to_tile "9 Tong";
-    Tile.string_to_tile "5 Tong";
-  ]
-
-let hh6_tiles =
-  [
-    Tile.string_to_tile "1 Tong";
-    Tile.string_to_tile "1 Tong";
-    Tile.string_to_tile "1 Tong";
-    Tile.string_to_tile "3 Tong";
-    Tile.string_to_tile "4 Tong";
-    Tile.string_to_tile "4 Tong";
-    Tile.string_to_tile "5 Tong";
-    Tile.string_to_tile "5 Tong";
-    Tile.string_to_tile "6 Tong";
-    Tile.string_to_tile "7 Tong";
-    Tile.string_to_tile "7 Tong";
-    Tile.string_to_tile "7 Tong";
-    Tile.string_to_tile "9 Tong";
-    Tile.string_to_tile "9 Tong";
-  ]
-
-let hh7_tiles =
-  [
-    Tile.string_to_tile "5 Tong";
-    Tile.string_to_tile "5 Tong";
-    Tile.string_to_tile "5 Tong";
-    Tile.string_to_tile "6 Tong";
-    Tile.string_to_tile "7 Tong";
-    Tile.string_to_tile "Zhong";
-    Tile.string_to_tile "Zhong";
-    Tile.string_to_tile "Zhong";
-    Tile.string_to_tile "Fa";
-    Tile.string_to_tile "Fa";
-    Tile.string_to_tile "Fa";
-    Tile.string_to_tile "Bai";
-    Tile.string_to_tile "Bai";
-    Tile.string_to_tile "Bai";
-  ]
-
-let hh8_tiles =
-  [
-    Tile.string_to_tile "3 Wan";
-    Tile.string_to_tile "4 Wan";
-    Tile.string_to_tile "4 Wan";
-    Tile.string_to_tile "4 Wan";
-    Tile.string_to_tile "4 Wan";
-    Tile.string_to_tile "5 Wan";
-    Tile.string_to_tile "5 Wan";
-    Tile.string_to_tile "6 Wan";
-    Tile.string_to_tile "6 Wan";
-    Tile.string_to_tile "6 Wan";
-    Tile.string_to_tile "6 Wan";
-    Tile.string_to_tile "7 Wan";
-    Tile.string_to_tile "9 Wan";
-    Tile.string_to_tile "9 Wan";
-  ]
-
 let complete_test name tiles expected =
   name >:: fun _ ->
   let hand = Hidden_hand.make_hidden_hand tiles in
@@ -394,42 +342,24 @@ let pinghu_test name tiles expected =
 
   assert_equal expected result ~printer:string_of_bool
 
-let pinghu_hand =
-  [
-    Tile.string_to_tile "1 Wan";
-    Tile.string_to_tile "2 Wan";
-    Tile.string_to_tile "3 Wan";
-    Tile.string_to_tile "4 Wan";
-    Tile.string_to_tile "5 Wan";
-    Tile.string_to_tile "6 Wan";
-    Tile.string_to_tile "7 Wan";
-    Tile.string_to_tile "8 Wan";
-    Tile.string_to_tile "9 Wan";
-    Tile.string_to_tile "2 Tiao";
-    Tile.string_to_tile "3 Tiao";
-    Tile.string_to_tile "4 Tiao";
-    Tile.string_to_tile "5 Tong";
-    Tile.string_to_tile "5 Tong";
-  ]
-
-let pinghu_test_list = [ pinghu_test "pinghu1" pinghu_hand true ]
+let pinghu_test_list = [ pinghu_test "pinghu1" Utilities.pinghu_hand true ]
 
 let complete_test_list =
-  [ complete_test "test1" hh1_tiles true ]
-  @ [ complete_test "test2" hh2_tiles true ]
+  [ complete_test "test1" Utilities.hh1_tiles true ]
+  @ [ complete_test "test2" Utilities.hh2_tiles true ]
     (* Empty hand should not complete *)
   @ [ complete_test "test3" [] false ]
   (* Single tile should not complete *)
   @ [ complete_test "test4" [ Tile.string_to_tile "1 Wan" ] false ]
-  @ [ complete_test "test5" hh3_tiles true ]
-  @ [ complete_test "test6" hh4_tiles true ]
+  @ [ complete_test "test5" Utilities.hh3_tiles true ]
+  @ [ complete_test "test6" Utilities.hh4_tiles true ]
   (* Empty hand should not complete *)
   @ [ complete_test "test4" [ Tile.string_to_tile "1 Wan" ] false ]
   (* Single tile should not complete *)
-  @ [ complete_test "test5" hh5_tiles true ]
-  @ [ complete_test "test6" hh6_tiles true ]
-  @ [ complete_test "test7" hh7_tiles true ]
-  @ [ complete_test "test8" hh8_tiles true ]
+  @ [ complete_test "test5" Utilities.hh5_tiles true ]
+  @ [ complete_test "test6" Utilities.hh6_tiles true ]
+  @ [ complete_test "test7" Utilities.hh7_tiles true ]
+  @ [ complete_test "test8" Utilities.hh8_tiles true ]
 
 (*initialized some variables to be used in the exposed hand tests*)
 let suit = Tile.string_to_suit "Tong"
@@ -535,6 +465,6 @@ let exposed_hand_test =
 let tests =
   "test suite"
   >::: tile_tests @ player_tests @ player_choice_tests @ complete_test_list
-       @ pinghu_test_list
+       @ pinghu_test_list @ exposed_hand_test
 
 let _ = run_test_tt_main tests
