@@ -15,6 +15,7 @@ type start_board = {
 
 type game_board = {
   mutable player_lst : Player.player list;
+      (* note: player's index NEVER changes!! *)
   mutable cur_player_id : int; (* index of current player: 0,1,2,3 *)
   mutable player_hid : Hidden_hand.hidden_hand;
       (* hidden hand of CURRENT player *)
@@ -72,6 +73,11 @@ let tile_keys =
     "bai";
   ]
 
+let window_width = 800
+let window_height = 600
+let center_x = window_width / 2
+let center_y = window_height / 2
+
 let load_tile_images () =
   List.iter
     (fun key ->
@@ -114,10 +120,86 @@ let draw_tile_list_from_keys keys x0 y0 (gb : game_board) =
           x := !x +. 40.0)
     keys
 
-let window_width = 800
-let window_height = 600
-let center_x = window_width / 2
-let center_y = window_height / 2
+(** [draw_other_exposed x y rot index dist gb]:
+    - [x] is the x-position
+    - [y] is the y-position
+    - [rot] is the angle CLOCKWISE to rotate tile
+    - [index] is THIS player's index (≠≠ current player)
+    - [dist] is distance of index of this player from index of current player
+      (e.g. cur = 2, this = 1, [dist] = 3 (cuz 2->3->0->1))
+    - [gb] is gameboard
+
+    [dist] determines which coordinate axis is incremented/decremented with each
+    tile drawn
+    - if [dist] = 1: this player is to the RIGHT of current player -> increment
+      DOWNWARDS in y-direction (cuz moving UP screen)
+    - if [dist] = 2: ~ TOP of screen -> increment DOWNWARDS in x-direction (cuz
+      moving LEFT screen)
+    - if [dist] = 3: ~ LEFT of current player -> increment UPWARDS in
+      y-direction (cuz moving DOWN screen) *)
+let draw_other_exposed x y rot index dist (gb : game_board) =
+  assert (index <> gb.cur_player_id);
+
+  (* current player's hand already rendered, don't need to draw again *)
+  let scale = 0.04 in
+
+  let pos = ref 0.0 in
+
+  (* [og_y] & [x_stack| only used when [dist] = 1 or 3
+
+     Purpose: to stack exposed tiles, else will exceed screen height *)
+  let og_y = float_of_int y in
+  let x_stack = ref (float_of_int x) in
+  (* depending on [dist], pos could either refer to value in x or y
+     coordinate *)
+  (match dist with
+  | 1 | 3 -> pos := float_of_int y
+  | 2 -> pos := float_of_int x
+  | _ -> failwith "Invalid drawing of exposed hand: [dist] var error");
+
+  (* get player corr. to [index] *)
+  let exposed =
+    Tile.tile_list_to_keys
+      (Exposed_hand.get_tiles
+         (Player.get_exposed (List.nth gb.player_lst index)))
+  in
+  (* note: if player's dont have anything in exposed hand, NOTHING will
+     render *)
+  List.iteri
+    (fun id tile ->
+      (* these tiles don't need to be buttons!! cuz non-active player *)
+      match get_tile_texture tile with
+      | Some tex -> (
+          let tex_w = float_of_int (Texture2D.width tex) *. scale in
+          let tex_h = float_of_int (Texture2D.width tex) *. scale in
+          let vect2 =
+            match dist with
+            | 1 | 3 -> Vector2.create !x_stack !pos
+            | 2 -> Vector2.create !pos (float_of_int y)
+            | _ -> failwith "Invalid drawing of exposed hand: [dist] var error"
+          in
+          draw_texture_ex tex vect2 rot scale Color.white;
+          match dist with
+          | 1 ->
+              (* 1st conditional here ensures that sets of 3 stay tgt; 2nd
+                 checks if exceed desired height of screen*)
+              if id mod 3 = 2 && !pos <= float_of_int (center_y - 100) then (
+                x_stack := !x_stack -. tex_h -. 5.;
+                pos := og_y (* width always, no matter [dist] *))
+              else pos := !pos -. tex_w
+          | 2 -> pos := !pos -. tex_w
+          | 3 ->
+              if id mod 3 = 2 && !pos >= float_of_int (center_y) then (
+                x_stack := !x_stack +. tex_h +. 5.;
+                pos := og_y (* width always, no matter [dist] 0123 *))
+              else pos := !pos +. tex_w
+          | _ -> failwith "Invalid drawing of exposed hand: [dist] var error")
+      | None ->
+          (* should never be None (i think) *)
+          failwith
+            "Error in drawing other players exposed hand: Tile texture not \
+             found.")
+    exposed
 
 let create_players name_arr : Player.player list =
   List.mapi (fun i name -> Player.create name (i + 1)) (Array.to_list name_arr)
@@ -130,34 +212,19 @@ let draw_peng_fail () : unit =
 
 (* todo: game logic: must check if CAN chi first b4 rendering!! *)
 let draw_chi_button p gb =
-  let rect =
-    Raylib.Rectangle.create
-      (float_of_int window_width -. 300.)
-      (float_of_int window_height -. 400.)
-      100.0 70.0
-  in
+  let rect = Raylib.Rectangle.create 200.0 210.0 100.0 70.0 in
   (* note: button in raygui automatically accounts for user's mouse position &
      when clicked *)
   let is_chi_clicked = Raygui.button rect "Chi Tile" in
   if is_chi_clicked then gb.is_chiing <- true
 
 let draw_peng_button p gb =
-  let rect =
-    Raylib.Rectangle.create
-      (float_of_int window_width -. 300.)
-      (float_of_int window_height -. 300.)
-      100.0 70.0
-  in
+  let rect = Raylib.Rectangle.create 350.0 210.0 100.0 70.0 in
   let is_peng_clicked = Raygui.button rect "Peng Tile" in
   if is_peng_clicked then gb.is_penging <- true
 
 let draw_draw_button p gb =
-  let rect =
-    Raylib.Rectangle.create
-      (float_of_int window_width -. 300.)
-      (float_of_int window_height -. 200.)
-      100.0 70.0
-  in
+  let rect = Raylib.Rectangle.create 500.0 210.0 100.0 70.0 in
   let is_draw_clicked = Raygui.button rect "Draw Tile" in
   if is_draw_clicked then
     (* update player's hidden hand *)
@@ -180,7 +247,7 @@ let init_tiles () =
     single [start_board] *)
 let setup_start () : start_board =
   (* only called once: start board & game board uses same window *)
-  set_config_flags [ ConfigFlags.Window_resizable ];
+  (* set_config_flags [ ConfigFlags.Window_resizable ]; *)
   (* todo: fix resizing bug *)
   init_window window_width window_height "OCaMahJong";
   set_target_fps 60;
@@ -257,8 +324,8 @@ let draw_discard_tile (tile_opt : Tile.tile option) =
   | Some tile -> (
       let scale = 0.04 in
       let key = Tile.tile_to_key tile in
-      let x = float_of_int center_x in
-      let y = float_of_int center_y in
+      let x = float_of_int (center_x - 30) in
+      let y = float_of_int (center_y) in
       match get_tile_texture key with
       | Some tex ->
           draw_texture_ex tex (Vector2.create x y) 0.0 scale Color.white
@@ -277,13 +344,14 @@ let draw_player_exp p gb : unit =
   let keys = Tile.tile_list_to_keys tiles in
   Printf.printf "Exposed hand keys:\n";
   List.iter (fun k -> Printf.printf " - %s\n" k) keys;
-  draw_tile_list_from_keys keys (center_x - 300) (window_height - 200) gb
+  draw_tile_list_from_keys keys 50 (window_height - 175) gb
 
+(* TODO: FUCK YOU CAN CLICK EXPOSED HAND TILES SHITSHITSHIT *)
 let draw_player_name p : unit =
   let font_size = 40 in
   let name = Player.get_name p in
   let name_x = center_x - (measure_text name font_size / 2) in
-  draw_text name name_x 100 font_size Color.white
+  draw_text name name_x 150 font_size Color.white
 
 (** Draws all components involved in starting interface *)
 let draw_all_start (sb : start_board) : unit =
@@ -386,15 +454,31 @@ let draw_all_game (gb : game_board) : unit =
   update_game_board gb;
   draw_bg "res/images/mahjong_pelt.jpg";
 
-  let p = List.nth gb.player_lst gb.cur_player_id in
+  let cur_p = gb.cur_player_id in
+  let p = List.nth gb.player_lst cur_p in
   draw_discard_tile gb.discard;
   draw_player_name p;
   draw_player_hid p gb;
   draw_player_exp p gb;
 
+  let other_ps_id =
+    [ (cur_p + 1) mod 4; (cur_p + 2) mod 4; (cur_p + 3) mod 4 ]
+  in
+
+  List.iteri
+    (fun id p_id ->
+      match id with
+      | 0 ->
+          draw_other_exposed (window_width - 100) (window_height - 185) 270.
+            p_id (id + 1) gb
+      | 1 -> draw_other_exposed (window_width - 35) 100 180. p_id (id + 1) gb
+      | 2 -> draw_other_exposed 100 103 90. p_id (id + 1) gb
+      | _ ->
+          failwith "Index out of bounds for drawing other player's exposed hand")
+    other_ps_id;
+
   (* only render draw/chi/peng button when player has not selected ANY of
      drawn/chi/peng actions. *)
-
   (* all buttons rendering *)
   if (not gb.is_drawn) && (not gb.is_chiing) && not gb.is_penging then (
     draw_draw_button p gb;
@@ -436,10 +520,12 @@ let rec start_loop (sb : start_board) : string array =
 
 (** Runs perpetually if user does not exit window *)
 let rec game_loop (gb : game_board) =
+  try
   match window_should_close () with
   | true -> close_window ()
   | false ->
       draw_all_game gb;
       game_loop gb
+  with Tile.NoTileLeft -> close_window () (* TODO: Game end screen *)
 
 let () = setup_start () |> start_loop |> setup_game |> game_loop

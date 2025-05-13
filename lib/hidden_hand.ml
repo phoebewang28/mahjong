@@ -36,7 +36,7 @@ let get hh idx = hh.hand.(idx)
 
 let get_tile_index hh tile =
   match Array.find_index (fun x -> x = tile) hh.hand with
-  | None -> raise (Invalid_argument "Index out of bounds")
+  | None -> raise (Invalid_argument "Index out of bounds") 
   | Some x -> x
 
 let get_size hh = hh.size

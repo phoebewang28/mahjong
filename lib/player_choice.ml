@@ -11,11 +11,13 @@ let throw (player : player) id =
   tile
 
 let draw (player : player) =
-  let hidden_hand = get_hidden player in
-  let tile = Array.get !tiles_arr !curr_index in
-  add hidden_hand tile;
-  curr_index := !curr_index + 1;
-  tile
+  try
+    let hidden_hand = get_hidden player in
+    let tile = Array.get !tiles_arr !curr_index in
+    add hidden_hand tile;
+    curr_index := !curr_index + 1;
+    tile
+  with Invalid_argument _ -> raise Tile.NoTileLeft
 
 (* ?? i thought i saw another compare function in another file*)
 let comp_tiles t1 t2 = get_num t1 - get_num t2
