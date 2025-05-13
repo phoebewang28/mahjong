@@ -5,9 +5,9 @@ open Hidden_hand
 
 let throw (player : player) id =
   let hid = get_hidden player in
-  let tile = Hidden_hand.get hid id in
+  let tile = get hid id in
   discarded := tile :: !discarded;
-  Hidden_hand.remove hid tile;
+  remove hid tile;
   tile
 
 let draw (player : player) =
@@ -19,9 +19,6 @@ let draw (player : player) =
     tile
   with Invalid_argument _ -> raise Tile.NoTileLeft
 
-(* ?? i thought i saw another compare function in another file*)
-let comp_tiles t1 t2 = get_num t1 - get_num t2
-
 let rec is_consec lst =
   match lst with
   | [] -> true
@@ -30,17 +27,10 @@ let rec is_consec lst =
       if get_num x + 1 <> get_num xs then false else is_consec (xs :: t)
   | _ -> failwith "Cannot check consecutivity for list of length < 2!"
 
-(* should these be in player ml?*)
-let print_player_hid player =
-  Hidden_hand.hidden_hand_to_string (Player.get_hidden player)
-
-let print_player_exp player =
-  Exposed_hand.exposed_hand_to_string (Player.get_exposed player)
-
 let chi_update t1 t2 dis ex hid : bool =
   if not (get_tao t1 = get_tao t2 && get_tao t2 = get_tao dis) then false
   else
-    let sorted = List.sort comp_tiles [ t1; t2; dis ] in
+    let sorted = List.sort compare_tile [ t1; t2; dis ] in
     if not (is_consec sorted) then false
     else (
       Hidden_hand.remove hid t1;
@@ -102,9 +92,12 @@ let peng_check (hand : hidden_hand) : bool =
   let rec count_tiles h acc =
     match h with
     | [] -> acc
-    | h :: t -> if h = dis then count_tiles t (acc + 1) else count_tiles t acc
+    | h :: t ->
+        if compare_tile h dis = 0 then count_tiles t (acc + 1)
+        else count_tiles t acc
   in
-  if count_tiles (get_tiles hand) 0 >= 2 then true else false
+  let count = count_tiles (get_tiles hand) 0 in
+  if count >= 2 then true else false
 
 let chi (player : player) id1 id2 : bool =
   let hid = get_hidden player in

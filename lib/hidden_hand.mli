@@ -35,7 +35,7 @@ val remove : hidden_hand -> tile -> unit
 (** [remove hh tile] removes Tile [tile] from the player's hand. Raises
     [Invalid_argument] if [tile] is not in player's hand. *)
 
-val replace : hidden_hand -> tile -> int -> unit
+(* val replace : hidden_hand -> tile -> int -> unit *)
 (** [replace hh tile idx] replaces the tile at [idx] from the player's hand. If
     [idx] is equal to 13, then [tile] is discarded. If [tile] is "Fake", then
     the hand size is decremented. *)

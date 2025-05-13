@@ -238,7 +238,8 @@ let make_player id name = Player.create name id
 let init_tiles () =
   Random.self_init ();
   let _ = Tile.init_tiles () in
-  Tile.shuffle !Tile.tiles_arr
+  ()
+(* Tile.shuffle !Tile.tiles_arr *)
 
 (** Setup for the starting interface and game window, returning initialized
     [start_board]

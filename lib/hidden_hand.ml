@@ -48,6 +48,7 @@ let add hh t =
   (* add the new tile to the end of the hand *)
   (* index at hh.size is None *)
   sort hh.hand;
+  (* move this in front of hh.hand assignment?*)
   hh.size <- hh.size + 1
 
 let remove hh tile =
@@ -58,14 +59,10 @@ let remove hh tile =
       sort hh.hand;
       hh.size <- hh.size - 1
 
-let replace hh tile idx =
-  if Tile.tile_to_string tile = "Fake" then hh.size <- hh.size - 1;
-  match idx with
-  | x when x >= 13 -> discarded := tile :: !discarded
-  | x ->
-      let discarded_tile = hh.hand.(idx) in
-      hh.hand.(idx) <- tile;
-      discarded := discarded_tile :: !discarded
+(* let replace hh tile idx = if Tile.tile_to_string tile = "Fake" then hh.size
+   <- hh.size - 1; match idx with | x when x >= 13 -> discarded := tile ::
+   !discarded | x -> let discarded_tile = hh.hand.(idx) in hh.hand.(idx) <-
+   tile; discarded := discarded_tile :: !discarded *)
 
 let get_hand hh = hh.hand
 
@@ -85,3 +82,4 @@ let hidden_hand_to_string hh =
       "" (get_tiles hh)
   in
   String.sub s 1 (String.length s - 1)
+[@@coverage off]
