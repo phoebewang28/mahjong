@@ -131,6 +131,8 @@ let draw_tile_list_from_keys keys x0 y0 (gb : game_board) =
 
     [dist] determines which coordinate axis is incremented/decremented with each
     tile drawn
+    - if [dist] = 0: this player IS current player -> increment UPWARDS in
+      x-direction (cuz moving RIGHT screen)
     - if [dist] = 1: this player is to the RIGHT of current player -> increment
       DOWNWARDS in y-direction (cuz moving UP screen)
     - if [dist] = 2: ~ TOP of screen -> increment DOWNWARDS in x-direction (cuz
@@ -138,8 +140,6 @@ let draw_tile_list_from_keys keys x0 y0 (gb : game_board) =
     - if [dist] = 3: ~ LEFT of current player -> increment UPWARDS in
       y-direction (cuz moving DOWN screen) *)
 let draw_other_exposed x y rot index dist (gb : game_board) =
-  assert (index <> gb.cur_player_id);
-
   (* current player's hand already rendered, don't need to draw again *)
   let scale = 0.04 in
 
@@ -150,11 +150,12 @@ let draw_other_exposed x y rot index dist (gb : game_board) =
      Purpose: to stack exposed tiles, else will exceed screen height *)
   let og_y = float_of_int y in
   let x_stack = ref (float_of_int x) in
+
   (* depending on [dist], pos could either refer to value in x or y
      coordinate *)
   (match dist with
   | 1 | 3 -> pos := float_of_int y
-  | 2 -> pos := float_of_int x
+  | 0 | 2 -> pos := float_of_int x
   | _ -> failwith "Invalid drawing of exposed hand: [dist] var error");
 
   (* get player corr. to [index] *)
@@ -175,11 +176,12 @@ let draw_other_exposed x y rot index dist (gb : game_board) =
           let vect2 =
             match dist with
             | 1 | 3 -> Vector2.create !x_stack !pos
-            | 2 -> Vector2.create !pos (float_of_int y)
+            | 0 | 2 -> Vector2.create !pos (float_of_int y)
             | _ -> failwith "Invalid drawing of exposed hand: [dist] var error"
           in
           draw_texture_ex tex vect2 rot scale Color.white;
           match dist with
+          | 0 -> pos := !pos +. tex_w
           | 1 ->
               (* 1st conditional here ensures that sets of 3 stay tgt; 2nd
                  checks if exceed desired height of screen*)
@@ -189,7 +191,7 @@ let draw_other_exposed x y rot index dist (gb : game_board) =
               else pos := !pos -. tex_w
           | 2 -> pos := !pos -. tex_w
           | 3 ->
-              if id mod 3 = 2 && !pos >= float_of_int (center_y) then (
+              if id mod 3 = 2 && !pos >= float_of_int center_y then (
                 x_stack := !x_stack +. tex_h +. 5.;
                 pos := og_y (* width always, no matter [dist] 0123 *))
               else pos := !pos +. tex_w
@@ -238,8 +240,7 @@ let make_player id name = Player.create name id
 let init_tiles () =
   Random.self_init ();
   let _ = Tile.init_tiles () in
-  ()
-(* Tile.shuffle !Tile.tiles_arr *)
+  Tile.shuffle !Tile.tiles_arr
 
 (** Setup for the starting interface and game window, returning initialized
     [start_board]
@@ -326,7 +327,7 @@ let draw_discard_tile (tile_opt : Tile.tile option) =
       let scale = 0.04 in
       let key = Tile.tile_to_key tile in
       let x = float_of_int (center_x - 30) in
-      let y = float_of_int (center_y) in
+      let y = float_of_int center_y in
       match get_tile_texture key with
       | Some tex ->
           draw_texture_ex tex (Vector2.create x y) 0.0 scale Color.white
@@ -347,7 +348,7 @@ let draw_player_exp p gb : unit =
   List.iter (fun k -> Printf.printf " - %s\n" k) keys;
   draw_tile_list_from_keys keys 50 (window_height - 175) gb
 
-(* TODO: FUCK YOU CAN CLICK EXPOSED HAND TILES SHITSHITSHIT *)
+
 let draw_player_name p : unit =
   let font_size = 40 in
   let name = Player.get_name p in
@@ -460,20 +461,20 @@ let draw_all_game (gb : game_board) : unit =
   draw_discard_tile gb.discard;
   draw_player_name p;
   draw_player_hid p gb;
-  draw_player_exp p gb;
 
   let other_ps_id =
-    [ (cur_p + 1) mod 4; (cur_p + 2) mod 4; (cur_p + 3) mod 4 ]
+    [ cur_p; (cur_p + 1) mod 4; (cur_p + 2) mod 4; (cur_p + 3) mod 4 ]
   in
 
   List.iteri
     (fun id p_id ->
       match id with
-      | 0 ->
+      | 0 -> draw_other_exposed 50 (window_height - 175) 0. p_id id gb
+      | 1 ->
           draw_other_exposed (window_width - 100) (window_height - 185) 270.
-            p_id (id + 1) gb
-      | 1 -> draw_other_exposed (window_width - 35) 100 180. p_id (id + 1) gb
-      | 2 -> draw_other_exposed 100 103 90. p_id (id + 1) gb
+            p_id id gb
+      | 2 -> draw_other_exposed (window_width - 35) 100 180. p_id id gb
+      | 3 -> draw_other_exposed 100 103 90. p_id id gb
       | _ ->
           failwith "Index out of bounds for drawing other player's exposed hand")
     other_ps_id;
@@ -522,11 +523,11 @@ let rec start_loop (sb : start_board) : string array =
 (** Runs perpetually if user does not exit window *)
 let rec game_loop (gb : game_board) =
   try
-  match window_should_close () with
-  | true -> close_window ()
-  | false ->
-      draw_all_game gb;
-      game_loop gb
+    match window_should_close () with
+    | true -> close_window ()
+    | false ->
+        draw_all_game gb;
+        game_loop gb
   with Tile.NoTileLeft -> close_window () (* TODO: Game end screen *)
 
 let () = setup_start () |> start_loop |> setup_game |> game_loop
