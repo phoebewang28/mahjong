@@ -351,3 +351,37 @@ let lvyise_hand2 =
     Tile.string_to_tile "Fa";
     Tile.string_to_tile "Fa";
     ]
+let qidui_hand1 =
+  [
+    Tile.string_to_tile "1 Wan";
+    Tile.string_to_tile "1 Wan";
+    Tile.string_to_tile "5 Wan";
+    Tile.string_to_tile "5 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "2 Tong";
+    Tile.string_to_tile "2 Tong";
+    Tile.string_to_tile "3 Tong";
+    Tile.string_to_tile "3 Tong";
+    Tile.string_to_tile "8 Tiao";
+    Tile.string_to_tile "8 Tiao";
+    Tile.string_to_tile "Fa";
+    Tile.string_to_tile "Fa";
+    ]
+let qidui_hand2 =
+  [
+    Tile.string_to_tile "1 Wan";
+    Tile.string_to_tile "1 Wan";
+    Tile.string_to_tile "2 Wan";
+    Tile.string_to_tile "2 Wan";
+    Tile.string_to_tile "3 Wan";
+    Tile.string_to_tile "3 Wan";
+    Tile.string_to_tile "2 Tong";
+    Tile.string_to_tile "2 Tong";
+    Tile.string_to_tile "2 Tong";
+    Tile.string_to_tile "8 Tiao";
+    Tile.string_to_tile "8 Tiao";
+    Tile.string_to_tile "8 Tiao";
+    Tile.string_to_tile "Fa";
+    Tile.string_to_tile "Fa";
+    ]

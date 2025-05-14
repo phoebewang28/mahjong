@@ -217,3 +217,24 @@ let lvyise (p : Player.player) : bool =
     let hand = hidden @ exposed in
     List.length (List.filter is_lv hand) = 14
   else false
+
+
+let qidui (p : Player.player) : bool =
+  let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+  let exposed = Exposed_hand.get_tiles (Player.get_exposed p) in
+  let hand = hidden @ exposed in
+  let unique_tiles = List.sort_uniq Tile.compare_tile hand in
+  List.for_all (fun t -> count_same hand t = 2 || count_same hand t = 4)
+  unique_tiles
+
+
+(* 
+let jiulianbaodeng (p : Player.player) : bool =
+  if qidui p then
+    let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+    let exposed = Exposed_hand.get_tiles (Player.get_exposed p) in
+    let hand = hidden @ exposed in
+    List.exists (fun t -> Tile.get_num t = 1) hand
+    && List.exists (fun t -> Tile.get_num t = 9) hand
+    && List.exists (fun t -> Tile.suit_to_string (Tile.get_tao t) = "Tiao") hand
+  else false *)
