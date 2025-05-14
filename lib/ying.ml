@@ -284,3 +284,27 @@ let jiulianbaodeng (p : Player.player) : bool =
       else false
     else false
   else false
+
+let rec try_make_kezi tiles n =
+  if n = 0 then true
+  else
+    match tiles with
+    | [] -> false
+    | t :: _ ->
+        if count_same tiles t >= 3 then
+          let rest = remove_n tiles t 3 in
+          try_make_kezi rest (n - 1)
+        else false
+let duiduihu (p : Player.player) : bool =
+  if complete p then
+    let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+    let exposed = Exposed_hand.get_tiles (Player.get_exposed p) in
+    let hand = hidden @ exposed in
+    try_make_kezi hand 4
+  else false
+
+let kankanhu (p : Player.player) : bool =
+  if complete p then
+    let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+    try_make_kezi hidden 4
+  else false

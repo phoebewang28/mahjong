@@ -52,3 +52,16 @@ val jiulianbaodeng : player -> bool
     - Returns true if the hand is a Jiulianbaodeng, false otherwise.
     - Precondition: [p] must be a valid player with a hidden hand of at most 14
       tiles. *)
+
+val duiduihu : player -> bool
+(** [duiduihu p] checks if player [p] has a Duiduihu hand.
+    - A Duiduihu hand consists of 4 Kezi groups and 1 pair.
+    - Returns true if the hand is a Duiduihu, false otherwise.
+    - Precondition: [p] must be a valid player with a hidden hand of at most 14
+      tiles. *)
+val kankanhu : player -> bool
+(** [kankanhu p] checks if player [p] has a Kankanhu hand.
+    - A Kankanhu hand consists of 4 Kezi groups and 1 pair, and all Kezi is in hidden hand.
+    - Returns true if the hand is a Kankanhu, false otherwise.
+    - Precondition: [p] must be a valid player with a hidden hand of at most 14
+      tiles. *)
