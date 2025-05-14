@@ -46,9 +46,9 @@ val qidui : player -> bool
     - Precondition: [p] must be a valid player with a hidden hand of at most 14
       tiles. *)
 
-(* val jiulianbaodeng : player -> bool
+val jiulianbaodeng : player -> bool
 (** [jiulianbaodeng p] checks if player [p] has a Jiulianbaodeng hand.
     - A Jiulianbaodeng hand consists of a consecutive sequece of 7 pairs of a single suite.
     - Returns true if the hand is a Jiulianbaodeng, false otherwise.
     - Precondition: [p] must be a valid player with a hidden hand of at most 14
-      tiles. *) *)
+      tiles. *)
