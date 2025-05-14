@@ -525,3 +525,72 @@ let qingyise_hand2 =
     Tile.string_to_tile "5 Tiao";
     Tile.string_to_tile "5 Tiao";
   ]
+
+let ziyise_hand1 =
+  [
+    Tile.string_to_tile "Dong";
+    Tile.string_to_tile "Dong";
+    Tile.string_to_tile "Dong";
+    Tile.string_to_tile "Nan";
+    Tile.string_to_tile "Nan";
+    Tile.string_to_tile "Bei";
+    Tile.string_to_tile "Bei";
+    Tile.string_to_tile "Bei";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+  ]
+let ziyise_hand2 =
+  [
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "Nan";
+    Tile.string_to_tile "Nan";
+    Tile.string_to_tile "Bei";
+    Tile.string_to_tile "Bei";
+    Tile.string_to_tile "Bei";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+  ]
+let hunyise_hand1 =
+  [
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "Nan";
+    Tile.string_to_tile "Nan";
+    Tile.string_to_tile "Bei";
+    Tile.string_to_tile "Bei";
+    Tile.string_to_tile "Bei";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+  ]
+let hunyise_hand2 =
+  [
+    Tile.string_to_tile "1 Wan";
+    Tile.string_to_tile "1 Wan";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "Bei";
+    Tile.string_to_tile "Bei";
+    Tile.string_to_tile "Bei";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+  ]

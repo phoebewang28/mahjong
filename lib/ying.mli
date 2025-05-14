@@ -72,3 +72,52 @@ val qingyise : player -> bool
     - Returns true if the hand is a Qingyise, false otherwise.
     - Precondition: [p] must be a valid player with a hidden hand of at most 14
       tiles. *)
+
+val ziyise : player -> bool
+(** [ziyise p] checks if player [p] has a Ziyise hand.
+    - A Ziyise hand consists of all zi(Dapai).
+    - Returns true if the hand is a Ziyise, false otherwise.
+    - Precondition: [p] must be a valid player with a hidden hand of at most 14
+      tiles. *)
+
+val hunyise : player -> bool
+(** [hunyiise p] checks if player [p] has a Hunyiise hand.
+    - A Hunyiise hand consists a single suite of Wan, Tong, Tiao and Dapai.
+    - Returns true if the hand is a Hunyiise, false otherwise.
+    - Precondition: [p] must be a valid player with a hidden hand of at most 14
+      tiles. *)
+
+(* val sananke : player -> bool
+(** [sananke p] checks if player [p] has a Sananke hand.
+    - A Sananke hand is a complete hand consists of 3 groups of 3 identical tiles in hidden hand.
+    - Returns true if the hand is a Sananke, false otherwise.
+    - Precondition: [p] must be a valid player with a hidden hand of at most 14
+      tiles. *)
+
+val xiaosixi : player -> bool
+(** [xiaosixi p] checks if player [p] has a Xiaosixi hand.
+    - A Xiaosixi hand is a complete hand consists of 3 groups of the 4 wind tiles and 1 pair of wind tiles.
+    - Returns true if the hand is a Xiaosixi, false otherwise.
+    - Precondition: [p] must be a valid player with a hidden hand of at most 14
+      tiles. *)
+
+val duanyaojiu : player -> bool
+(** [duanyaojiu p] checks if player [p] has a Duanyaojiu hand.
+    - A Duanyaojiu hand is a complete hand without tiles of num 1 and 9.
+    - Returns true if the hand is a Duanyaojiu, false otherwise.
+    - Precondition: [p] must be a valid player with a hidden hand of at most 14
+      tiles. *)
+
+val qinglaotou : player -> bool
+(** [qinglaotou p] checks if player [p] has a Qinglaotou hand.
+    - A Qinglaotou hand consists of 4 groups of 4 wind tiles and 1 pair.
+    - Returns true if the hand is a Qinglaotou, false otherwise.
+    - Precondition: [p] must be a valid player with a hidden hand of at most 14
+      tiles. *)
+
+val hunlaotou : player -> bool
+(** [hunlaotou p] checks if player [p] has a Hunlaotou hand.
+    - A Hunlaotou hand consists of 4 groups of 4 wind tiles and 1 pair.
+    - Returns true if the hand is a Hunlaotou, false otherwise.
+    - Precondition: [p] must be a valid player with a hidden hand of at most 14
+      tiles. *) *)
