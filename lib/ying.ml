@@ -316,3 +316,28 @@ let qingyise (p : Player.player) : bool =
     let hand = hidden @ exposed in
     is_single_kind hand
   else false
+let is_zi tiles =
+  List.filter
+    (fun t ->
+      match Tile.suit_to_string (Tile.get_tao t) with
+      | "Dong" | "Nan" | "Xi" | "Bei" | "Zhong" | "Fa" | "Bai" -> true
+      | _ -> false)
+    tiles
+let ziyise (p : Player.player) : bool =
+  if complete p || qidui p then
+    let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+    let exposed = Exposed_hand.get_tiles (Player.get_exposed p) in
+    let hand = hidden @ exposed in
+    List.length (is_zi hand) = List.length hand
+  else false
+
+let hunyise (p : Player.player) : bool =
+  if complete p || qidui p then
+    let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+    let exposed = Exposed_hand.get_tiles (Player.get_exposed p) in
+    let hand = hidden @ exposed in
+    let zi_len = List.length (is_zi hand) in
+    let shu_len = max (List.length (is_tong hand))
+    (max (List.length (is_wan hand)) (List.length (is_tiao hand)))in
+    List.length hand = zi_len + shu_len
+  else false
