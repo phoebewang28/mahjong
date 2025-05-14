@@ -69,12 +69,25 @@ let get_non_loopback_ip () =
     Unix.close sock;
     "Unknown"
 
-let run_server _ port =
-  let addr = Unix.ADDR_INET (Unix.inet_addr_any, port) in
-  Lwt_io.establish_server_with_client_address addr on_connect >>= fun _server ->
-  let actual_ip = get_non_loopback_ip () in
-  Lwt_io.printf "Server running at %s:%d\n" actual_ip port >>= fun () ->
-  fst (Lwt.wait ())
+let get_lan_ip () =
+  let sock = Unix.socket Unix.PF_INET Unix.SOCK_DGRAM 0 in
+  let dummy = Unix.inet_addr_of_string "8.8.8.8" in
+  let dummy_addr = Unix.ADDR_INET (dummy, 80) in
+  Unix.connect sock dummy_addr;
+  let local_addr = Unix.getsockname sock in
+  Unix.close sock;
+  match local_addr with
+  | Unix.ADDR_INET (inet, _) -> inet
+  | _ -> failwith "Unexpected socket address"
+
+let run_server port =
+  let bind_addr = Unix.ADDR_INET (Unix.inet_addr_any, port) in
+  let lan_ip = get_lan_ip () in
+  Lwt_io.establish_server_with_client_address bind_addr on_connect >>= fun _ ->
+  Lwt_io.printf "Server running at %s:%d\n"
+    (Unix.string_of_inet_addr lan_ip)
+    port
+  >>= fun () -> fst (Lwt.wait ())
 
 let run_client ip port =
   Lwt_io.open_connection (Unix.ADDR_INET (ip, port))
@@ -106,7 +119,7 @@ let () =
         if Array.length Sys.argv < 3 then usage ()
         else
           let port = int_of_string Sys.argv.(2) in
-          Lwt_main.run (run_server Unix.inet_addr_any port)
+          Lwt_main.run (run_server port)
     | "client" ->
         if Array.length Sys.argv < 4 then usage ()
         else
