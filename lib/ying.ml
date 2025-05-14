@@ -217,3 +217,70 @@ let lvyise (p : Player.player) : bool =
     let hand = hidden @ exposed in
     List.length (List.filter is_lv hand) = 14
   else false
+
+
+let qidui (p : Player.player) : bool =
+  let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+  let exposed = Exposed_hand.get_tiles (Player.get_exposed p) in
+  let hand = hidden @ exposed in
+  let unique_tiles = List.sort_uniq Tile.compare_tile hand in
+  List.for_all (fun t -> count_same hand t = 2 || count_same hand t = 4)
+  unique_tiles
+
+
+let is_consecutive tiles =
+  let rec aux acc = function
+    | [] -> acc
+    | t :: [] -> acc + 1
+    | t1 :: t2 :: rest ->
+        if Tile.get_num t2 - Tile.get_num t1 = 1 then
+          aux (acc + 1) (t2 :: rest)
+        else acc
+  in
+  aux 0 tiles = 7
+
+let is_tong tiles =
+  List.filter
+    (fun t ->
+      match Tile.suit_to_string (Tile.get_tao t) with
+      | "Tong" -> true
+      | _ -> false)
+    tiles
+let is_tiao tiles =
+  List.filter
+    (fun t ->
+      match Tile.suit_to_string (Tile.get_tao t) with
+      | "Tiao" -> true
+      | _ -> false)
+    tiles
+
+let is_wan tiles =
+  List.filter
+    (fun t ->
+      match Tile.suit_to_string (Tile.get_tao t) with
+      | "Wan" -> true
+      | _ -> false)
+    tiles
+
+let is_single_kind tiles = 
+  List.length (is_wan tiles) = List.length tiles ||
+  List.length (is_tiao tiles) = List.length tiles ||
+  List.length (is_tong tiles) = List.length tiles
+    
+let jiulianbaodeng (p : Player.player) : bool =
+  if complete p then
+    let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+    let exposed = Exposed_hand.get_tiles (Player.get_exposed p) in
+    let hand = hidden @ exposed in
+    if is_single_kind hand then
+      let tao = Tile.get_tao (List.hd hand)in
+      let c1 = count_same hand (Tile.make_tile 1 tao) in
+      let c9 = count_same hand (Tile.make_tile 9 tao) in
+      if c1 >= 3 && c9 >= 3 then
+        let hand = remove_n hand (Tile.make_tile 1 tao) c1 in
+        let hand = remove_n hand (Tile.make_tile 9 tao) c9 in
+        let unique_tiles = List.sort_uniq Tile.compare_tile hand in
+          is_consecutive unique_tiles 
+      else false
+    else false
+  else false
