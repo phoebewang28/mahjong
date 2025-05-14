@@ -40,6 +40,15 @@ let rec try_make_melds tiles n =
           else false
         in
         attempt_triple || attempt_sequence
+let is_wind t =
+      match Tile.suit_to_string (Tile.get_tao t) with
+      | "Dong" | "Nan" | "Xi" | "Bei" -> true
+      | _ -> false
+let is_wind_group (g,t) = 
+  match Tile.group_to_string g with
+  | "Shun" -> false
+  | "San" | "Si" -> is_wind t
+  | _ -> false
 
 let complete (p : Player.player) : bool =
   let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
@@ -114,3 +123,43 @@ let pinghu (p : Player.player) : bool =
       let unique_tiles = List.sort_uniq Tile.compare_tile hidden in
       try_all_pairs unique_tiles
   else false
+
+
+  let rec try_make_wind_only tiles n =
+    if n = 0 then tiles = []
+    else
+      match tiles with
+      | [] -> false
+      | t :: _ ->
+          if is_wind t then
+            let t2 = Tile.make_tile (0) (Tile.get_tao t) in
+            let t3 = Tile.make_tile (0) (Tile.get_tao t) in
+            if List.mem t2 tiles && List.mem t3 tiles then
+              let rest = remove_tiles tiles [ t; t2; t3 ] in
+              try_make_wind_only rest (n - 1)
+            else false
+          else false
+
+let dasixi (p : Player.player) : bool =
+  if complete p then
+    let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+    let exposed = Exposed_hand.get_exposed_hand (Player.get_exposed p) in
+    let exposed_count = List.length (List.filter is_wind_group exposed) in
+    let needed = 4 - exposed_count in
+    let rec try_all_pairs = function
+        | [] -> false
+        | t :: rest ->
+            if count_same hidden t >= 2 then
+              let remaining =
+                List.sort Tile.compare_tile (remove_n hidden t 2)
+              in
+              if try_make_wind_only remaining needed then true
+              else
+                try_all_pairs
+                  (List.filter (fun x -> Tile.compare_tile x t <> 0) rest)
+            else try_all_pairs rest
+      in
+      let unique_tiles = List.sort_uniq Tile.compare_tile hidden in
+      try_all_pairs unique_tiles
+  else false
+  

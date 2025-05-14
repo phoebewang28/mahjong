@@ -49,3 +49,7 @@ val exposed_hand_count : exposed_hand -> int
 *)
 val get_groups : exposed_hand -> group list
 (** [get_groups h] returns a list of groups in the exposed hand [h]. *)
+
+val get_exposed_hand : exposed_hand -> (group * tile) list
+(** [get_exposed_hand h] returns the exposed hand [h] as a list of pairs,
+    where each pair consists of a group and a tile. *)

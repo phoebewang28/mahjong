@@ -17,3 +17,11 @@ val pinghu : player -> bool
     - Returns true if the hand is a Pinghu, false otherwise.
     - Precondition: [p] must be a valid player with a hidden hand of at most 14
       tiles. *)
+
+val dasixi : player -> bool
+(** [dasixi p] checks if player [p] has a Dasixi hand.
+    - A Dasixi hand consists of 4 groups of 4 identical tiles(feng pai) and 1 pair.
+    - Returns true if the hand is a Dasixi, false otherwise.
+    - Precondition: [p] must be a valid player with a hidden hand of at most 14
+      tiles. *)
+(* val qingyise : player -> bool *)

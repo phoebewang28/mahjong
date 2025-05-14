@@ -245,3 +245,21 @@ let pinghu_hand =
     Tile.string_to_tile "5 Tong";
     Tile.string_to_tile "5 Tong";
   ]
+
+let dasixi_hand =
+  [
+    Tile.string_to_tile "Dong";
+    Tile.string_to_tile "Dong";
+    Tile.string_to_tile "Dong";
+    Tile.string_to_tile "Nan";
+    Tile.string_to_tile "Nan";
+    Tile.string_to_tile "Nan";
+    Tile.string_to_tile "Xi";
+    Tile.string_to_tile "Xi";
+    Tile.string_to_tile "Xi";
+    Tile.string_to_tile "Bei";
+    Tile.string_to_tile "Bei";
+    Tile.string_to_tile "Bei";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Zhong";
+    ]

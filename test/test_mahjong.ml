@@ -344,6 +344,41 @@ let pinghu_test name tiles expected =
 
 let pinghu_test_list = [ pinghu_test "pinghu1" Utilities.pinghu_hand true ]
 
+let dasixi_test name tiles expected =
+  name >:: fun _ ->
+  let hand = Hidden_hand.make_hidden_hand tiles in
+  let p =
+    Player.make_player "TestPlayer" 0 0 hand
+      (Exposed_hand.empty_exposed_hand ())
+  in
+
+  Printf.printf "[DEBUG][dasixi] Hand: %s\n"
+    (String.concat " | "
+       (List.map Tile.tile_to_string (Hidden_hand.get_tiles hand)));
+
+  let hidden_tiles = Hidden_hand.get_tiles hand in
+  let unique_tiles = List.sort_uniq Tile.compare_tile hidden_tiles in
+  List.iter
+    (fun t ->
+      let count =
+        List.length
+          (List.filter (fun x -> Tile.compare_tile x t = 0) hidden_tiles)
+      in
+      if count >= 2 then
+        Printf.printf "[DEBUG][dasixi] Trying pair candidate: %s (x%d)\n"
+          (Tile.tile_to_string t) count)
+    unique_tiles;
+
+  let result = Ying.dasixi p in
+
+  Printf.printf "[DEBUG][dasixi] Result: %b (Expected: %b)\n\n" result expected;
+
+  assert_equal expected result ~printer:string_of_bool
+let dasixi_test_list =
+  [ dasixi_test "dasixi" Utilities.dasixi_hand true ]
+
+(* List of complete tests *)
+
 let complete_test_list =
   [ complete_test "test1" Utilities.hh1_tiles true ]
   @ [ complete_test "test2" Utilities.hh2_tiles true ]
@@ -465,6 +500,6 @@ let exposed_hand_test =
 let tests =
   "test suite"
   >::: tile_tests @ player_tests @ player_choice_tests @ complete_test_list
-       @ pinghu_test_list @ exposed_hand_test
+       @ pinghu_test_list @ exposed_hand_test @ dasixi_test_list
 
 let _ = run_test_tt_main tests

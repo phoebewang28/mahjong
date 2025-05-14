@@ -44,3 +44,6 @@ let empty_exposed_hand () : exposed_hand = ref []
 
 let exposed_hand_count (e : exposed_hand) : int = List.length !e
 let get_groups (e : exposed_hand) : group list = List.map fst !e
+
+let get_exposed_hand (e : exposed_hand) : (group * tile) list =
+  List.map (fun (g, t) -> (g, t)) !e
