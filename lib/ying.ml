@@ -132,10 +132,8 @@ let pinghu (p : Player.player) : bool =
       | [] -> false
       | t :: _ ->
           if is_wind t then
-            let t2 = Tile.make_tile (0) (Tile.get_tao t) in
-            let t3 = Tile.make_tile (0) (Tile.get_tao t) in
-            if List.mem t2 tiles && List.mem t3 tiles then
-              let rest = remove_tiles tiles [ t; t2; t3 ] in
+            if (count_same tiles t) >= 3 then
+              let rest = remove_n tiles t 3 in
               try_make_wind_only rest (n - 1)
             else false
           else false
