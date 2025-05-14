@@ -308,3 +308,11 @@ let kankanhu (p : Player.player) : bool =
     let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
     try_make_kezi hidden 4
   else false
+
+let qingyise (p : Player.player) : bool =
+  if complete p || qidui p then
+    let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+    let exposed = Exposed_hand.get_tiles (Player.get_exposed p) in
+    let hand = hidden @ exposed in
+    is_single_kind hand
+  else false
