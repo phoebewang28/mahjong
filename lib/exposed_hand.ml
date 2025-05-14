@@ -11,6 +11,8 @@ let peng (t : tile) (e : exposed_hand) : unit = e := (make_group "San", t) :: !e
 let ming_gang (t : tile) (e : exposed_hand) : unit =
   e := (make_group "Si", t) :: !e
 
+let get_hand e = e
+
 let exposed_hand_to_string (e : exposed_hand) : string =
   String.concat ", "
     (List.map
@@ -41,3 +43,4 @@ let get_tiles (e : exposed_hand) : tile list =
 let empty_exposed_hand () : exposed_hand = ref []
 
 let exposed_hand_count (e : exposed_hand) : int = List.length !e
+let get_groups (e : exposed_hand) : group list = List.map fst !e

@@ -27,6 +27,11 @@ val ming_gang : tile -> exposed_hand -> unit
    = {1,1,1,1} while the type will be "Tong" and the group will be "Si".
    - Precondition: Only called when legal peng set is created.*)
 
+val get_hand : exposed_hand -> (group * tile) list ref
+(** [get_hand hand] retrieves the current hand represented by [hand]. The hand
+    is a reference to a list of pairs, where each pair consists of a [group] and
+    a [tile]. *)
+
 val exposed_hand_to_string : exposed_hand -> string
 (** [exposed_hand_to_string h] returns a string representation of the exposed
     hand [h].
@@ -42,3 +47,5 @@ val empty_exposed_hand : unit -> exposed_hand
 val exposed_hand_count : exposed_hand -> int
 (** [exposed_hand_count h] returns the number of groups in the exposed hand [h].
 *)
+val get_groups : exposed_hand -> group list
+(** [get_groups h] returns a list of groups in the exposed hand [h]. *)

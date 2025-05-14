@@ -1,4 +1,5 @@
 exception InvalidTile of string
+exception NoTileLeft
 
 type da_pai =
   | Dong
