@@ -31,4 +31,10 @@ val dasanyuan : player -> bool
     - Returns true if the hand is a Dasanyuan, false otherwise.
     - Precondition: [p] must be a valid player with a hidden hand of at most 14
       tiles. *)
-(* val qingyise : player -> bool *)
+
+val lvyise : player -> bool
+(** [lvyise p] checks if player [p] has a Lvyise hand.
+    - A Lvyise hand is a complete hand consisting of 2,3,4,6,8 tiao and Fa.
+    - Returns true if the hand is a Lvyise, false otherwise.
+    - Precondition: [p] must be a valid player with a hidden hand of at most 14
+      tiles. *)

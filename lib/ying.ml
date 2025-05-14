@@ -202,3 +202,18 @@ let dasanyuan (p : Player.player) : bool =
       let unique_tiles = List.sort_uniq Tile.compare_tile hidden in
       try_all_pairs unique_tiles
   else false
+let is_lv t =
+  match Tile.suit_to_string (Tile.get_tao t) with
+  | "Fa" -> true
+  | "Tiao" ->
+      let num = Tile.get_num t in
+      if num = 2 || num = 3 || num = 4 || num = 6 || num = 8 then true
+      else false
+  | _ -> false
+let lvyise (p : Player.player) : bool =
+  if complete p then
+    let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+    let exposed = Exposed_hand.get_tiles (Player.get_exposed p) in
+    let hand = hidden @ exposed in
+    List.length (List.filter is_lv hand) = 14
+  else false
