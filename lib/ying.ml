@@ -159,5 +159,49 @@ let dasixi (p : Player.player) : bool =
       in
       let unique_tiles = List.sort_uniq Tile.compare_tile hidden in
       try_all_pairs unique_tiles
+  else false  
+
+let is_dragon t =
+  match Tile.suit_to_string (Tile.get_tao t) with
+  | "Zhong" | "Fa" | "Bai" -> true
+  | _ -> false
+
+let is_dragon_group (g,t) = 
+    match Tile.group_to_string g with
+    | "Shun" -> false
+    | "San" | "Si" -> is_dragon t
+    | _ -> false
+let rec try_make_dragon_only tiles n =
+  if n = 0 then tiles = []
+  else
+    match tiles with
+    | [] -> false
+    | t :: _ ->
+        if is_dragon t then
+          if (count_same tiles t) >= 3 then
+            let rest = remove_n tiles t 3 in
+            try_make_dragon_only rest (n - 1)
+          else false
+        else false
+let dasanyuan (p : Player.player) : bool =
+  if complete p then
+    let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+    let exposed = Exposed_hand.get_exposed_hand (Player.get_exposed p) in
+    let exposed_count = List.length (List.filter is_dragon_group exposed) in
+    let needed = 3 - exposed_count in
+    let rec try_all_pairs = function
+        | [] -> false
+        | t :: rest ->
+            if count_same hidden t >= 2 then
+              let remaining =
+                List.sort Tile.compare_tile (remove_n hidden t 2)
+              in
+              if try_make_dragon_only remaining needed then true
+              else
+                try_all_pairs
+                  (List.filter (fun x -> Tile.compare_tile x t <> 0) rest)
+            else try_all_pairs rest
+      in
+      let unique_tiles = List.sort_uniq Tile.compare_tile hidden in
+      try_all_pairs unique_tiles
   else false
-  

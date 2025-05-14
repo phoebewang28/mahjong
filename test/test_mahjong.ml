@@ -375,8 +375,44 @@ let dasixi_test name tiles expected =
 
   assert_equal expected result ~printer:string_of_bool
 let dasixi_test_list =
-  [ dasixi_test "dasixi" Utilities.dasixi_hand true ]
+  [ dasixi_test "dasixi" Utilities.dasixi_hand1 true ]
+  @ [ dasixi_test "dasixi2" Utilities.dasixi_hand2 false ]
 
+
+  let dasanyuan_test name tiles expected =
+    name >:: fun _ ->
+    let hand = Hidden_hand.make_hidden_hand tiles in
+    let p =
+      Player.make_player "TestPlayer" 0 0 hand
+        (Exposed_hand.empty_exposed_hand ())
+    in
+  
+    Printf.printf "[DEBUG][dasanyuan] Hand: %s\n"
+      (String.concat " | "
+         (List.map Tile.tile_to_string (Hidden_hand.get_tiles hand)));
+  
+    let hidden_tiles = Hidden_hand.get_tiles hand in
+    let unique_tiles = List.sort_uniq Tile.compare_tile hidden_tiles in
+    List.iter
+      (fun t ->
+        let count =
+          List.length
+            (List.filter (fun x -> Tile.compare_tile x t = 0) hidden_tiles)
+        in
+        if count >= 2 then
+          Printf.printf "[DEBUG][dasanyuan] Trying pair candidate: %s (x%d)\n"
+            (Tile.tile_to_string t) count)
+      unique_tiles;
+  
+    let result = Ying.dasanyuan p in
+  
+    Printf.printf "[DEBUG][dasanyuan] Result: %b (Expected: %b)\n\n" result expected;
+  
+    assert_equal expected result ~printer:string_of_bool
+  let dasanyuan_test_list =
+    [ dasanyuan_test "dasanyuan" Utilities.dasanyuan_hand1 true ]
+    @ [ dasanyuan_test "dasanyuan2" Utilities.dasanyuan_hand2 false ]
+  
 (* List of complete tests *)
 
 let complete_test_list =
