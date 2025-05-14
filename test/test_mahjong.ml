@@ -536,6 +536,6 @@ let exposed_hand_test =
 let tests =
   "test suite"
   >::: tile_tests @ player_tests @ player_choice_tests @ complete_test_list
-       @ pinghu_test_list @ exposed_hand_test @ dasixi_test_list
+       @ pinghu_test_list @ exposed_hand_test @ dasixi_test_list @ dasanyuan_test_list
 
 let _ = run_test_tt_main tests
