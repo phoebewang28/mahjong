@@ -316,3 +316,38 @@ let dasanyuan_hand2 =
     Tile.string_to_tile "Zhong";
     Tile.string_to_tile "Zhong";
   ]
+
+let lvyise_hand1 =
+  [
+    Tile.string_to_tile "2 Tiao";
+    Tile.string_to_tile "3 Tiao";
+    Tile.string_to_tile "4 Tiao";
+    Tile.string_to_tile "4 Tiao";
+    Tile.string_to_tile "4 Tiao";
+    Tile.string_to_tile "4 Tiao";
+    Tile.string_to_tile "6 Tiao";
+    Tile.string_to_tile "6 Tiao";
+    Tile.string_to_tile "6 Tiao";
+    Tile.string_to_tile "8 Tiao";
+    Tile.string_to_tile "8 Tiao";
+    Tile.string_to_tile "Fa";
+    Tile.string_to_tile "Fa";
+    Tile.string_to_tile "Fa";
+    ]
+let lvyise_hand2 =
+  [
+    Tile.string_to_tile "1 Tiao";
+    Tile.string_to_tile "2 Tiao";
+    Tile.string_to_tile "3 Tiao";
+    Tile.string_to_tile "4 Tiao";
+    Tile.string_to_tile "5 Tiao";
+    Tile.string_to_tile "6 Tiao";
+    Tile.string_to_tile "6 Tiao";
+    Tile.string_to_tile "6 Tiao";
+    Tile.string_to_tile "6 Tiao";
+    Tile.string_to_tile "8 Tiao";
+    Tile.string_to_tile "8 Tiao";
+    Tile.string_to_tile "Fa";
+    Tile.string_to_tile "Fa";
+    Tile.string_to_tile "Fa";
+    ]

@@ -344,6 +344,28 @@ let pinghu_test name tiles expected =
 
 let pinghu_test_list = [ pinghu_test "pinghu1" Utilities.pinghu_hand true ]
 
+let lvyise_test name tiles expected =
+  name >:: fun _ ->
+  let hand = Hidden_hand.make_hidden_hand tiles in
+  let p =
+    Player.make_player "TestPlayer" 0 0 hand
+      (Exposed_hand.empty_exposed_hand ())
+  in
+
+  Printf.printf "[DEBUG][Lvyise] Hand: %s\n"
+    (String.concat " | "
+       (List.map Tile.tile_to_string (Hidden_hand.get_tiles hand)));
+
+  let result = Ying.lvyise p in
+
+  Printf.printf "[DEBUG][Lvyise] Result: %b (Expected: %b)\n\n" result expected;
+
+  assert_equal expected result ~printer:string_of_bool
+
+let lvyise_test_list =
+  [ lvyise_test "lvyise" Utilities.lvyise_hand1 true ]
+  @ [ lvyise_test "lvyise2" Utilities.lvyise_hand2 false ]
+
 let dasixi_test name tiles expected =
   name >:: fun _ ->
   let hand = Hidden_hand.make_hidden_hand tiles in
@@ -537,5 +559,6 @@ let tests =
   "test suite"
   >::: tile_tests @ player_tests @ player_choice_tests @ complete_test_list
        @ pinghu_test_list @ exposed_hand_test @ dasixi_test_list @ dasanyuan_test_list
+       @ lvyise_test_list
 
 let _ = run_test_tt_main tests
