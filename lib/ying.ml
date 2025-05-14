@@ -1,3 +1,5 @@
+exception PlayerWin of Player.player
+
 let count_same tiles tile =
   List.length (List.filter (fun t -> Tile.compare_tile t tile = 0) tiles)
 

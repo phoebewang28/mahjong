@@ -348,7 +348,6 @@ let draw_player_exp p gb : unit =
   List.iter (fun k -> Printf.printf " - %s\n" k) keys;
   draw_tile_list_from_keys keys 50 (window_height - 175) gb
 
-
 let draw_player_name p : unit =
   let font_size = 40 in
   let name = Player.get_name p in
@@ -431,7 +430,7 @@ let chi_from_clicked p gb : unit =
   then
     (*successful chi -> taken out into exposed hand, should engage throwing
       now *)
-    gb.is_throwing <- true
+    if Ying.complete p then raise (Ying.PlayerWin p) else gb.is_throwing <- true
   else gb.is_chiing <- false;
   (* deactivate is_chiing cuz failed *)
   gb.clicked_tiles.(0) <- -1;
@@ -443,7 +442,8 @@ let peng_from_clicked p gb : unit =
   if
     (* both tiles selected for penging *)
     Player_choice.peng p gb.clicked_tiles.(0) gb.clicked_tiles.(1)
-  then gb.is_throwing <- true
+  then
+    if Ying.complete p then raise (Ying.PlayerWin p) else gb.is_throwing <- true
   else gb.is_penging <- false;
   gb.clicked_tiles.(0) <- -1;
   gb.clicked_tiles.(1) <- -1
@@ -528,6 +528,8 @@ let rec game_loop (gb : game_board) =
     | false ->
         draw_all_game gb;
         game_loop gb
-  with Tile.NoTileLeft -> close_window () (* TODO: Game end screen *)
+  with
+  | Tile.NoTileLeft -> close_window () (* TODO: Game end screen *)
+  | Ying.PlayerWin player -> close_window ()
 
 let () = setup_start () |> start_loop |> setup_game |> game_loop

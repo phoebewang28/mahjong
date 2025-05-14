@@ -2,6 +2,7 @@ open Tile
 open Str
 open Player
 open Hidden_hand
+open Ying
 
 let throw (player : player) id =
   let hid = get_hidden player in
@@ -15,6 +16,7 @@ let draw (player : player) =
     let hidden_hand = get_hidden player in
     let tile = Array.get !tiles_arr !curr_index in
     add hidden_hand tile;
+    if Ying.complete player then raise (Ying.PlayerWin player);
     curr_index := !curr_index + 1;
     tile
   with Invalid_argument _ -> raise Tile.NoTileLeft
@@ -103,10 +105,18 @@ let chi (player : player) id1 id2 : bool =
   let hid = get_hidden player in
   let ex = get_exposed player in
   let dis = List.hd !discarded in
-  chi_update (Hidden_hand.get hid id1) (Hidden_hand.get hid id2) dis ex hid
+  let succ =
+    chi_update (Hidden_hand.get hid id1) (Hidden_hand.get hid id2) dis ex hid
+  in
+  if succ && Ying.complete player then raise (Ying.PlayerWin player);
+  succ
 
 let peng (player : player) id1 id2 : bool =
   let hid = get_hidden player in
   let ex = get_exposed player in
   let dis = List.hd !discarded in
-  peng_update (Hidden_hand.get hid id1) (Hidden_hand.get hid id2) dis ex hid
+  let succ =
+    peng_update (Hidden_hand.get hid id1) (Hidden_hand.get hid id2) dis ex hid
+  in
+  if succ && Ying.complete player then raise (Ying.PlayerWin player);
+  succ
