@@ -240,7 +240,8 @@ let make_player id name = Player.create name id
 let init_tiles () =
   Random.self_init ();
   let _ = Tile.init_tiles () in
-  Tile.shuffle !Tile.tiles_arr
+  ()
+(* Tile.shuffle !Tile.tiles_arr *)
 
 (** Setup for the starting interface and game window, returning initialized
     [start_board]
@@ -251,6 +252,7 @@ let setup_start () : start_board =
   (* only called once: start board & game board uses same window *)
   (* set_config_flags [ ConfigFlags.Window_resizable ]; *)
   (* todo: fix resizing bug *)
+  set_trace_log_level Raylib.TraceLogLevel.None;
   init_window window_width window_height "OCaMahJong";
   set_target_fps 60;
   load_tile_images ();
@@ -346,8 +348,8 @@ let draw_player_exp p gb : unit =
   let keys = Tile.tile_list_to_keys tiles in
   Printf.printf "Exposed hand keys:\n";
   List.iter (fun k -> Printf.printf " - %s\n" k) keys;
+  flush stdout;
   draw_tile_list_from_keys keys 50 (window_height - 175) gb
-
 
 let draw_player_name p : unit =
   let font_size = 40 in
@@ -431,7 +433,7 @@ let chi_from_clicked p gb : unit =
   then
     (*successful chi -> taken out into exposed hand, should engage throwing
       now *)
-    gb.is_throwing <- true
+    if Ying.complete p then raise (Ying.PlayerWin p) else gb.is_throwing <- true
   else gb.is_chiing <- false;
   (* deactivate is_chiing cuz failed *)
   gb.clicked_tiles.(0) <- -1;
@@ -443,7 +445,8 @@ let peng_from_clicked p gb : unit =
   if
     (* both tiles selected for penging *)
     Player_choice.peng p gb.clicked_tiles.(0) gb.clicked_tiles.(1)
-  then gb.is_throwing <- true
+  then
+    if Ying.complete p then raise (Ying.PlayerWin p) else gb.is_throwing <- true
   else gb.is_penging <- false;
   gb.clicked_tiles.(0) <- -1;
   gb.clicked_tiles.(1) <- -1
@@ -528,6 +531,8 @@ let rec game_loop (gb : game_board) =
     | false ->
         draw_all_game gb;
         game_loop gb
-  with Tile.NoTileLeft -> close_window () (* TODO: Game end screen *)
+  with
+  | Tile.NoTileLeft -> close_window () (* TODO: Game end screen *)
+  | Ying.PlayerWin player -> close_window ()
 
 let () = setup_start () |> start_loop |> setup_game |> game_loop

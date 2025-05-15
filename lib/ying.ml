@@ -1,3 +1,5 @@
+exception PlayerWin of Player.player
+
 (** [count_same tiles tile] counts the number of occurrences of [tile] in the
     list [tiles]. *)
 let count_same tiles tile =

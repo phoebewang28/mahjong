@@ -1,62 +1,129 @@
-let localhost_5000 = Unix.ADDR_INET (Unix.inet_addr_any, 5000)
+open Lwt.Infix
 
-let server_ip () =
-  let host = Unix.gethostname () in
-  let addr = (Unix.gethostbyname host).Unix.h_addr_list.(0) in
-  Unix.string_of_inet_addr addr
+type client = {
+  addr : string;
+  port : int;
+  out_chan : Lwt_io.output_channel;
+}
 
-let ip_for_client =
-  Unix.ADDR_INET (Unix.inet_addr_of_string (server_ip ()), 5000)
+let clients = ref []
 
-let get_local_ip () =
-  let host = Unix.gethostname () in
-  let addresses = Unix.gethostbyname host in
-  Array.iter
-    (fun addr ->
-      let ip_str = Unix.string_of_inet_addr addr in
-      Printf.printf "IP address: %s\n" ip_str)
-    addresses.Unix.h_addr_list
+let broadcast msg =
+  Lwt_list.iter_p
+    (fun c ->
+      Lwt.catch
+        (fun () -> Lwt_io.write_line c.out_chan msg)
+        (fun _ -> Lwt.return_unit))
+    !clients
 
-let string_of_sockaddr = function
-  | Unix.ADDR_UNIX s -> s
-  | ADDR_INET (ip, port) ->
-      Printf.sprintf "%s:%d" (Unix.string_of_inet_addr ip) port
+let string_of_sockaddr (addr : Unix.sockaddr) : string =
+  match addr with
+  | Unix.ADDR_INET (inet_addr, port) ->
+      let ip_str = Unix.string_of_inet_addr inet_addr in
+      Printf.sprintf "%s:%d" ip_str port
+  | Unix.ADDR_UNIX path -> Printf.sprintf "unix:%s" path
 
-let client_handler client_socket_address (client_in, client_out) =
-  let%lwt () =
-    Lwt_io.printlf "I got a connection from %s."
-      (string_of_sockaddr client_socket_address)
+let remove_client client =
+  clients := List.filter (fun c -> c.out_chan != client.out_chan) !clients
+
+let rec handle_client client input_chan =
+  Lwt_io.read_line_opt input_chan >>= function
+  | Some msg ->
+      if String.starts_with ~prefix:"MOVE:" msg then
+        let content = String.sub msg 5 (String.length msg - 5) in
+        let full_msg = Printf.sprintf "STATE:%s" content in
+        broadcast full_msg >>= fun () -> handle_client client input_chan
+      else
+        Lwt_io.printf "Unrecognized message from %s:%d: %s\n" client.addr
+          client.port msg
+        >>= fun () -> handle_client client input_chan
+  | None ->
+      Lwt_io.printf "Client %s:%d disconnected.\n" client.addr client.port
+      >>= fun () ->
+      remove_client client;
+      Lwt.return_unit
+
+let on_connect addr (input_chan, output_chan) =
+  let ip, port =
+    match addr with
+    | Unix.ADDR_INET (inet_addr, port) ->
+        (Unix.string_of_inet_addr inet_addr, port)
+    | _ -> ("Unknown", 0)
   in
-  Lwt.return ()
+  Lwt_io.printf "Connection from %s:%d\n" ip port >>= fun () ->
+  let client = { addr = ip; port; out_chan = output_chan } in
+  clients := client :: !clients;
+  handle_client client input_chan
 
-let run_server () =
-  let server () =
-    let%lwt () = Lwt_io.printlf "I am the server." in
-    get_local_ip ();
-    print_endline (Unix.string_of_inet_addr Unix.inet_addr_loopback);
-    let%lwt running_server =
-      Lwt_io.establish_server_with_client_address localhost_5000 client_handler
-    in
-    fst (Lwt.wait ())
-  in
-  Lwt_main.run (server ())
+let get_non_loopback_ip () =
+  let sock = Unix.socket Unix.PF_INET Unix.SOCK_DGRAM 0 in
+  let dummy_addr = Unix.ADDR_INET (Unix.inet_addr_of_string "8.8.8.8", 80) in
+  try
+    Unix.connect sock dummy_addr;
+    let local_addr = Unix.getsockname sock in
+    Unix.close sock;
+    match local_addr with
+    | Unix.ADDR_INET (inet_addr, _) -> Unix.string_of_inet_addr inet_addr
+    | _ -> "Unknown"
+  with _ ->
+    Unix.close sock;
+    "Unknown"
 
-let run_client () =
-  let client () =
-    let%lwt () = Lwt_io.printlf "I am a client." in
-    let%lwt server_in, server_out = Lwt_io.open_connection ip_for_client in
-    let%lwt () = Lwt_io.printlf "I connected to the server" in
-    Lwt.return ()
-  in
-  Lwt_main.run (client ())
+let get_lan_ip () =
+  let sock = Unix.socket Unix.PF_INET Unix.SOCK_DGRAM 0 in
+  let dummy = Unix.inet_addr_of_string "8.8.8.8" in
+  let dummy_addr = Unix.ADDR_INET (dummy, 80) in
+  Unix.connect sock dummy_addr;
+  let local_addr = Unix.getsockname sock in
+  Unix.close sock;
+  match local_addr with
+  | Unix.ADDR_INET (inet, _) -> inet
+  | _ -> failwith "Unexpected socket address"
 
-let _ =
-  let print_usage () =
-    Printf.printf "Usage: %s <server | client>\n" Sys.argv.(0)
+let run_server port =
+  let bind_addr = Unix.ADDR_INET (Unix.inet_addr_any, port) in
+  let lan_ip = get_lan_ip () in
+  Lwt_io.establish_server_with_client_address bind_addr on_connect >>= fun _ ->
+  Lwt_io.printf "Server running at %s:%d\n"
+    (Unix.string_of_inet_addr lan_ip)
+    port
+  >>= fun () -> fst (Lwt.wait ())
+
+let run_client ip port =
+  Lwt_io.open_connection (Unix.ADDR_INET (ip, port))
+  >>= fun (input_chan, output_chan) ->
+  let rec loop () =
+    Lwt.choose
+      [
+        ( Lwt_io.read_line_opt Lwt_io.stdin >>= function
+          | Some line -> Lwt_io.write_line output_chan ("MOVE:" ^ line)
+          | None -> Lwt.return_unit );
+        ( Lwt_io.read_line_opt input_chan >>= function
+          | Some msg -> Lwt_io.printl msg
+          | None ->
+              Lwt_io.printl "Server closed connection." >>= fun () -> exit 0 );
+      ]
+    >>= fun () -> loop ()
   in
-  if Array.length Sys.argv < 2 then print_usage ()
+  loop ()
+
+let () =
+  let usage () =
+    Printf.printf "Usage:\n  %s server <port>\n  %s client <IP> <port>\n"
+      Sys.argv.(0) Sys.argv.(0)
+  in
+  if Array.length Sys.argv < 2 then usage ()
   else
     match Sys.argv.(1) with
-    | "server" -> run_server ()
-    | "client" -> run_client ()
-    | _ -> print_usage ()
+    | "server" ->
+        if Array.length Sys.argv < 3 then usage ()
+        else
+          let port = int_of_string Sys.argv.(2) in
+          Lwt_main.run (run_server port)
+    | "client" ->
+        if Array.length Sys.argv < 4 then usage ()
+        else
+          let ip = Unix.inet_addr_of_string Sys.argv.(2) in
+          let port = int_of_string Sys.argv.(3) in
+          Lwt_main.run (run_client ip port)
+    | _ -> usage ()
