@@ -1,7 +1,123 @@
 open OUnit2
 open Mahjong
-open Utilities
 open QCheck
+
+let tilesInOrder = Tile.init_tiles ()
+
+let printDeck tilearr =
+  Array.iter (fun tile -> print_endline (Tile.tile_to_string tile)) tilearr
+
+let test_tiles =
+  [
+    (Tile.string_to_tile "1 Tong", "Tong", 1, "1 Tong");
+    (Tile.string_to_tile "9 Tong", "Tong", 9, "9 Tong");
+    (Tile.string_to_tile "2 Wan", "Wan", 2, "2 Wan");
+    (Tile.string_to_tile "3 Tiao", "Tiao", 3, "3 Tiao");
+    (Tile.string_to_tile "Dong", "Dong", 0, "Dong");
+    (Tile.string_to_tile "Zhong", "Zhong", 0, "Zhong");
+  ]
+
+let test_bad_tiles =
+  [
+    "0 Tong";
+    "0 Wan";
+    "0 Tiao";
+    "10 Tong";
+    "0 Wan";
+    "Tiao";
+    "0 Nan";
+    "2 Zhong";
+    "6 Bei";
+    "0 Fa";
+    "Dragon";
+  ]
+
+let players_string = [ ("Caedy", 1); ("Albert", 2); ("Elinor", 3); ("Jess", 4) ]
+let player = Player.create "test" 0
+let test_player hh eh = Player.make_player "test" 0 10 hh eh
+
+(* use for qcheck *)
+let arbitrary_tile =
+  make
+    (Gen.oneofl
+       (List.map
+          (fun (x, y) -> Tile.make_tile y (Tile.string_to_suit x))
+          (List.map (fun x -> ("Tong", x)) [ 1; 2; 3; 4; 5; 6; 7; 8; 9 ]
+          @ List.map (fun x -> ("Wan", x)) [ 1; 2; 3; 4; 5; 6; 7; 8; 9 ]
+          @ List.map (fun x -> ("Tiao", x)) [ 1; 2; 3; 4; 5; 6; 7; 8; 9 ]
+          @ List.map
+              (fun x -> (x, 0))
+              [ "Dong"; "Nan"; "Xi"; "Bei"; "Zhong"; "Fa"; "Bai" ])))
+
+let txt_to_hand file =
+  let ic = open_in file in
+  let rec read_lines acc =
+    try
+      let line = input_line ic in
+      let tiles = String.split_on_char ',' line in
+      match List.length tiles with
+      | 1 ->
+          let tile = List.hd tiles in
+          let hand = Tile.string_to_tile tile in
+          read_lines (hand :: acc)
+      | 2 ->
+          let tile = List.hd tiles ^ " " ^ List.hd (List.tl tiles) in
+          let hand = Tile.string_to_tile tile in
+          read_lines (hand :: acc)
+      | _ -> failwith "Invalid tile format in input file"
+    with End_of_file ->
+      close_in ic;
+      List.rev acc
+  in
+  read_lines []
+
+let hh1_tiles = txt_to_hand "../data/win_conditions/hh/1.txt"
+let hh2_tiles = txt_to_hand "../data/win_conditions/hh/2.txt"
+let hh3_tiles = txt_to_hand "../data/win_conditions/hh/3.txt"
+let hh4_tiles = txt_to_hand "../data/win_conditions/hh/4.txt"
+let hh5_tiles = txt_to_hand "../data/win_conditions/hh/5.txt"
+let hh6_tiles = txt_to_hand "../data/win_conditions/hh/6.txt"
+let hh7_tiles = txt_to_hand "../data/win_conditions/hh/7.txt"
+let hh8_tiles = txt_to_hand "../data/win_conditions/hh/8.txt"
+let hh9_tiles = txt_to_hand "../data/win_conditions/hh/9.txt"
+let pinghu_hand = txt_to_hand "../data/win_conditions/pinghu/1.txt"
+let dasixi_hand1 = txt_to_hand "../data/win_conditions/dasixi/1.txt"
+let dasixi_hand2 = txt_to_hand "../data/win_conditions/dasixi/2.txt"
+let dasanyuan_hand1 = txt_to_hand "../data/win_conditions/dasanyuan/1.txt"
+let dasanyuan_hand2 = txt_to_hand "../data/win_conditions/dasanyuan/2.txt"
+let lvyise_hand1 = txt_to_hand "../data/win_conditions/lvyise/1.txt"
+let lvyise_hand2 = txt_to_hand "../data/win_conditions/lvyise/2.txt"
+let qidui_hand1 = txt_to_hand "../data/win_conditions/qidui/1.txt"
+let qidui_hand2 = txt_to_hand "../data/win_conditions/qidui/2.txt"
+
+let jiulianbaodeng_hand1 =
+  txt_to_hand "../data/win_conditions/jiulianbaodeng/1.txt"
+
+let jiulianbaodeng_hand2 =
+  txt_to_hand "../data/win_conditions/jiulianbaodeng/2.txt"
+
+let duiduihu_hand1 = txt_to_hand "../data/win_conditions/duiduihu/1.txt"
+let duiduihu_hand2 = txt_to_hand "../data/win_conditions/duiduihu/2.txt"
+let kankanhu_hand1 = txt_to_hand "../data/win_conditions/kankanhu/1.txt"
+let kankanhu_hand2 = txt_to_hand "../data/win_conditions/kankanhu/2.txt"
+let qingyise_hand1 = txt_to_hand "../data/win_conditions/qingyise/1.txt"
+let qingyise_hand2 = txt_to_hand "../data/win_conditions/qingyise/2.txt"
+let ziyise_hand1 = txt_to_hand "../data/win_conditions/ziyise/1.txt"
+let ziyise_hand2 = txt_to_hand "../data/win_conditions/ziyise/2.txt"
+let hunyise_hand1 = txt_to_hand "../data/win_conditions/hunyise/1.txt"
+let hunyise_hand2 = txt_to_hand "../data/win_conditions/hunyise/2.txt"
+let xiaosixi_hand1 = txt_to_hand "../data/win_conditions/xiaosixi/1.txt"
+let xiaosixi_hand2 = txt_to_hand "../data/win_conditions/xiaosixi/2.txt"
+let sananke_hand1 = txt_to_hand "../data/win_conditions/sananke/1.txt"
+let sananke_hand2 = txt_to_hand "../data/win_conditions/sananke/2.txt"
+let duanyaojiu_hand1 = txt_to_hand "../data/win_conditions/duanyaojiu/1.txt"
+let duanyaojiu_hand2 = txt_to_hand "../data/win_conditions/duanyaojiu/2.txt"
+let qingyaojiu_hand1 = txt_to_hand "../data/win_conditions/qingyaojiu/1.txt"
+let qingyaojiu_hand2 = txt_to_hand "../data/win_conditions/qingyaojiu/2.txt"
+let qingyaojiu_hand3 = txt_to_hand "../data/win_conditions/qingyaojiu/3.txt"
+let hunyaojiu_hand1 = txt_to_hand "../data/win_conditions/hunyaojiu/1.txt"
+let hunyaojiu_hand2 = txt_to_hand "../data/win_conditions/hunyaojiu/2.txt"
+let hunyaojiu_hand3 = txt_to_hand "../data/win_conditions/hunyaojiu/3.txt"
 
 let tile_test fn expected_val print name =
   name >:: fun _ -> assert_equal fn expected_val ~printer:print
@@ -105,7 +221,7 @@ let throw_discarded_test player id =
 let chi_check_qcheck_test =
   QCheck_runner.to_ounit2_test
     (let arbitrary_hand =
-       QCheck.list_of_size (QCheck.int_range 13 14).gen Utilities.arbitrary_tile
+       QCheck.list_of_size (QCheck.int_range 13 14).gen arbitrary_tile
      in
      QCheck.Test.make ~count:100
        ~name:"tests chi_check with a randomly generated hand" arbitrary_hand
@@ -136,7 +252,7 @@ let peng_test player t1 t2 expected =
   assert_equal (Player_choice.peng player t1 t2) expected
 
 let player_choice_tests =
-  let player = Utilities.player in
+  let player = player in
   [
     draw_next_tile_test (Tile.string_to_tile "1 Tong") player 0;
     draw_next_tile_test (Tile.string_to_tile "2 Tong") player 4;
@@ -145,47 +261,38 @@ let player_choice_tests =
   @ [ hh_size_test "throw" player ]
   @ [ draw_curr_ind_test player ]
   @ [ throw_discarded_test player 0; throw_discarded_test player 1 ]
-  @ [
-      chi_peng_check_test "chi" true
-        (Hidden_hand.make_hidden_hand Utilities.hh9_tiles);
-    ]
-  @ [
-      chi_peng_check_test "chi" false
-        (Hidden_hand.make_hidden_hand Utilities.hh5_tiles);
-    ]
-  @ [
-      chi_peng_check_test "peng" true
-        (Hidden_hand.make_hidden_hand Utilities.hh6_tiles);
-    ]
+  @ [ chi_peng_check_test "chi" true (Hidden_hand.make_hidden_hand hh9_tiles) ]
+  @ [ chi_peng_check_test "chi" false (Hidden_hand.make_hidden_hand hh5_tiles) ]
+  @ [ chi_peng_check_test "peng" true (Hidden_hand.make_hidden_hand hh6_tiles) ]
   @ [
       chi_peng_check_test "peng" false
-        (Hidden_hand.make_hidden_hand Utilities.pinghu_hand);
+        (Hidden_hand.make_hidden_hand pinghu_hand);
     ]
   @ [
       chi_test
-        (Utilities.test_player
-           (Hidden_hand.make_hidden_hand Utilities.hh9_tiles)
+        (test_player
+           (Hidden_hand.make_hidden_hand hh9_tiles)
            (Exposed_hand.empty_exposed_hand ()))
         2 3 true;
     ]
   @ [
       chi_test
-        (Utilities.test_player
-           (Hidden_hand.make_hidden_hand Utilities.hh7_tiles)
+        (test_player
+           (Hidden_hand.make_hidden_hand hh7_tiles)
            (Exposed_hand.empty_exposed_hand ()))
         0 1 false;
     ]
   @ [
       peng_test
-        (Utilities.test_player
-           (Hidden_hand.make_hidden_hand Utilities.hh6_tiles)
+        (test_player
+           (Hidden_hand.make_hidden_hand hh6_tiles)
            (Exposed_hand.empty_exposed_hand ()))
         0 1 true;
     ]
   @ [
       peng_test
-        (Utilities.test_player
-           (Hidden_hand.make_hidden_hand Utilities.hh6_tiles)
+        (test_player
+           (Hidden_hand.make_hidden_hand hh6_tiles)
            (Exposed_hand.empty_exposed_hand ()))
         10 11 false;
     ]
@@ -239,29 +346,27 @@ let player_win_test (p : Player.player) (players : Player.player list) bet =
 let ocahmahjong_team = List.map (fun (a, b) -> Player.create a b) players_string
 
 let player_tests =
-  List.flatten
-    (List.map (fun (a, b) -> create_player_test a b) Utilities.players_string)
+  List.flatten (List.map (fun (a, b) -> create_player_test a b) players_string)
   @ [ player_win_test (List.hd ocahmahjong_team) ocahmahjong_team 10 ]
 (* @ [ player_win_test (List.hd ocahmahjong_team) ocahmahjong_team 10 ] *)
 
 let tile_tests =
-  (*Tests that will be applied on various selected tiles, refer to
-    Utilities.ml*)
-  List.map (fun (a, _, c, _) -> tile_num_test a c) Utilities.test_tiles
-  @ List.map (fun (a, b, _, _) -> tile_suit_test a b) Utilities.test_tiles
+  (*Tests that will be applied on various selected tiles, refer to ml*)
+  List.map (fun (a, _, c, _) -> tile_num_test a c) test_tiles
+  @ List.map (fun (a, b, _, _) -> tile_suit_test a b) test_tiles
   @ List.map
       (fun a ->
         tile_test_raise ("make tile fail test " ^ a) Tile.string_to_tile a)
-      Utilities.test_bad_tiles
+      test_bad_tiles
   @ List.mapi
       (fun i (a, _, _, d) ->
-        if i < List.length Utilities.test_tiles - 1 then
-          let b, _, _, e = List.nth Utilities.test_tiles (i + 1) in
+        if i < List.length test_tiles - 1 then
+          let b, _, _, e = List.nth test_tiles (i + 1) in
           compare_tiles_test 0 true a b
         else tile_test "meh" "meh" (fun x -> x) "huh")
-      Utilities.test_tiles
-  @ List.map (fun (a, _, _, d) -> tile_to_string_test a d) Utilities.test_tiles
-  @ List.map (fun (a, _, _, d) -> string_to_tile_test d a) Utilities.test_tiles
+      test_tiles
+  @ List.map (fun (a, _, _, d) -> tile_to_string_test a d) test_tiles
+  @ List.map (fun (a, _, _, d) -> string_to_tile_test d a) test_tiles
   @
   (*Tests that are moreso invariant checkers / one-time cases*)
   [
@@ -342,7 +447,7 @@ let pinghu_test name tiles expected =
 
   assert_equal expected result ~printer:string_of_bool
 
-let pinghu_test_list = [ pinghu_test "pinghu1" Utilities.pinghu_hand true ]
+let pinghu_test_list = [ pinghu_test "pinghu1" pinghu_hand true ]
 
 let hunyise_test name tiles expected =
   name >:: fun _ ->
@@ -363,8 +468,8 @@ let hunyise_test name tiles expected =
   assert_equal expected result ~printer:string_of_bool
 
 let hunyise_test_list =
-  [ hunyise_test "hunyise" Utilities.hunyise_hand1 true ]
-  @ [ hunyise_test "hunyise2" Utilities.hunyise_hand2 false ]
+  [ hunyise_test "hunyise" hunyise_hand1 true ]
+  @ [ hunyise_test "hunyise2" hunyise_hand2 false ]
 
 let ziyise_test name tiles expected =
   name >:: fun _ ->
@@ -385,8 +490,8 @@ let ziyise_test name tiles expected =
   assert_equal expected result ~printer:string_of_bool
 
 let ziyise_test_list =
-  [ ziyise_test "ziyise" Utilities.ziyise_hand1 true ]
-  @ [ ziyise_test "ziyise2" Utilities.ziyise_hand2 false ]
+  [ ziyise_test "ziyise" ziyise_hand1 true ]
+  @ [ ziyise_test "ziyise2" ziyise_hand2 false ]
 
 let qingyise_test name tiles expected =
   name >:: fun _ ->
@@ -402,14 +507,14 @@ let qingyise_test name tiles expected =
 
   let result = Ying.qingyise p in
 
-  Printf.printf "[DEBUG][qingyise] Result: %b (Expected: %b)\n\n" result expected;
+  Printf.printf "[DEBUG][qingyise] Result: %b (Expected: %b)\n\n" result
+    expected;
 
   assert_equal expected result ~printer:string_of_bool
 
 let qingyise_test_list =
-  [ qingyise_test "qingyise" Utilities.qingyise_hand1 true ]
-  @ [ qingyise_test "qingyise2" Utilities.qingyise_hand2 false ]
-
+  [ qingyise_test "qingyise" qingyise_hand1 true ]
+  @ [ qingyise_test "qingyise2" qingyise_hand2 false ]
 
 let duiduihu_test name tiles expected =
   name >:: fun _ ->
@@ -425,13 +530,14 @@ let duiduihu_test name tiles expected =
 
   let result = Ying.duiduihu p in
 
-  Printf.printf "[DEBUG][duiduihu] Result: %b (Expected: %b)\n\n" result expected;
+  Printf.printf "[DEBUG][duiduihu] Result: %b (Expected: %b)\n\n" result
+    expected;
 
   assert_equal expected result ~printer:string_of_bool
 
 let duiduihu_test_list =
-  [ duiduihu_test "duiduihu" Utilities.duiduihu_hand1 true ]
-  @ [ duiduihu_test "duiduihu2" Utilities.duiduihu_hand2 false ]
+  [ duiduihu_test "duiduihu" duiduihu_hand1 true ]
+  @ [ duiduihu_test "duiduihu2" duiduihu_hand2 false ]
 
 let kankanhu_test name tiles expected =
   name >:: fun _ ->
@@ -447,13 +553,14 @@ let kankanhu_test name tiles expected =
 
   let result = Ying.kankanhu p in
 
-  Printf.printf "[DEBUG][kankanhu] Result: %b (Expected: %b)\n\n" result expected;
+  Printf.printf "[DEBUG][kankanhu] Result: %b (Expected: %b)\n\n" result
+    expected;
 
   assert_equal expected result ~printer:string_of_bool
 
 let kankanhu_test_list =
-  [ kankanhu_test "kankanhu" Utilities.kankanhu_hand1 true ]
-  @ [ kankanhu_test "kankanhu2" Utilities.kankanhu_hand2 false ]
+  [ kankanhu_test "kankanhu" kankanhu_hand1 true ]
+  @ [ kankanhu_test "kankanhu2" kankanhu_hand2 false ]
 
 let sananke_test name tiles expected =
   name >:: fun _ ->
@@ -474,8 +581,9 @@ let sananke_test name tiles expected =
   assert_equal expected result ~printer:string_of_bool
 
 let sananke_test_list =
-  [ sananke_test "sananke" Utilities.sananke_hand1 true ]
-  @ [ sananke_test "sananke2" Utilities.sananke_hand2 false ]
+  [ sananke_test "sananke" sananke_hand1 true ]
+  @ [ sananke_test "sananke2" sananke_hand2 false ]
+
 let jiulianbaodeng_test name tiles expected =
   name >:: fun _ ->
   let hand = Hidden_hand.make_hidden_hand tiles in
@@ -490,13 +598,14 @@ let jiulianbaodeng_test name tiles expected =
 
   let result = Ying.jiulianbaodeng p in
 
-  Printf.printf "[DEBUG][jiulianbaodeng] Result: %b (Expected: %b)\n\n" result expected;
+  Printf.printf "[DEBUG][jiulianbaodeng] Result: %b (Expected: %b)\n\n" result
+    expected;
 
   assert_equal expected result ~printer:string_of_bool
 
 let jiulianbaodeng_test_list =
-  [ jiulianbaodeng_test "jiulianbaodeng" Utilities.jiulianbaodeng_hand1 true ]
-  @ [ jiulianbaodeng_test "jiulianbaodeng2" Utilities.jiulianbaodeng_hand2 false ]
+  [ jiulianbaodeng_test "jiulianbaodeng" jiulianbaodeng_hand1 true ]
+  @ [ jiulianbaodeng_test "jiulianbaodeng2" jiulianbaodeng_hand2 false ]
 
 let qidui_test name tiles expected =
   name >:: fun _ ->
@@ -517,8 +626,8 @@ let qidui_test name tiles expected =
   assert_equal expected result ~printer:string_of_bool
 
 let qidui_test_list =
-  [ qidui_test "qidui" Utilities.qidui_hand1 true ]
-  @ [ qidui_test "qidui2" Utilities.qidui_hand2 false ]
+  [ qidui_test "qidui" qidui_hand1 true ]
+  @ [ qidui_test "qidui2" qidui_hand2 false ]
 
 let lvyise_test name tiles expected =
   name >:: fun _ ->
@@ -539,8 +648,8 @@ let lvyise_test name tiles expected =
   assert_equal expected result ~printer:string_of_bool
 
 let lvyise_test_list =
-  [ lvyise_test "lvyise" Utilities.lvyise_hand1 true ]
-  @ [ lvyise_test "lvyise2" Utilities.lvyise_hand2 false ]
+  [ lvyise_test "lvyise" lvyise_hand1 true ]
+  @ [ lvyise_test "lvyise2" lvyise_hand2 false ]
 
 let dasixi_test name tiles expected =
   name >:: fun _ ->
@@ -572,9 +681,10 @@ let dasixi_test name tiles expected =
   Printf.printf "[DEBUG][dasixi] Result: %b (Expected: %b)\n\n" result expected;
 
   assert_equal expected result ~printer:string_of_bool
+
 let dasixi_test_list =
-  [ dasixi_test "dasixi" Utilities.dasixi_hand1 true ]
-  @ [ dasixi_test "dasixi2" Utilities.dasixi_hand2 false ]
+  [ dasixi_test "dasixi" dasixi_hand1 true ]
+  @ [ dasixi_test "dasixi2" dasixi_hand2 false ]
 
 let xiaosixi_test name tiles expected =
   name >:: fun _ ->
@@ -603,47 +713,50 @@ let xiaosixi_test name tiles expected =
 
   let result = Ying.xiaosixi p in
 
-  Printf.printf "[DEBUG][xiaosixi] Result: %b (Expected: %b)\n\n" result expected;
+  Printf.printf "[DEBUG][xiaosixi] Result: %b (Expected: %b)\n\n" result
+    expected;
 
   assert_equal expected result ~printer:string_of_bool
+
 let xiaosixi_test_list =
-  [ xiaosixi_test "xiaosixi" Utilities.xiaosixi_hand1 true ]
-  @ [ xiaosixi_test "xiaosixi2" Utilities.xiaosixi_hand2 false ]
+  [ xiaosixi_test "xiaosixi" xiaosixi_hand1 true ]
+  @ [ xiaosixi_test "xiaosixi2" xiaosixi_hand2 false ]
 
+let dasanyuan_test name tiles expected =
+  name >:: fun _ ->
+  let hand = Hidden_hand.make_hidden_hand tiles in
+  let p =
+    Player.make_player "TestPlayer" 0 0 hand
+      (Exposed_hand.empty_exposed_hand ())
+  in
 
-  let dasanyuan_test name tiles expected =
-    name >:: fun _ ->
-    let hand = Hidden_hand.make_hidden_hand tiles in
-    let p =
-      Player.make_player "TestPlayer" 0 0 hand
-        (Exposed_hand.empty_exposed_hand ())
-    in
-  
-    Printf.printf "[DEBUG][dasanyuan] Hand: %s\n"
-      (String.concat " | "
-         (List.map Tile.tile_to_string (Hidden_hand.get_tiles hand)));
-  
-    let hidden_tiles = Hidden_hand.get_tiles hand in
-    let unique_tiles = List.sort_uniq Tile.compare_tile hidden_tiles in
-    List.iter
-      (fun t ->
-        let count =
-          List.length
-            (List.filter (fun x -> Tile.compare_tile x t = 0) hidden_tiles)
-        in
-        if count >= 2 then
-          Printf.printf "[DEBUG][dasanyuan] Trying pair candidate: %s (x%d)\n"
-            (Tile.tile_to_string t) count)
-      unique_tiles;
-  
-    let result = Ying.dasanyuan p in
-  
-    Printf.printf "[DEBUG][dasanyuan] Result: %b (Expected: %b)\n\n" result expected;
-  
-    assert_equal expected result ~printer:string_of_bool
-  let dasanyuan_test_list =
-    [ dasanyuan_test "dasanyuan" Utilities.dasanyuan_hand1 true ]
-    @ [ dasanyuan_test "dasanyuan2" Utilities.dasanyuan_hand2 false ]
+  Printf.printf "[DEBUG][dasanyuan] Hand: %s\n"
+    (String.concat " | "
+       (List.map Tile.tile_to_string (Hidden_hand.get_tiles hand)));
+
+  let hidden_tiles = Hidden_hand.get_tiles hand in
+  let unique_tiles = List.sort_uniq Tile.compare_tile hidden_tiles in
+  List.iter
+    (fun t ->
+      let count =
+        List.length
+          (List.filter (fun x -> Tile.compare_tile x t = 0) hidden_tiles)
+      in
+      if count >= 2 then
+        Printf.printf "[DEBUG][dasanyuan] Trying pair candidate: %s (x%d)\n"
+          (Tile.tile_to_string t) count)
+    unique_tiles;
+
+  let result = Ying.dasanyuan p in
+
+  Printf.printf "[DEBUG][dasanyuan] Result: %b (Expected: %b)\n\n" result
+    expected;
+
+  assert_equal expected result ~printer:string_of_bool
+
+let dasanyuan_test_list =
+  [ dasanyuan_test "dasanyuan" dasanyuan_hand1 true ]
+  @ [ dasanyuan_test "dasanyuan2" dasanyuan_hand2 false ]
 
 let duanyaojiu_test name tiles expected =
   name >:: fun _ ->
@@ -659,13 +772,15 @@ let duanyaojiu_test name tiles expected =
 
   let result = Ying.duanyaojiu p in
 
-  Printf.printf "[DEBUG][duanyaojiu] Result: %b (Expected: %b)\n\n" result expected;
+  Printf.printf "[DEBUG][duanyaojiu] Result: %b (Expected: %b)\n\n" result
+    expected;
 
   assert_equal expected result ~printer:string_of_bool
 
 let duanyaojiu_test_list =
-  [ duanyaojiu_test "duanyaojiu" Utilities.duanyaojiu_hand1 true ]
-  @ [ duanyaojiu_test "duanyaojiu2" Utilities.duanyaojiu_hand2 false ]
+  [ duanyaojiu_test "duanyaojiu" duanyaojiu_hand1 true ]
+  @ [ duanyaojiu_test "duanyaojiu2" duanyaojiu_hand2 false ]
+
 let qingyaojiu_test name tiles expected =
   name >:: fun _ ->
   let hand = Hidden_hand.make_hidden_hand tiles in
@@ -680,13 +795,15 @@ let qingyaojiu_test name tiles expected =
 
   let result = Ying.qingyaojiu p in
 
-  Printf.printf "[DEBUG][qingyaojiu] Result: %b (Expected: %b)\n\n" result expected;
+  Printf.printf "[DEBUG][qingyaojiu] Result: %b (Expected: %b)\n\n" result
+    expected;
 
   assert_equal expected result ~printer:string_of_bool
+
 let qingyaojiu_test_list =
-  [ qingyaojiu_test "qingyaojiu" Utilities.qingyaojiu_hand1 true ]
-  @ [ qingyaojiu_test "qingyaojiu2" Utilities.qingyaojiu_hand2 false ]
-  @ [ qingyaojiu_test "qingyaojiu3" Utilities.qingyaojiu_hand3 true ]
+  [ qingyaojiu_test "qingyaojiu" qingyaojiu_hand1 true ]
+  @ [ qingyaojiu_test "qingyaojiu2" qingyaojiu_hand2 false ]
+  @ [ qingyaojiu_test "qingyaojiu3" qingyaojiu_hand3 true ]
 
 let hunyaojiu_test name tiles expected =
   name >:: fun _ ->
@@ -702,32 +819,34 @@ let hunyaojiu_test name tiles expected =
 
   let result = Ying.hunyaojiu p in
 
-  Printf.printf "[DEBUG][hunyaojiu] Result: %b (Expected: %b)\n\n" result expected;
-  
+  Printf.printf "[DEBUG][hunyaojiu] Result: %b (Expected: %b)\n\n" result
+    expected;
+
   assert_equal expected result ~printer:string_of_bool
+
 let hunyaojiu_test_list =
-  [ hunyaojiu_test "hunyaojiu" Utilities.hunyaojiu_hand1 true ]
-  @ [ hunyaojiu_test "hunyaojiu2" Utilities.hunyaojiu_hand2 false ]
-  @ [ hunyaojiu_test "hunyaojiu3" Utilities.hunyaojiu_hand3 true ]
-  
+  [ hunyaojiu_test "hunyaojiu" hunyaojiu_hand1 true ]
+  @ [ hunyaojiu_test "hunyaojiu2" hunyaojiu_hand2 false ]
+  @ [ hunyaojiu_test "hunyaojiu3" hunyaojiu_hand3 true ]
+
 (* List of complete tests *)
 
 let complete_test_list =
-  [ complete_test "test1" Utilities.hh1_tiles true ]
-  @ [ complete_test "test2" Utilities.hh2_tiles true ]
+  [ complete_test "test1" hh1_tiles true ]
+  @ [ complete_test "test2" hh2_tiles true ]
     (* Empty hand should not complete *)
   @ [ complete_test "test3" [] false ]
   (* Single tile should not complete *)
   @ [ complete_test "test4" [ Tile.string_to_tile "1 Wan" ] false ]
-  @ [ complete_test "test5" Utilities.hh3_tiles true ]
-  @ [ complete_test "test6" Utilities.hh4_tiles true ]
+  @ [ complete_test "test5" hh3_tiles true ]
+  @ [ complete_test "test6" hh4_tiles true ]
   (* Empty hand should not complete *)
   @ [ complete_test "test4" [ Tile.string_to_tile "1 Wan" ] false ]
   (* Single tile should not complete *)
-  @ [ complete_test "test5" Utilities.hh5_tiles true ]
-  @ [ complete_test "test6" Utilities.hh6_tiles true ]
-  @ [ complete_test "test7" Utilities.hh7_tiles true ]
-  @ [ complete_test "test8" Utilities.hh8_tiles true ]
+  @ [ complete_test "test5" hh5_tiles true ]
+  @ [ complete_test "test6" hh6_tiles true ]
+  @ [ complete_test "test7" hh7_tiles true ]
+  @ [ complete_test "test8" hh8_tiles true ]
 
 (*initialized some variables to be used in the exposed hand tests*)
 let suit = Tile.string_to_suit "Tong"
@@ -833,10 +952,11 @@ let exposed_hand_test =
 let tests =
   "test suite"
   >::: tile_tests @ player_tests @ player_choice_tests @ complete_test_list
-       @ pinghu_test_list @ exposed_hand_test @ dasixi_test_list @ dasanyuan_test_list
-       @ lvyise_test_list @ qidui_test_list @ jiulianbaodeng_test_list @ duiduihu_test_list
-       @ kankanhu_test_list @ qingyise_test_list @ ziyise_test_list @ xiaosixi_test_list
-       @ sananke_test_list @ duanyaojiu_test_list @ qingyaojiu_test_list @ hunyaojiu_test_list
-       @ hunyise_test_list
+       @ pinghu_test_list @ exposed_hand_test @ dasixi_test_list
+       @ dasanyuan_test_list @ lvyise_test_list @ qidui_test_list
+       @ jiulianbaodeng_test_list @ duiduihu_test_list @ kankanhu_test_list
+       @ qingyise_test_list @ ziyise_test_list @ xiaosixi_test_list
+       @ sananke_test_list @ duanyaojiu_test_list @ qingyaojiu_test_list
+       @ hunyaojiu_test_list @ hunyise_test_list
 
 let _ = run_test_tt_main tests
