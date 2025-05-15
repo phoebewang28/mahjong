@@ -2,4 +2,4 @@
 
 References:
 
-1. [Mahjong](https://en.wikipedia.org/wiki/Mahjong)
+1. [Mahjong Tiles Image and Winning Conditions](https://en.wikipedia.org/wiki/Mahjong)
