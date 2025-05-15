@@ -32,6 +32,15 @@ type game_board = {
          only not -1 when chi/peng*)
 }
 
+(* game state when a player has won/no more tiles left -> allows player to
+   restart the game or completely quit window *)
+type end_board = {
+  mutable on_end_screen : bool;
+  mutable is_no_tile_left : bool;
+      (* true when game ends because no tile is left *)
+      (* TODO need another one where you have player who won *)
+}
+
 (* Tile image handling *)
 let tile_image_table : (string, Texture2D.t) Hashtbl.t = Hashtbl.create 50
 
@@ -242,17 +251,19 @@ let init_tiles () =
   let _ = Tile.init_tiles () in
   Tile.shuffle !Tile.tiles_arr
 
+let setup_window () =
+  (* only called once: start board & game board uses same window *)
+  (* set_config_flags [ ConfigFlags.Window_resizable ]; *)
+  (* todo: fix resizing bug *)
+  init_window window_width window_height "OCaMahJong";
+  set_target_fps 60
+
 (** Setup for the starting interface and game window, returning initialized
     [start_board]
 
     Note: should only be called ONCE -> an entire mahjong game should have a
     single [start_board] *)
 let setup_start () : start_board =
-  (* only called once: start board & game board uses same window *)
-  (* set_config_flags [ ConfigFlags.Window_resizable ]; *)
-  (* todo: fix resizing bug *)
-  init_window window_width window_height "OCaMahJong";
-  set_target_fps 60;
   load_tile_images ();
   {
     player_name_inputs = [| "Player 1"; "Player 2"; "Player 3"; "Player 4" |];
@@ -288,6 +299,9 @@ let setup_game name_arr : game_board =
     clicked_tiles = [| -1; -1 |];
     (* -1: no tile selected *)
   }
+
+let setup_end (is_no_tile_left : bool) =
+  { on_end_screen = true; is_no_tile_left }
 
 (** Updates current [gb] with new fields after player's actions *)
 let update_game_board (gb : game_board) : unit =
@@ -348,7 +362,6 @@ let draw_player_exp p gb : unit =
   List.iter (fun k -> Printf.printf " - %s\n" k) keys;
   draw_tile_list_from_keys keys 50 (window_height - 175) gb
 
-
 let draw_player_name p : unit =
   let font_size = 40 in
   let name = Player.get_name p in
@@ -404,6 +417,39 @@ let draw_all_start (sb : start_board) : unit =
     done
   end;
 
+  (* done drawing: now show it *)
+  end_drawing ()
+
+let draw_all_end (eb : end_board) =
+  assert eb.on_end_screen;
+  begin_drawing ();
+  clear_background Color.white;
+
+  draw_bg "res/images/imposter.jpg";
+
+  draw_text "Game Over" (center_x - 125) (100) 50 Color.red;
+
+  if eb.is_no_tile_left then
+    draw_text "No tiles left. Result: Draw." (center_x - 175) (175) 35 Color.red;
+
+  (* restart button *)
+  let restart =
+    Rectangle.create
+      (float_of_int (center_x - 200))
+      (float_of_int (center_y - 50))
+      100. 70.
+  in
+  if Raygui.button restart "Restart" then eb.on_end_screen <- false;
+
+  let quit =
+    Rectangle.create
+      (float_of_int (center_x - 200))
+      (float_of_int (center_y + 50))
+      100. 70.
+  in
+  if Raygui.button quit "Quit Game" then (
+    close_window ();
+    exit 0);
   (* done drawing: now show it *)
   end_drawing ()
 
@@ -528,6 +574,37 @@ let rec game_loop (gb : game_board) =
     | false ->
         draw_all_game gb;
         game_loop gb
-  with Tile.NoTileLeft -> close_window () (* TODO: Game end screen *)
+  with Tile.NoTileLeft -> raise Tile.NoTileLeft
+(* failure will be caught by parent function *)
 
-let () = setup_start () |> start_loop |> setup_game |> game_loop
+(** Runs perpetually if user does not hit "restart button" or close window.
+    - if hits "restart": transitions to start board
+
+    If user hits "start", returns array of player names. *)
+let rec end_loop (eb : end_board) =
+  match window_should_close () with
+  | true ->
+      close_window ();
+      exit 0 (* quit program *)
+  | false ->
+      if eb.on_end_screen then (
+        draw_all_end eb;
+        end_loop eb)
+      else
+        (* if on_end_screen false, meaning user has clicked "restart" button ->
+           transition to start board *)
+        ()
+
+let () =
+  let _ = setup_window () in
+  let rec replay () =
+    try
+      let _ = setup_start () |> start_loop |> setup_game |> game_loop in
+      setup_end false |> end_loop |> replay
+    with Tile.NoTileLeft -> setup_end true |> end_loop |> replay
+  in
+  replay ()
+
+(* let () = let _ = setup_window () in let rec replay () = let sb = setup_start
+   () in ignore (start_loop sb); let eb = setup_end () in end_loop eb; replay ()
+   in replay () *)
