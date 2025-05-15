@@ -1,2 +1,2 @@
-Note: to count line count, use the following line: 
+Note: to count line count, use the following line to exclude external libraries that we used for gui: 
 cloc --by-file --include-lang=OCaml . --exclude-list-file=.clocignore
