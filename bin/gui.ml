@@ -36,9 +36,9 @@ type game_board = {
    restart the game or completely quit window *)
 type end_board = {
   mutable on_end_screen : bool;
-  mutable is_no_tile_left : bool;
-      (* true when game ends because no tile is left *)
-      (* TODO need another one where you have player who won *)
+  is_no_tile_left : bool; (* true when game ends because no tile is left *)
+  player_win :
+    Player.player option (* None if no player won (aka. is_no_tile_left true)*);
 }
 
 (* Tile image handling *)
@@ -237,10 +237,11 @@ let draw_peng_button p gb =
 let draw_draw_button p gb =
   let rect = Raylib.Rectangle.create 500.0 210.0 100.0 70.0 in
   let is_draw_clicked = Raygui.button rect "Draw Tile" in
-  if is_draw_clicked then
+  if is_draw_clicked then (
     (* update player's hidden hand *)
     let _ = Player_choice.draw p in
-    gb.is_drawn <- true
+    print_endline ("drawing: is complete: " ^ string_of_bool (Ying.complete p));
+    if Ying.complete p then raise (Ying.PlayerWin p) else gb.is_drawn <- true)
 
 (** [make_player id name] creates a player with the given [id] and [name]. *)
 let make_player id name = Player.create name id
@@ -252,9 +253,10 @@ let init_tiles () =
   Tile.shuffle !Tile.tiles_arr
 
 let setup_window () =
-  (* only called once: start board & game board uses same window *)
+  (* only called once: start board & game boardsuses same window *)
   (* set_config_flags [ ConfigFlags.Window_resizable ]; *)
   (* todo: fix resizing bug *)
+  Raylib.set_trace_log_level Raylib.TraceLogLevel.None;
   init_window window_width window_height "OCaMahJong";
   set_target_fps 60
 
@@ -300,8 +302,8 @@ let setup_game name_arr : game_board =
     (* -1: no tile selected *)
   }
 
-let setup_end (is_no_tile_left : bool) =
-  { on_end_screen = true; is_no_tile_left }
+let setup_end (is_no_tile_left : bool) (p : Player.player option) =
+  { on_end_screen = true; is_no_tile_left; player_win = p }
 
 (** Updates current [gb] with new fields after player's actions *)
 let update_game_board (gb : game_board) : unit =
@@ -427,10 +429,19 @@ let draw_all_end (eb : end_board) =
 
   draw_bg "res/images/imposter.jpg";
 
-  draw_text "Game Over" (center_x - 125) (100) 50 Color.red;
+  draw_text "Game Over" (center_x - 125) 100 50 Color.red;
 
-  if eb.is_no_tile_left then
-    draw_text "No tiles left. Result: Draw." (center_x - 175) (175) 35 Color.red;
+  if eb.is_no_tile_left then (
+    assert (eb.player_win = None);
+    draw_text "No tiles left. Result: Draw." (center_x - 175) 175 35 Color.red);
+
+  (match eb.player_win with
+  | None -> ()
+  | Some p ->
+      assert (eb.is_no_tile_left = false);
+      draw_text
+        ("Result: " ^ Player.get_name p ^ " wins!!")
+        (center_x - 130) 175 35 Color.red);
 
   (* restart button *)
   let restart =
@@ -471,13 +482,13 @@ let throw_reset p gb : unit =
 let chi_from_clicked p gb : unit =
   assert gb.is_chiing;
   assert (gb.clicked_tiles.(0) <> -1 && gb.clicked_tiles.(1) <> -1);
-  if
-    (* both tiles selected for chiing *)
-    Player_choice.chi p gb.clicked_tiles.(0) gb.clicked_tiles.(1)
-  then
-    (*successful chi -> taken out into exposed hand, should engage throwing
-      now *)
-    gb.is_throwing <- true
+  if Player_choice.chi p gb.clicked_tiles.(0) gb.clicked_tiles.(1) then (
+    print_endline ("ching: is complete: " ^ string_of_bool (Ying.complete p));
+    (* both tiles selected for penging *)
+    if Ying.complete p then raise (Ying.PlayerWin p)
+    else gb.is_throwing <- true
+      (*successful chi -> taken out into exposed hand, should engage throwing
+        now *))
   else gb.is_chiing <- false;
   (* deactivate is_chiing cuz failed *)
   gb.clicked_tiles.(0) <- -1;
@@ -486,10 +497,10 @@ let chi_from_clicked p gb : unit =
 let peng_from_clicked p gb : unit =
   assert gb.is_penging;
   assert (gb.clicked_tiles.(0) <> -1 && gb.clicked_tiles.(1) <> -1);
-  if
+  if Player_choice.peng p gb.clicked_tiles.(0) gb.clicked_tiles.(1) then (
+    print_endline ("penging: is complete: " ^ string_of_bool (Ying.complete p));
     (* both tiles selected for penging *)
-    Player_choice.peng p gb.clicked_tiles.(0) gb.clicked_tiles.(1)
-  then gb.is_throwing <- true
+    if Ying.complete p then raise (Ying.PlayerWin p) else gb.is_throwing <- true)
   else gb.is_penging <- false;
   gb.clicked_tiles.(0) <- -1;
   gb.clicked_tiles.(1) <- -1
@@ -574,7 +585,9 @@ let rec game_loop (gb : game_board) =
     | false ->
         draw_all_game gb;
         game_loop gb
-  with Tile.NoTileLeft -> raise Tile.NoTileLeft
+  with
+  | Tile.NoTileLeft -> raise Tile.NoTileLeft
+  | Ying.PlayerWin p -> raise (Ying.PlayerWin p)
 (* failure will be caught by parent function *)
 
 (** Runs perpetually if user does not hit "restart button" or close window.
@@ -599,9 +612,14 @@ let () =
   let _ = setup_window () in
   let rec replay () =
     try
-      let _ = setup_start () |> start_loop |> setup_game |> game_loop in
-      setup_end false |> end_loop |> replay
-    with Tile.NoTileLeft -> setup_end true |> end_loop |> replay
+      let _ =
+        setup_start () |> start_loop |> setup_game |> game_loop
+        (* any form of game ending always throws an exception *)
+      in
+      ()
+    with
+    | Tile.NoTileLeft -> setup_end true None |> end_loop |> replay
+    | Ying.PlayerWin p -> setup_end false (Some p) |> end_loop |> replay
   in
   replay ()
 
