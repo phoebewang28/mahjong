@@ -285,28 +285,64 @@ let jiulianbaodeng (p : Player.player) : bool =
     else false
   else false
 
-let rec try_make_kezi tiles n =
-  if n = 0 then true
+let rec try_make_melds_count tiles n a =
+  if n = 0 && a = 0 then true
   else
     match tiles with
     | [] -> false
     | t :: _ ->
-        if count_same tiles t >= 3 then
-          let rest = remove_n tiles t 3 in
-          try_make_kezi rest (n - 1)
-        else false
+        let attempt_triple =
+          if count_same tiles t >= 3 then
+            let rest = remove_n tiles t 3 in
+            try_make_melds_count rest (n - 1) (a - 1)
+          else false
+        in
+        let attempt_sequence =
+          if is_shu t && Tile.get_num t <= 7 then
+            let t2 = Tile.make_tile (Tile.get_num t + 1) (Tile.get_tao t) in
+            let t3 = Tile.make_tile (Tile.get_num t + 2) (Tile.get_tao t) in
+            if List.mem t2 tiles && List.mem t3 tiles then
+              let rest = remove_tiles tiles [ t; t2; t3 ] in
+              try_make_melds_count rest (n - 1) a
+            else false
+          else false
+        in
+        attempt_triple || attempt_sequence
+  let try_make_kezi tiles n a =  
+    let rec try_all_pairs = function
+    | [] -> false
+    | t:: rest ->
+        if count_same tiles t >= 2 then
+          let remaining = remove_n tiles t 2 in
+          if try_make_melds_count remaining n a then true
+          else
+            try_all_pairs
+              (List.filter (fun x -> Tile.compare_tile x t <> 0) rest)
+        else try_all_pairs rest
+  in
+
+  (* Get unique tiles to try as pairs *)
+  let unique_tiles = List.sort_uniq Tile.compare_tile tiles in
+  try_all_pairs unique_tiles
+
+
+let is_wind t =
+      match Tile.suit_to_string (Tile.get_tao t) with
+      | "Dong" | "Nan" | "Xi" | "Bei" -> true
+      | _ -> false
+
 let duiduihu (p : Player.player) : bool =
   if complete p then
     let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
     let exposed = Exposed_hand.get_tiles (Player.get_exposed p) in
     let hand = hidden @ exposed in
-    try_make_kezi hand 4
+    try_make_kezi hand 4 4
   else false
 
 let kankanhu (p : Player.player) : bool =
   if complete p then
     let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
-    try_make_kezi hidden 4
+    try_make_kezi hidden 4 4
   else false
 
 let qingyise (p : Player.player) : bool =
@@ -341,3 +377,34 @@ let hunyise (p : Player.player) : bool =
     (max (List.length (is_wan hand)) (List.length (is_tiao hand)))in
     List.length hand = zi_len + shu_len
   else false
+
+let sananke (p : Player.player) : bool =
+  if complete p then
+    let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+    try_make_kezi hidden 4 3
+  else false
+
+let xiaosixi (p : Player.player) : bool =
+  if complete p then
+    let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+    let exposed = Exposed_hand.get_exposed_hand (Player.get_exposed p) in
+    let exposed_count = List.length (List.filter is_wind_group exposed) in
+    let needed = 3 - exposed_count in
+    let rec try_all_pairs = function
+        | [] -> false
+        | t :: rest ->
+            if count_same hidden t >= 2 && is_wind t then
+              let remaining =
+                List.sort Tile.compare_tile (remove_n hidden t 2)
+              in
+              if try_make_wind_only remaining needed then true
+              else
+                try_all_pairs
+                  (List.filter (fun x -> Tile.compare_tile x t <> 0) rest)
+            else try_all_pairs rest
+      in
+      let unique_tiles = List.sort_uniq Tile.compare_tile hidden in
+      try_all_pairs unique_tiles
+  else false  
+
+(* need to track the kezi we have *)

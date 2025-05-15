@@ -87,12 +87,12 @@ val hunyise : player -> bool
     - Precondition: [p] must be a valid player with a hidden hand of at most 14
       tiles. *)
 
-(* val sananke : player -> bool
+val sananke : player -> bool
 (** [sananke p] checks if player [p] has a Sananke hand.
     - A Sananke hand is a complete hand consists of 3 groups of 3 identical tiles in hidden hand.
     - Returns true if the hand is a Sananke, false otherwise.
     - Precondition: [p] must be a valid player with a hidden hand of at most 14
-      tiles. *)
+      tiles.*)
 
 val xiaosixi : player -> bool
 (** [xiaosixi p] checks if player [p] has a Xiaosixi hand.
@@ -101,7 +101,7 @@ val xiaosixi : player -> bool
     - Precondition: [p] must be a valid player with a hidden hand of at most 14
       tiles. *)
 
-val duanyaojiu : player -> bool
+(* val duanyaojiu : player -> bool
 (** [duanyaojiu p] checks if player [p] has a Duanyaojiu hand.
     - A Duanyaojiu hand is a complete hand without tiles of num 1 and 9.
     - Returns true if the hand is a Duanyaojiu, false otherwise.
@@ -120,4 +120,4 @@ val hunlaotou : player -> bool
     - A Hunlaotou hand consists of 4 groups of 4 wind tiles and 1 pair.
     - Returns true if the hand is a Hunlaotou, false otherwise.
     - Precondition: [p] must be a valid player with a hidden hand of at most 14
-      tiles. *) *)
+      tiles. *)  *)
