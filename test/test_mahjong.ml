@@ -837,5 +837,6 @@ let tests =
        @ lvyise_test_list @ qidui_test_list @ jiulianbaodeng_test_list @ duiduihu_test_list
        @ kankanhu_test_list @ qingyise_test_list @ ziyise_test_list @ xiaosixi_test_list
        @ sananke_test_list @ duanyaojiu_test_list @ qingyaojiu_test_list @ hunyaojiu_test_list
+       @ hunyise_test_list
 
 let _ = run_test_tt_main tests
