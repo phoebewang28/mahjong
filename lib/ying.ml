@@ -1,22 +1,27 @@
+(** [count_same tiles tile] counts the number of occurrences of [tile] in the list [tiles]. *)
 let count_same tiles tile =
   List.length (List.filter (fun t -> Tile.compare_tile t tile = 0) tiles)
 
+(** [remove_n tiles t n] removes [n] occurrences of [t] from the list [tiles]. *)
 let rec remove_n tiles t n : Tile.tile list =
   match (tiles, n) with
   | [], _ -> []
   | _, 0 -> tiles
   | h :: tl, _ -> if h = t then remove_n tl t (n - 1) else h :: remove_n tl t n
 
+(** [is_shu t] checks if the tile [t] belongs to the suits "Wan", "Tong", or "Tiao". *)
 let is_shu t =
   match Tile.suit_to_string (Tile.get_tao t) with
   | "Wan" | "Tong" | "Tiao" -> true
   | _ -> false
 
+(** [remove_tiles tiles ts] removes all tiles in [ts] from the list [tiles]. *)
 let rec remove_tiles tiles ts =
   match ts with
   | [] -> tiles
   | r :: rs -> remove_tiles (remove_n tiles r 1) rs
 
+(** [try_make_melds tiles n] checks if [tiles] can form [n] melds (triples or sequences). *)
 let rec try_make_melds tiles n =
   if n = 0 then tiles = []
   else
@@ -40,10 +45,14 @@ let rec try_make_melds tiles n =
           else false
         in
         attempt_triple || attempt_sequence
+
+(** [is_wind t] checks if the tile [t] is a wind tile ("Dong", "Nan", "Xi", "Bei"). *)
 let is_wind t =
       match Tile.suit_to_string (Tile.get_tao t) with
       | "Dong" | "Nan" | "Xi" | "Bei" -> true
       | _ -> false
+
+(** [is_wind_group (g, t)] checks if the group [g] with tile [t] is a wind group. *)
 let is_wind_group (g,t) = 
   match Tile.group_to_string g with
   | "Shun" -> false
@@ -73,6 +82,7 @@ let complete (p : Player.player) : bool =
   let unique_tiles = List.sort_uniq Tile.compare_tile hidden in
   try_all_pairs unique_tiles
 
+(** [has_pon_or_kan p] checks if the player [p] has any exposed "Pon" or "Kan" groups. *)
 let has_pon_or_kan (p : Player.player) : bool =
   List.exists
     (fun g ->
@@ -81,6 +91,7 @@ let has_pon_or_kan (p : Player.player) : bool =
       | _ -> false)
     (Exposed_hand.get_groups (Player.get_exposed p))
 
+(** [try_make_sequence_only tiles n] checks if [tiles] can form [n] sequences only. *)
 let rec try_make_sequence_only tiles n =
   if n = 0 then tiles = []
   else
@@ -124,7 +135,7 @@ let pinghu (p : Player.player) : bool =
       try_all_pairs unique_tiles
   else false
 
-
+(** [try_make_wind_only tiles n] checks if [tiles] can form [n] wind melds only. *)
 let rec try_make_wind_only tiles n =
     if n = 0 then true
     else
@@ -161,16 +172,20 @@ let dasixi (p : Player.player) : bool =
       try_all_pairs unique_tiles
   else false  
 
+(** [is_dragon t] checks if the tile [t] is a dragon tile ("Zhong", "Fa", "Bai"). *)
 let is_dragon t =
   match Tile.suit_to_string (Tile.get_tao t) with
   | "Zhong" | "Fa" | "Bai" -> true
   | _ -> false
 
+(** [is_dragon_group (g, t)] checks if the group [g] with tile [t] is a dragon group. *)
 let is_dragon_group (g,t) = 
     match Tile.group_to_string g with
     | "Shun" -> false
     | "San" | "Si" -> is_dragon t
     | _ -> false
+
+(** [try_make_dragon_only tiles n] checks if [tiles] can form [n] dragon melds only. *)
 let rec try_make_dragon_only tiles n =
   if n = 0 then true
   else
@@ -183,6 +198,7 @@ let rec try_make_dragon_only tiles n =
             try_make_dragon_only rest (n - 1)
           else false
         else try_make_dragon_only xs n
+
 let dasanyuan (p : Player.player) : bool =
   if complete p then
     let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
@@ -202,6 +218,8 @@ let dasanyuan (p : Player.player) : bool =
       let unique_tiles = List.sort_uniq Tile.compare_tile hidden in
       try_all_pairs unique_tiles
   else false
+
+(** [is_lv t] checks if the tile [t] is a green tile ("Fa" or "Tiao" tiles with num 2, 3, 4, 6, 8 ). *)
 let is_lv t =
   match Tile.suit_to_string (Tile.get_tao t) with
   | "Fa" -> true
@@ -227,7 +245,7 @@ let qidui (p : Player.player) : bool =
   List.for_all (fun t -> count_same hand t = 2 || count_same hand t = 4)
   unique_tiles
 
-
+(** [is_consecutive tiles] checks if the tiles in [tiles] form a consecutive sequence(from 2 to 8). *)
 let is_consecutive tiles =
   let rec aux acc = function
     | [] -> acc
@@ -239,6 +257,7 @@ let is_consecutive tiles =
   in
   aux 0 tiles = 7
 
+(** [is_tong tiles] filters the tiles in [tiles] to only include "Tong" tiles. *)
 let is_tong tiles =
   List.filter
     (fun t ->
@@ -246,6 +265,8 @@ let is_tong tiles =
       | "Tong" -> true
       | _ -> false)
     tiles
+
+(** [is_tiao tiles] filters the tiles in [tiles] to only include "Tiao" tiles. *)
 let is_tiao tiles =
   List.filter
     (fun t ->
@@ -254,6 +275,7 @@ let is_tiao tiles =
       | _ -> false)
     tiles
 
+(** [is_wan tiles] filters the tiles in [tiles] to only include "Wan" tiles. *)
 let is_wan tiles =
   List.filter
     (fun t ->
@@ -262,6 +284,7 @@ let is_wan tiles =
       | _ -> false)
     tiles
 
+(** [is_single_kind tiles] checks if all tiles in [tiles] belong to the same suit. *)
 let is_single_kind tiles = 
   List.length (is_wan tiles) = List.length tiles ||
   List.length (is_tiao tiles) = List.length tiles ||
@@ -285,6 +308,7 @@ let jiulianbaodeng (p : Player.player) : bool =
     else false
   else false
 
+(** [try_make_melds_count tiles n a] checks if [tiles] can form [n] melds with [a] Kezi melds. *)
 let rec try_make_melds_count tiles n a =
   if n = 0 && a = 0 then true
   else
@@ -308,6 +332,8 @@ let rec try_make_melds_count tiles n a =
           else false
         in
         attempt_triple || attempt_sequence
+
+(** [try_make_kezi tiles n a] checks if [tiles] can form [n] melds with [a] Kezi. *)
   let try_make_kezi tiles n a =  
     let rec try_all_pairs = function
     | [] -> false
@@ -352,6 +378,8 @@ let qingyise (p : Player.player) : bool =
     let hand = hidden @ exposed in
     is_single_kind hand
   else false
+
+(** [is_zi tiles] filters the tiles in [tiles] to only include honor tiles. *)
 let is_zi tiles =
   List.filter
     (fun t ->
@@ -409,6 +437,7 @@ let xiaosixi (p : Player.player) : bool =
       try_all_pairs unique_tiles
   else false  
 
+  (** [is_yaojiu tiles] filters the tiles in [tiles] to only include tiles with num 1 or 9. *)
   let is_yaojiu tiles =
     List.filter
       (fun t ->
