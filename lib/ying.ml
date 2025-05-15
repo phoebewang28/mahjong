@@ -1,5 +1,10 @@
 exception PlayerWin of Player.player
 
+let filter_hidden player =
+  List.filter
+    (fun x -> Tile.suit_to_string (Tile.get_tao x) <> "Fake")
+    (Hidden_hand.get_tiles (Player.get_hidden player))
+
 (** [count_same tiles tile] counts the number of occurrences of [tile] in the
     list [tiles]. *)
 let count_same tiles tile =
@@ -68,7 +73,7 @@ let is_wind_group (g, t) =
   | _ -> false
 
 let complete (p : Player.player) : bool =
-  let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+  let hidden = filter_hidden p in
   let exposed_blocks = Exposed_hand.exposed_hand_count (Player.get_exposed p) in
   let needed = 4 - exposed_blocks in
 
@@ -121,7 +126,7 @@ let pinghu (p : Player.player) : bool =
   if complete p then
     if has_pon_or_kan p then false
     else
-      let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+      let hidden = filter_hidden p in
       let exposed_blocks =
         Exposed_hand.exposed_hand_count (Player.get_exposed p)
       in
@@ -162,7 +167,7 @@ let rec try_make_wind_only tiles n =
 
 let dasixi (p : Player.player) : bool =
   if complete p then
-    let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+    let hidden = filter_hidden p in
     let exposed = Exposed_hand.get_exposed_hand (Player.get_exposed p) in
     let exposed_count = List.length (List.filter is_wind_group exposed) in
     let needed = 4 - exposed_count in
@@ -213,7 +218,7 @@ let rec try_make_dragon_only tiles n =
 
 let dasanyuan (p : Player.player) : bool =
   if complete p then
-    let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+    let hidden = filter_hidden p in
     let exposed = Exposed_hand.get_exposed_hand (Player.get_exposed p) in
     let exposed_count = List.length (List.filter is_dragon_group exposed) in
     let needed = 3 - exposed_count in
@@ -246,14 +251,14 @@ let is_lv t =
 
 let lvyise (p : Player.player) : bool =
   if complete p then
-    let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+    let hidden = filter_hidden p in
     let exposed = Exposed_hand.get_tiles (Player.get_exposed p) in
     let hand = hidden @ exposed in
     List.length (List.filter is_lv hand) = 14
   else false
 
 let qidui (p : Player.player) : bool =
-  let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+  let hidden = filter_hidden p in
   let exposed = Exposed_hand.get_tiles (Player.get_exposed p) in
   let hand = hidden @ exposed in
   let unique_tiles = List.sort_uniq Tile.compare_tile hand in
@@ -311,7 +316,7 @@ let is_single_kind tiles =
 
 let jiulianbaodeng (p : Player.player) : bool =
   if complete p then
-    let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+    let hidden = filter_hidden p in
     let exposed = Exposed_hand.get_tiles (Player.get_exposed p) in
     let hand = hidden @ exposed in
     if is_single_kind hand then
@@ -379,7 +384,7 @@ let is_wind t =
 
 let duiduihu (p : Player.player) : bool =
   if complete p then
-    let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+    let hidden = filter_hidden p in
     let exposed = Exposed_hand.get_tiles (Player.get_exposed p) in
     let hand = hidden @ exposed in
     try_make_kezi hand 4 4
@@ -387,13 +392,13 @@ let duiduihu (p : Player.player) : bool =
 
 let kankanhu (p : Player.player) : bool =
   if complete p then
-    let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+    let hidden = filter_hidden p in
     try_make_kezi hidden 4 4
   else false
 
 let qingyise (p : Player.player) : bool =
   if complete p || qidui p then
-    let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+    let hidden = filter_hidden p in
     let exposed = Exposed_hand.get_tiles (Player.get_exposed p) in
     let hand = hidden @ exposed in
     is_single_kind hand
@@ -410,7 +415,7 @@ let is_zi tiles =
 
 let ziyise (p : Player.player) : bool =
   if complete p || qidui p then
-    let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+    let hidden = filter_hidden p in
     let exposed = Exposed_hand.get_tiles (Player.get_exposed p) in
     let hand = hidden @ exposed in
     List.length (is_zi hand) = List.length hand
@@ -418,7 +423,7 @@ let ziyise (p : Player.player) : bool =
 
 let hunyise (p : Player.player) : bool =
   if complete p || qidui p then
-    let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+    let hidden = filter_hidden p in
     let exposed = Exposed_hand.get_tiles (Player.get_exposed p) in
     let hand = hidden @ exposed in
     let zi_len = List.length (is_zi hand) in
@@ -432,7 +437,7 @@ let hunyise (p : Player.player) : bool =
 
 let sananke (p : Player.player) : bool =
   if complete p then
-    let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+    let hidden = filter_hidden p in
     let exposed_blocks =
       Exposed_hand.exposed_hand_count (Player.get_exposed p)
     in
@@ -442,7 +447,7 @@ let sananke (p : Player.player) : bool =
 
 let xiaosixi (p : Player.player) : bool =
   if complete p then
-    let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+    let hidden = filter_hidden p in
     let exposed = Exposed_hand.get_exposed_hand (Player.get_exposed p) in
     let exposed_count = List.length (List.filter is_wind_group exposed) in
     let needed = 3 - exposed_count in
@@ -473,7 +478,7 @@ let is_yaojiu tiles =
 
 let duanyaojiu (p : Player.player) : bool =
   if complete p || qidui p then
-    let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+    let hidden = filter_hidden p in
     let exposed = Exposed_hand.get_tiles (Player.get_exposed p) in
     let hand = hidden @ exposed in
     List.length (is_yaojiu hand) = 0
@@ -481,7 +486,7 @@ let duanyaojiu (p : Player.player) : bool =
 
 let qingyaojiu (p : Player.player) : bool =
   if complete p || qidui p then
-    let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+    let hidden = filter_hidden p in
     let exposed = Exposed_hand.get_tiles (Player.get_exposed p) in
     let hand = hidden @ exposed in
     List.length (is_yaojiu hand) = List.length hand
@@ -489,7 +494,7 @@ let qingyaojiu (p : Player.player) : bool =
 
 let hunyaojiu (p : Player.player) : bool =
   if complete p || qidui p then
-    let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+    let hidden = filter_hidden p in
     let exposed = Exposed_hand.get_tiles (Player.get_exposed p) in
     let hand = hidden @ exposed in
     List.length (is_yaojiu hand) + List.length (is_zi hand) = List.length hand

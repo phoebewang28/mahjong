@@ -135,6 +135,7 @@ let chi (player : player) id1 id2 : bool =
   let succ =
     chi_update (Hidden_hand.get hid id1) (Hidden_hand.get hid id2) dis ex hid
   in
+  print_hand player;
   ANSITerminal.printf [ red ]
     "CHI %s: Checking if player %s has completed: %b\n"
     (Tile.tile_to_string dis) (Player.get_name player) (Ying.complete player);
@@ -149,6 +150,7 @@ let peng (player : player) id1 id2 : bool =
   let succ =
     peng_update (Hidden_hand.get hid id1) (Hidden_hand.get hid id2) dis ex hid
   in
+  print_hand player;
   ANSITerminal.printf [ red ]
     "PENG %s: Checking if player %s has completed: %b\n"
     (Tile.tile_to_string dis) (Player.get_name player) (Ying.complete player);
