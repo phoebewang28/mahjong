@@ -48,7 +48,8 @@ val qidui : player -> bool
 
 val jiulianbaodeng : player -> bool
 (** [jiulianbaodeng p] checks if player [p] has a Jiulianbaodeng hand.
-    - A Jiulianbaodeng hand consists of a consecutive sequece of 7 pairs of a single suite.
+    - A Jiulianbaodeng hand consists of a consecutive sequece of 7 pairs of a 
+      single suite.
     - Returns true if the hand is a Jiulianbaodeng, false otherwise.
     - Precondition: [p] must be a valid player with a hidden hand of at most 14
       tiles. *)
@@ -61,7 +62,8 @@ val duiduihu : player -> bool
       tiles. *)
 val kankanhu : player -> bool
 (** [kankanhu p] checks if player [p] has a Kankanhu hand.
-    - A Kankanhu hand consists of 4 Kezi groups and 1 pair, and all Kezi is in hidden hand.
+    - A Kankanhu hand consists of 4 Kezi groups and 1 pair, and all Kezi is in 
+      hidden hand.
     - Returns true if the hand is a Kankanhu, false otherwise.
     - Precondition: [p] must be a valid player with a hidden hand of at most 14
       tiles. *)
@@ -89,14 +91,16 @@ val hunyise : player -> bool
 
 val sananke : player -> bool
 (** [sananke p] checks if player [p] has a Sananke hand.
-    - A Sananke hand is a complete hand consists of 3 groups of 3 identical tiles in hidden hand.
+    - A Sananke hand is a complete hand consists of 3 groups of 3 identical 
+tiles in hidden hand.
     - Returns true if the hand is a Sananke, false otherwise.
     - Precondition: [p] must be a valid player with a hidden hand of at most 14
       tiles.*)
 
 val xiaosixi : player -> bool
 (** [xiaosixi p] checks if player [p] has a Xiaosixi hand.
-    - A Xiaosixi hand is a complete hand consists of 3 groups of the 4 wind tiles and 1 pair of wind tiles.
+    - A Xiaosixi hand is a complete hand consists of 3 groups of the 4 wind 
+      tiles and 1 pair of wind tiles.
     - Returns true if the hand is a Xiaosixi, false otherwise.
     - Precondition: [p] must be a valid player with a hidden hand of at most 14
       tiles. *)
@@ -117,7 +121,8 @@ val qingyaojiu : player -> bool
 
 val hunyaojiu : player -> bool
 (** [hunyaojiu p] checks if player [p] has a Hunyaojiu hand.
-    - A Hunyaojiu hand is a complete hand consists of only num 1 and 9 and zi(Dapai).
+    - A Hunyaojiu hand is a complete hand consists of only num 1 and 9 and zi
+      (Dapai).
     - Returns true if the hand is a Hunyaojiu, false otherwise.
     - Precondition: [p] must be a valid player with a hidden hand of at most 14
       tiles. *)
