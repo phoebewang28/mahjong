@@ -666,7 +666,49 @@ let duanyaojiu_test name tiles expected =
 let duanyaojiu_test_list =
   [ duanyaojiu_test "duanyaojiu" Utilities.duanyaojiu_hand1 true ]
   @ [ duanyaojiu_test "duanyaojiu2" Utilities.duanyaojiu_hand2 false ]
+let qingyaojiu_test name tiles expected =
+  name >:: fun _ ->
+  let hand = Hidden_hand.make_hidden_hand tiles in
+  let p =
+    Player.make_player "TestPlayer" 0 0 hand
+      (Exposed_hand.empty_exposed_hand ())
+  in
 
+  Printf.printf "[DEBUG][qingyaojiu] Hand: %s\n"
+    (String.concat " | "
+       (List.map Tile.tile_to_string (Hidden_hand.get_tiles hand)));
+
+  let result = Ying.qingyaojiu p in
+
+  Printf.printf "[DEBUG][qingyaojiu] Result: %b (Expected: %b)\n\n" result expected;
+
+  assert_equal expected result ~printer:string_of_bool
+let qingyaojiu_test_list =
+  [ qingyaojiu_test "qingyaojiu" Utilities.qingyaojiu_hand1 true ]
+  @ [ qingyaojiu_test "qingyaojiu2" Utilities.qingyaojiu_hand2 false ]
+  @ [ qingyaojiu_test "qingyaojiu3" Utilities.qingyaojiu_hand3 true ]
+
+let hunyaojiu_test name tiles expected =
+  name >:: fun _ ->
+  let hand = Hidden_hand.make_hidden_hand tiles in
+  let p =
+    Player.make_player "TestPlayer" 0 0 hand
+      (Exposed_hand.empty_exposed_hand ())
+  in
+
+  Printf.printf "[DEBUG][hunyaojiu] Hand: %s\n"
+    (String.concat " | "
+       (List.map Tile.tile_to_string (Hidden_hand.get_tiles hand)));
+
+  let result = Ying.hunyaojiu p in
+
+  Printf.printf "[DEBUG][hunyaojiu] Result: %b (Expected: %b)\n\n" result expected;
+  
+  assert_equal expected result ~printer:string_of_bool
+let hunyaojiu_test_list =
+  [ hunyaojiu_test "hunyaojiu" Utilities.hunyaojiu_hand1 true ]
+  @ [ hunyaojiu_test "hunyaojiu2" Utilities.hunyaojiu_hand2 false ]
+  @ [ hunyaojiu_test "hunyaojiu3" Utilities.hunyaojiu_hand3 true ]
   
 (* List of complete tests *)
 
@@ -794,6 +836,6 @@ let tests =
        @ pinghu_test_list @ exposed_hand_test @ dasixi_test_list @ dasanyuan_test_list
        @ lvyise_test_list @ qidui_test_list @ jiulianbaodeng_test_list @ duiduihu_test_list
        @ kankanhu_test_list @ qingyise_test_list @ ziyise_test_list @ xiaosixi_test_list
-       @ sananke_test_list @ duanyaojiu_test_list
+       @ sananke_test_list @ duanyaojiu_test_list @ qingyaojiu_test_list @ hunyaojiu_test_list
 
 let _ = run_test_tt_main tests

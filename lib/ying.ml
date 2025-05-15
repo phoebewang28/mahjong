@@ -416,10 +416,26 @@ let xiaosixi (p : Player.player) : bool =
         | 1 | 9 -> true
         | _ -> false)
       tiles
-  let duanyaojiu (p : Player.player) : bool =
+let duanyaojiu (p : Player.player) : bool =
     if complete p || qidui p then
       let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
       let exposed = Exposed_hand.get_tiles (Player.get_exposed p) in
       let hand = hidden @ exposed in
       List.length (is_yaojiu hand) = 0
+    else false
+
+let qingyaojiu (p : Player.player) : bool =
+    if complete p || qidui p then
+      let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+      let exposed = Exposed_hand.get_tiles (Player.get_exposed p) in
+      let hand = hidden @ exposed in
+      List.length (is_yaojiu hand) = List.length hand
+    else false
+
+let hunyaojiu (p : Player.player) : bool =
+    if complete p || qidui p then
+      let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+      let exposed = Exposed_hand.get_tiles (Player.get_exposed p) in
+      let hand = hidden @ exposed in
+      List.length (is_yaojiu hand) + List.length (is_zi hand)= List.length hand
     else false

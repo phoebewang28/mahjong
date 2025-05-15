@@ -700,3 +700,106 @@ let duanyaojiu_hand2 =
     Tile.string_to_tile "Bai";
     Tile.string_to_tile "Bai";
     ]
+let qingyaojiu_hand1 =
+  [
+    Tile.string_to_tile "1 Wan";
+    Tile.string_to_tile "1 Wan";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "9 Tong";
+    Tile.string_to_tile "9 Tong";
+    Tile.string_to_tile "9 Tong";
+    Tile.string_to_tile "1 Tiao";
+    Tile.string_to_tile "1 Tiao";
+    Tile.string_to_tile "1 Tiao";
+    Tile.string_to_tile "9 Tiao";
+    Tile.string_to_tile "9 Tiao";
+    Tile.string_to_tile "9 Tiao";
+    ]
+let qingyaojiu_hand2 =
+  [
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "8 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "8 Tong";
+    Tile.string_to_tile "8 Tong";
+    Tile.string_to_tile "8 Tong";
+    Tile.string_to_tile "5 Tiao";
+    Tile.string_to_tile "5 Tiao";
+    Tile.string_to_tile "5 Tiao";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+    ]   
+let qingyaojiu_hand3 =
+  [
+    Tile.string_to_tile "1 Wan";
+    Tile.string_to_tile "1 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "9 Tong";
+    Tile.string_to_tile "9 Tong";
+    Tile.string_to_tile "1 Tiao";
+    Tile.string_to_tile "1 Tiao";
+    Tile.string_to_tile "9 Tiao";
+    Tile.string_to_tile "9 Tiao";
+    ]
+
+let hunyaojiu_hand1 =
+  [
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "1 Tiao";
+    Tile.string_to_tile "1 Tiao";
+    Tile.string_to_tile "1 Tiao";
+    Tile.string_to_tile "9 Tiao";
+    Tile.string_to_tile "9 Tiao";
+    Tile.string_to_tile "9 Tiao";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+    ]
+let hunyaojiu_hand2 =
+  [
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "8 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "8 Tong";
+    Tile.string_to_tile "8 Tong";
+    Tile.string_to_tile "8 Tong";
+    Tile.string_to_tile "5 Tiao";
+    Tile.string_to_tile "5 Tiao";
+    Tile.string_to_tile "5 Tiao";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+    ]   
+let hunyaojiu_hand3 =
+  [
+    Tile.string_to_tile "1 Wan";
+    Tile.string_to_tile "1 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "9 Tong";
+    Tile.string_to_tile "9 Tong";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+    ]
