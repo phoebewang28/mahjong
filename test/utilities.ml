@@ -525,3 +525,281 @@ let qingyise_hand2 =
     Tile.string_to_tile "5 Tiao";
     Tile.string_to_tile "5 Tiao";
   ]
+
+let ziyise_hand1 =
+  [
+    Tile.string_to_tile "Dong";
+    Tile.string_to_tile "Dong";
+    Tile.string_to_tile "Dong";
+    Tile.string_to_tile "Nan";
+    Tile.string_to_tile "Nan";
+    Tile.string_to_tile "Bei";
+    Tile.string_to_tile "Bei";
+    Tile.string_to_tile "Bei";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+  ]
+let ziyise_hand2 =
+  [
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "Nan";
+    Tile.string_to_tile "Nan";
+    Tile.string_to_tile "Bei";
+    Tile.string_to_tile "Bei";
+    Tile.string_to_tile "Bei";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+  ]
+let hunyise_hand1 =
+  [
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "Nan";
+    Tile.string_to_tile "Nan";
+    Tile.string_to_tile "Bei";
+    Tile.string_to_tile "Bei";
+    Tile.string_to_tile "Bei";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+  ]
+let hunyise_hand2 =
+  [
+    Tile.string_to_tile "1 Wan";
+    Tile.string_to_tile "1 Wan";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "Bei";
+    Tile.string_to_tile "Bei";
+    Tile.string_to_tile "Bei";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+  ]
+
+let xiaosixi_hand1 =
+  [
+    Tile.string_to_tile "Dong";
+    Tile.string_to_tile "Dong";
+    Tile.string_to_tile "Dong";
+    Tile.string_to_tile "Nan";
+    Tile.string_to_tile "Nan";
+    Tile.string_to_tile "Nan";
+    Tile.string_to_tile "Xi";
+    Tile.string_to_tile "Xi";
+    Tile.string_to_tile "Xi";
+    Tile.string_to_tile "Bei";
+    Tile.string_to_tile "Bei";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Zhong";
+    ]
+
+let xiaosixi_hand2 =
+  [
+    Tile.string_to_tile "1 Wan";
+    Tile.string_to_tile "1 Wan";
+    Tile.string_to_tile "1 Wan";
+    Tile.string_to_tile "Nan";
+    Tile.string_to_tile "Nan";
+    Tile.string_to_tile "Nan";
+    Tile.string_to_tile "Xi";
+    Tile.string_to_tile "Xi";
+    Tile.string_to_tile "Xi";
+    Tile.string_to_tile "Bei";
+    Tile.string_to_tile "Bei";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Zhong";
+    ]
+
+let sananke_hand1 =
+  [
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "8 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "8 Tong";
+    Tile.string_to_tile "8 Tong";
+    Tile.string_to_tile "8 Tong";
+    Tile.string_to_tile "5 Tiao";
+    Tile.string_to_tile "5 Tiao";
+    Tile.string_to_tile "5 Tiao";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+    ]
+let sananke_hand2 =
+  [
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "8 Wan";
+    Tile.string_to_tile "8 Wan";
+    Tile.string_to_tile "8 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "7 Tong";
+    Tile.string_to_tile "8 Tong";
+    Tile.string_to_tile "9 Tong";
+    Tile.string_to_tile "5 Tiao";
+    Tile.string_to_tile "5 Tiao";
+    Tile.string_to_tile "5 Tiao";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+    ]
+
+let duanyaojiu_hand1 =
+  [
+    Tile.string_to_tile "2 Tiao";
+    Tile.string_to_tile "3 Tiao";
+    Tile.string_to_tile "4 Tiao";
+    Tile.string_to_tile "4 Tiao";
+    Tile.string_to_tile "4 Tiao";
+    Tile.string_to_tile "4 Tiao";
+    Tile.string_to_tile "6 Tiao";
+    Tile.string_to_tile "6 Tiao";
+    Tile.string_to_tile "6 Tiao";
+    Tile.string_to_tile "8 Tiao";
+    Tile.string_to_tile "8 Tiao";
+    Tile.string_to_tile "Fa";
+    Tile.string_to_tile "Fa";
+    Tile.string_to_tile "Fa";
+    ]
+let duanyaojiu_hand2 =
+  [
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "8 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "8 Tong";
+    Tile.string_to_tile "8 Tong";
+    Tile.string_to_tile "8 Tong";
+    Tile.string_to_tile "5 Tiao";
+    Tile.string_to_tile "5 Tiao";
+    Tile.string_to_tile "5 Tiao";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+    ]
+let qingyaojiu_hand1 =
+  [
+    Tile.string_to_tile "1 Wan";
+    Tile.string_to_tile "1 Wan";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "9 Tong";
+    Tile.string_to_tile "9 Tong";
+    Tile.string_to_tile "9 Tong";
+    Tile.string_to_tile "1 Tiao";
+    Tile.string_to_tile "1 Tiao";
+    Tile.string_to_tile "1 Tiao";
+    Tile.string_to_tile "9 Tiao";
+    Tile.string_to_tile "9 Tiao";
+    Tile.string_to_tile "9 Tiao";
+    ]
+let qingyaojiu_hand2 =
+  [
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "8 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "8 Tong";
+    Tile.string_to_tile "8 Tong";
+    Tile.string_to_tile "8 Tong";
+    Tile.string_to_tile "5 Tiao";
+    Tile.string_to_tile "5 Tiao";
+    Tile.string_to_tile "5 Tiao";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+    ]   
+let qingyaojiu_hand3 =
+  [
+    Tile.string_to_tile "1 Wan";
+    Tile.string_to_tile "1 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "9 Tong";
+    Tile.string_to_tile "9 Tong";
+    Tile.string_to_tile "1 Tiao";
+    Tile.string_to_tile "1 Tiao";
+    Tile.string_to_tile "9 Tiao";
+    Tile.string_to_tile "9 Tiao";
+    ]
+
+let hunyaojiu_hand1 =
+  [
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "1 Tiao";
+    Tile.string_to_tile "1 Tiao";
+    Tile.string_to_tile "1 Tiao";
+    Tile.string_to_tile "9 Tiao";
+    Tile.string_to_tile "9 Tiao";
+    Tile.string_to_tile "9 Tiao";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+    ]
+let hunyaojiu_hand2 =
+  [
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "8 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "8 Tong";
+    Tile.string_to_tile "8 Tong";
+    Tile.string_to_tile "8 Tong";
+    Tile.string_to_tile "5 Tiao";
+    Tile.string_to_tile "5 Tiao";
+    Tile.string_to_tile "5 Tiao";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+    ]   
+let hunyaojiu_hand3 =
+  [
+    Tile.string_to_tile "1 Wan";
+    Tile.string_to_tile "1 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "1 Tong";
+    Tile.string_to_tile "9 Tong";
+    Tile.string_to_tile "9 Tong";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Zhong";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+    ]
