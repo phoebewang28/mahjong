@@ -101,14 +101,14 @@ val xiaosixi : player -> bool
     - Precondition: [p] must be a valid player with a hidden hand of at most 14
       tiles. *)
 
-(* val duanyaojiu : player -> bool
+val duanyaojiu : player -> bool
 (** [duanyaojiu p] checks if player [p] has a Duanyaojiu hand.
     - A Duanyaojiu hand is a complete hand without tiles of num 1 and 9.
     - Returns true if the hand is a Duanyaojiu, false otherwise.
     - Precondition: [p] must be a valid player with a hidden hand of at most 14
       tiles. *)
 
-val qinglaotou : player -> bool
+(* val qinglaotou : player -> bool
 (** [qinglaotou p] checks if player [p] has a Qinglaotou hand.
     - A Qinglaotou hand consists of 4 groups of 4 wind tiles and 1 pair.
     - Returns true if the hand is a Qinglaotou, false otherwise.

@@ -381,7 +381,9 @@ let hunyise (p : Player.player) : bool =
 let sananke (p : Player.player) : bool =
   if complete p then
     let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
-    try_make_kezi hidden 4 3
+    let exposed_blocks = Exposed_hand.exposed_hand_count (Player.get_exposed p) in
+    let needed = 4 - exposed_blocks in
+    try_make_kezi hidden needed 3
   else false
 
 let xiaosixi (p : Player.player) : bool =
@@ -407,4 +409,17 @@ let xiaosixi (p : Player.player) : bool =
       try_all_pairs unique_tiles
   else false  
 
-(* need to track the kezi we have *)
+  let is_yaojiu tiles =
+    List.filter
+      (fun t ->
+        match Tile.get_num t with
+        | 1 | 9 -> true
+        | _ -> false)
+      tiles
+  let duanyaojiu (p : Player.player) : bool =
+    if complete p || qidui p then
+      let hidden = Hidden_hand.get_tiles (Player.get_hidden p) in
+      let exposed = Exposed_hand.get_tiles (Player.get_exposed p) in
+      let hand = hidden @ exposed in
+      List.length (is_yaojiu hand) = 0
+    else false

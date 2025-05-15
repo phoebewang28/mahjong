@@ -665,3 +665,38 @@ let sananke_hand2 =
     Tile.string_to_tile "Bai";
     Tile.string_to_tile "Bai";
     ]
+
+let duanyaojiu_hand1 =
+  [
+    Tile.string_to_tile "2 Tiao";
+    Tile.string_to_tile "3 Tiao";
+    Tile.string_to_tile "4 Tiao";
+    Tile.string_to_tile "4 Tiao";
+    Tile.string_to_tile "4 Tiao";
+    Tile.string_to_tile "4 Tiao";
+    Tile.string_to_tile "6 Tiao";
+    Tile.string_to_tile "6 Tiao";
+    Tile.string_to_tile "6 Tiao";
+    Tile.string_to_tile "8 Tiao";
+    Tile.string_to_tile "8 Tiao";
+    Tile.string_to_tile "Fa";
+    Tile.string_to_tile "Fa";
+    Tile.string_to_tile "Fa";
+    ]
+let duanyaojiu_hand2 =
+  [
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "7 Wan";
+    Tile.string_to_tile "8 Wan";
+    Tile.string_to_tile "9 Wan";
+    Tile.string_to_tile "8 Tong";
+    Tile.string_to_tile "8 Tong";
+    Tile.string_to_tile "8 Tong";
+    Tile.string_to_tile "5 Tiao";
+    Tile.string_to_tile "5 Tiao";
+    Tile.string_to_tile "5 Tiao";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+    Tile.string_to_tile "Bai";
+    ]
