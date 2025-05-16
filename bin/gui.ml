@@ -234,14 +234,18 @@ let draw_peng_button p gb =
   let is_peng_clicked = Raygui.button rect "Peng Tile" in
   if is_peng_clicked then gb.is_penging <- true
 
+let draw_ying_button p =
+  assert (Ying.complete p);
+  let rect = Raylib.Rectangle.create 500.0 300.0 100.0 70.0 in
+  if Raygui.button rect "Ying" then raise (Ying.PlayerWin p)
+
 let draw_draw_button p gb =
   let rect = Raylib.Rectangle.create 500.0 210.0 100.0 70.0 in
   let is_draw_clicked = Raygui.button rect "Draw Tile" in
-  if is_draw_clicked then (
+  if is_draw_clicked then
     (* update player's hidden hand *)
     let _ = Player_choice.draw p in
-    print_endline ("drawing: is complete: " ^ string_of_bool (Ying.complete p));
-    if Ying.complete p then raise (Ying.PlayerWin p) else gb.is_drawn <- true)
+    gb.is_drawn <- true
 
 (** [make_player id name] creates a player with the given [id] and [name]. *)
 let make_player id name = Player.create name id
@@ -490,14 +494,12 @@ let throw_reset p gb : unit =
 let chi_from_clicked p gb : unit =
   assert gb.is_chiing;
   assert (gb.clicked_tiles.(0) <> -1 && gb.clicked_tiles.(1) <> -1);
-  if Player_choice.chi p gb.clicked_tiles.(0) gb.clicked_tiles.(1) then (
-    print_endline ("ching: is complete: " ^ string_of_bool (Ying.complete p));
-    (* both tiles selected for penging *)
-    if Ying.complete p then raise (Ying.PlayerWin p)
-    else gb.is_throwing <- true
-      (*successful chi -> taken out into exposed hand, should engage throwing
-        now *))
-  else gb.is_chiing <- false; 
+  if Player_choice.chi p gb.clicked_tiles.(0) gb.clicked_tiles.(1) then
+    (* both tiles selected for chiing *)
+    gb.is_throwing <- true
+    (*successful chi -> taken out into exposed hand, should engage throwing
+      now *)
+  else gb.is_chiing <- false;
   (* deactivate is_chiing cuz failed *)
   gb.clicked_tiles.(0) <- -1;
   gb.clicked_tiles.(1) <- -1
@@ -505,10 +507,9 @@ let chi_from_clicked p gb : unit =
 let peng_from_clicked p gb : unit =
   assert gb.is_penging;
   assert (gb.clicked_tiles.(0) <> -1 && gb.clicked_tiles.(1) <> -1);
-  if Player_choice.peng p gb.clicked_tiles.(0) gb.clicked_tiles.(1) then (
-    print_endline ("penging: is complete: " ^ string_of_bool (Ying.complete p));
+  if Player_choice.peng p gb.clicked_tiles.(0) gb.clicked_tiles.(1) then
     (* both tiles selected for penging *)
-    if Ying.complete p then raise (Ying.PlayerWin p) else gb.is_throwing <- true)
+    gb.is_throwing <- true
   else gb.is_penging <- false;
   gb.clicked_tiles.(0) <- -1;
   gb.clicked_tiles.(1) <- -1
@@ -555,10 +556,12 @@ let draw_all_game (gb : game_board) : unit =
     | Some _ ->
         if Player_choice.chi_check gb.player_hid then draw_chi_button p gb;
         if Player_choice.peng_check gb.player_hid then draw_peng_button p gb)
-  else if gb.is_throwing then throw_reset p gb
-    (* this is_throwing clause MUST come BEFORE the others!! cuz other clauses
-       and is_throwing can be true simultaneously, o/w throw_reset is never
-       gonna run *)
+  else if gb.is_throwing then (
+    throw_reset p gb;
+    if Ying.complete p then draw_ying_button p
+      (* this is_throwing clause MUST come BEFORE the others!! cuz other clauses
+         and is_throwing can be true simultaneously, o/w throw_reset is never
+         gonna run *))
   else if gb.is_drawn then
     (* chi button clicked -> no buttons render *)
     gb.is_throwing <- true
