@@ -18,15 +18,13 @@ cd <repository-name>
 ```
 opam update
 opam upgrade
-opam install raylib raygui ounit2 containers
-lwt_ppx
-ANSITerminal
+opam install raylib raygui ounit2 containers lwt_ppx ANSITerminal bisect_ppx qcheck yojson re
 ```
 
 ## Running the Game
 
 1. Run `dune build`
-2. Run `dune exec bin/main.exe` to start the game.
+2. Run `dune exec bin/gui.exe` to start the game.
 3. The Mahjong GUI will appear:
    Set name for all players when you see the "Please enter your 4 player names: " prompt and the game will authomatically start.
    A list of player hands will be printed, and players will take turns moving.

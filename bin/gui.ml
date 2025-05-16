@@ -250,6 +250,7 @@ let make_player id name = Player.create name id
 let init_tiles () =
   Random.self_init ();
   let _ = Tile.init_tiles () in
+  (* () *)
   Tile.shuffle !Tile.tiles_arr
 
 let setup_window () =
@@ -362,6 +363,7 @@ let draw_player_exp p gb : unit =
   let keys = Tile.tile_list_to_keys tiles in
   Printf.printf "Exposed hand keys:\n";
   List.iter (fun k -> Printf.printf " - %s\n" k) keys;
+  flush stdout;
   draw_tile_list_from_keys keys 50 (window_height - 175) gb
 
 let draw_player_name p : unit =

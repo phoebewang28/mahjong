@@ -3,4 +3,4 @@
  (libraries str ANSITerminal)
  (instrumentation
   (backend bisect_ppx))
- (modules player tile hidden_hand player_choice exposed_hand dice ying))
+ (modules player tile hidden_hand player_choice exposed_hand ying))

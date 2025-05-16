@@ -133,18 +133,22 @@ let rec move p1 p2 p3 p4 : unit =
   print_spacing p1;
   print_hand p1;
   choose_move p1;
+  if Ying.pinghu p1 then print_endline "Player 1 won!";
 
   print_spacing p2;
   print_hand p2;
   choose_move p2;
+  if Ying.pinghu p1 then print_endline "Player 2 won!";
 
   print_spacing p3;
   print_hand p3;
   choose_move p3;
+  if Ying.pinghu p1 then print_endline "Player 3 won!";
 
   print_spacing p4;
   print_hand p4;
   choose_move p4;
+  if Ying.pinghu p1 then print_endline "Player 4 won!";
 
   move p1 p2 p3 p4
 
@@ -178,4 +182,6 @@ let () =
   print_hand player4;
 
   (* Recursively calls moves for players in order *)
-  move player1 player2 player3 player4
+  try move player1 player2 player3 player4 with
+  | Tile.NoTileLeft -> print_endline "Game ended without a winner..."
+  | Ying.PlayerWin player -> print_endline (Player.get_name player ^ " won!")

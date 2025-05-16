@@ -63,6 +63,7 @@
 
 (package
  (name raylib-gen)
+ (allow_empty)
  (version 0.1.0)
  (description "Binding generation for raylib")
  (synopsis "Binding generation for raylib")

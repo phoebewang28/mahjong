@@ -36,7 +36,7 @@ let get hh idx = hh.hand.(idx)
 
 let get_tile_index hh tile =
   match Array.find_index (fun x -> x = tile) hh.hand with
-  | None -> raise (Invalid_argument "Index out of bounds") 
+  | None -> raise (Invalid_argument "Index out of bounds")
   | Some x -> x
 
 let get_size hh = hh.size
@@ -73,9 +73,8 @@ let get_tiles hh = Array.to_list hh.hand
 
 let hidden_hand_to_string hh =
   (*Just to help w the terminal debugging.*)
-  List.iter (printf "  %d   |") [ 1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13 ];
-  print_endline "";
-
+  (* List.iter (printf "  %d   |") [ 1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13 ];
+  print_endline ""; *)
   let s =
     List.fold_left
       (fun acc x -> acc ^ ", " ^ Tile.tile_to_string x)

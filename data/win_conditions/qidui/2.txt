@@ -1,0 +1,14 @@
+1,Wan
+1,Wan
+2,Wan
+2,Wan
+3,Wan
+3,Wan
+2,Tong
+2,Tong
+2,Tong
+8,Tiao
+8,Tiao
+8,Tiao
+Fa
+Fa

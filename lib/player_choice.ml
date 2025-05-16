@@ -2,11 +2,34 @@ open Tile
 open Str
 open Player
 open Hidden_hand
+open Ying
+open ANSITerminal
+
+let print_hand player =
+  ANSITerminal.printf [ cyan ] "%s\n" (String.make 100 '-');
+  ANSITerminal.printf [ yellow ] "%s\n" (Player.get_name player);
+  ANSITerminal.printf [ magenta ] "Hidden tiles:\n";
+  ANSITerminal.printf [ green ] "%s\n"
+    (Hidden_hand.hidden_hand_to_string (Player.get_hidden player));
+  print_endline "";
+  ANSITerminal.printf [ magenta ] "Exposed tiles:\n";
+  ANSITerminal.printf [ green ] "%s\n"
+    (Exposed_hand.exposed_hand_to_string (Player.get_exposed player))
 
 let throw (player : player) id =
+  ANSITerminal.printf [ red ] "THROW: Checking if player %s has completed: %b\n"
+    (Player.get_name player) (Ying.complete player);
+
+  if Ying.complete player then raise (Ying.PlayerWin player);
   let hid = get_hidden player in
   let tile = get hid id in
   discarded := tile :: !discarded;
+  ANSITerminal.printf [ magenta ] "Discarded tiles:\n";
+  let discarded_tiles_str =
+    String.concat ", " (List.map Tile.tile_to_string !discarded)
+  in
+  ANSITerminal.printf [ green ] "%s\n" discarded_tiles_str;
+  flush stdout;
   remove hid tile;
   tile
 
@@ -15,6 +38,12 @@ let draw (player : player) =
     let hidden_hand = get_hidden player in
     let tile = Array.get !tiles_arr !curr_index in
     add hidden_hand tile;
+    print_hand player;
+    ANSITerminal.printf [ red ]
+      "DRAW %s: Checking if player %s has completed: %b\n"
+      (Tile.tile_to_string tile) (Player.get_name player) (Ying.complete player);
+    flush stdout;
+    if Ying.complete player then raise (Ying.PlayerWin player);
     curr_index := !curr_index + 1;
     tile
   with Invalid_argument _ -> raise Tile.NoTileLeft
@@ -103,10 +132,28 @@ let chi (player : player) id1 id2 : bool =
   let hid = get_hidden player in
   let ex = get_exposed player in
   let dis = List.hd !discarded in
-  chi_update (Hidden_hand.get hid id1) (Hidden_hand.get hid id2) dis ex hid
+  let succ =
+    chi_update (Hidden_hand.get hid id1) (Hidden_hand.get hid id2) dis ex hid
+  in
+  print_hand player;
+  ANSITerminal.printf [ red ]
+    "CHI %s: Checking if player %s has completed: %b\n"
+    (Tile.tile_to_string dis) (Player.get_name player) (Ying.complete player);
+  flush stdout;
+  if Ying.complete player then raise (Ying.PlayerWin player);
+  succ
 
 let peng (player : player) id1 id2 : bool =
   let hid = get_hidden player in
   let ex = get_exposed player in
   let dis = List.hd !discarded in
-  peng_update (Hidden_hand.get hid id1) (Hidden_hand.get hid id2) dis ex hid
+  let succ =
+    peng_update (Hidden_hand.get hid id1) (Hidden_hand.get hid id2) dis ex hid
+  in
+  print_hand player;
+  ANSITerminal.printf [ red ]
+    "PENG %s: Checking if player %s has completed: %b\n"
+    (Tile.tile_to_string dis) (Player.get_name player) (Ying.complete player);
+  flush stdout;
+  if Ying.complete player then raise (Ying.PlayerWin player);
+  succ
