@@ -25,6 +25,8 @@ opam install raylib raygui ounit2 containers lwt_ppx ANSITerminal bisect_ppx qch
 1. Run `dune build`
 2. Run `dune exec bin/gui.exe` to start the game.
 3. The Mahjong GUI will appear:
-   Set name for all players when you see the "Please enter your 4 player names: " prompt and the game will authomatically start.
-   A list of player hands will be printed, and players will take turns moving.
-4. To end the game: Control + C
+   Set name for all players when you see the "Please enter your 4 player names: " prompt. 
+   Once the names are set, press the "START" button to start the game.
+4. To end the game manually, click the "close window" button in the top corner. 
+5. The game ends when a player gets a winning hand or when the tiles are exhausted. 
+   From the end screen, you can play a new game by clicking the "restart" button or quit the game by clicking the "quit" button. 
