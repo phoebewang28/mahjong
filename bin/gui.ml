@@ -241,7 +241,7 @@ let draw_draw_button p gb =
     (* update player's hidden hand *)
     let _ = Player_choice.draw p in
     print_endline ("drawing: is complete: " ^ string_of_bool (Ying.complete p));
-    if Ying.complete p then raise (Ying.PlayerWin p) else gb.is_drawn <- true; raise (Ying.PlayerWin p))
+    if Ying.complete p then raise (Ying.PlayerWin p) else gb.is_drawn <- true)
 
 (** [make_player id name] creates a player with the given [id] and [name]. *)
 let make_player id name = Player.create name id
