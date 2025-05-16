@@ -5,8 +5,6 @@ type exposed_hand
    exposed_hand and returns a new exposed_hand with the specified group
    added. *)
 
-(* TODO: update comments*)
-
 val chi : tile -> exposed_hand -> unit
 (** Given tile [t], [chi t] adds consecutive-number set to exposed hand. 
    - Example: [t] is 1 Tong, numbers of all tiles inset will be = {1,2,3} while

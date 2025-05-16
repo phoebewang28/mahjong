@@ -112,3 +112,9 @@ val tile_to_key : tile -> string
       default), then [tile_to_key t] returns "Dong" *)
 
 val tile_list_to_keys : tile list -> string list
+(** [tile_list_to_keys lst] returns a list of string representations of tiles in
+    the list [lst]
+    - Example: if [lst] is a list of tiles with number 5 and suit "Tiao", then
+      [tile_list_to_keys lst] returns ["5 Tiao"]
+    - Example: if [lst] is a list of tiles with suit "Dong"(the number will be
+      set to 0 as default), then [tile_list_to_keys lst] returns ["Dong"] *)
