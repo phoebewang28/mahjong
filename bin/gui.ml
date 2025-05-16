@@ -344,9 +344,6 @@ let draw_bg filename =
   let max_scale = max scale_x scale_y in
   draw_texture_ex background (Vector2.create 0. 0.) 0. max_scale Color.white
 
-(* let draw_discard dis = let font_size = 30 in let dis_x = center_x -
-   (measure_text dis font_size / 2) in draw_text dis dis_x center_y font_size
-   Color.red *)
 
 let draw_discard_tile (tile_opt : Tile.tile option) =
   match tile_opt with
@@ -633,7 +630,3 @@ let () =
     | Ying.PlayerWin p -> setup_end false (Some p) |> end_loop |> replay
   in
   replay ()
-
-(* let () = let _ = setup_window () in let rec replay () = let sb = setup_start
-   () in ignore (start_loop sb); let eb = setup_end () in end_loop eb; replay ()
-   in replay () *)
