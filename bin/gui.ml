@@ -241,7 +241,7 @@ let draw_draw_button p gb =
     (* update player's hidden hand *)
     let _ = Player_choice.draw p in
     print_endline ("drawing: is complete: " ^ string_of_bool (Ying.complete p));
-    if Ying.complete p then raise (Ying.PlayerWin p) else gb.is_drawn <- true)
+    if Ying.complete p then raise (Ying.PlayerWin p) else gb.is_drawn <- true; raise (Ying.PlayerWin p))
 
 (** [make_player id name] creates a player with the given [id] and [name]. *)
 let make_player id name = Player.create name id
@@ -268,6 +268,7 @@ let setup_window () =
     single [start_board] *)
 let setup_start () : start_board =
   load_tile_images ();
+  Tile.reset_tiles ();
   {
     player_name_inputs = [| "Player 1"; "Player 2"; "Player 3"; "Player 4" |];
     player_name_edit_mode = [| false; false; false; false |];
@@ -280,9 +281,14 @@ let setup_start () : start_board =
 
     Precondition: [name_arr] must already be initialized *)
 let setup_game name_arr : game_board =
+  print_endline "got to inside of setup_game";
   assert (Array.length name_arr <> 0);
+
+  print_endline "name_arr correct";
   (* tiles must be initialized b4 players created!! *)
   init_tiles ();
+
+  print_endline "init tiles correct";
 
   let p_lst = create_players name_arr in
   let first_player = List.nth p_lst 0 in
@@ -443,7 +449,7 @@ let draw_all_end (eb : end_board) =
       assert (eb.is_no_tile_left = false);
       draw_text
         ("Result: " ^ Player.get_name p ^ " wins!!")
-        (center_x - 130) 175 35 Color.red);
+        (center_x - 175) 175 35 Color.red);
 
   (* restart button *)
   let restart =
@@ -491,7 +497,7 @@ let chi_from_clicked p gb : unit =
     else gb.is_throwing <- true
       (*successful chi -> taken out into exposed hand, should engage throwing
         now *))
-  else gb.is_chiing <- false;
+  else gb.is_chiing <- false; 
   (* deactivate is_chiing cuz failed *)
   gb.clicked_tiles.(0) <- -1;
   gb.clicked_tiles.(1) <- -1

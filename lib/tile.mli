@@ -20,6 +20,9 @@ val curr_index : int ref
 val shuffle : 'a array -> unit
 (**[shuffle] shuffles the tiles, used at initialization*)
 
+val reset_tiles : unit -> unit
+(** called when game is restarted: resets all tiles to original 136 *)
+
 val get_num : tile -> int
 (** [get_num t] returns number associated with tile [t]
     - Example: if [t] is a tile with number 5, then [get_num t] returns 5

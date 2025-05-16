@@ -48,6 +48,11 @@ let shuffle tiles =
 (*blank tiles_arr to be initialized soon*)
 let tiles_arr = ref [||]
 
+
+let reset_tiles () = 
+  tiles_arr := [||];
+  curr_index :=  0
+
 (**[init_tiles] initializes 136 tiles in a given order*)
 let init_tiles () =
   (*makes "blank tiles"*)
