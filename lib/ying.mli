@@ -3,6 +3,7 @@ open Tile
 open Hidden_hand
 open Exposed_hand
 
+
 exception PlayerWin of Player.player
 
 val complete : player -> bool

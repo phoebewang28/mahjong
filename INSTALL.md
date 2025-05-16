@@ -12,8 +12,7 @@ git clone <repository-url>
 cd <repository-name>
 ```
 
-3. The following ocaml libraries need to be installed: NIL
-   raylib, raygui, ounit2.
+3. The following ocaml libraries need to be installed: raylib, raygui, ounit2.
 
 ```
 opam update

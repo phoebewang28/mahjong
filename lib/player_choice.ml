@@ -19,8 +19,6 @@ let print_hand player =
 let throw (player : player) id =
   ANSITerminal.printf [ red ] "THROW: Checking if player %s has completed: %b\n"
     (Player.get_name player) (Ying.complete player);
-
-  if Ying.complete player then raise (Ying.PlayerWin player);
   let hid = get_hidden player in
   let tile = get hid id in
   discarded := tile :: !discarded;
@@ -43,7 +41,6 @@ let draw (player : player) =
       "DRAW %s: Checking if player %s has completed: %b\n"
       (Tile.tile_to_string tile) (Player.get_name player) (Ying.complete player);
     flush stdout;
-    if Ying.complete player then raise (Ying.PlayerWin player);
     curr_index := !curr_index + 1;
     tile
   with Invalid_argument _ -> raise Tile.NoTileLeft
@@ -132,7 +129,6 @@ let chi (player : player) id1 id2 : bool =
     "CHI %s: Checking if player %s has completed: %b\n"
     (Tile.tile_to_string dis) (Player.get_name player) (Ying.complete player);
   flush stdout;
-  if Ying.complete player then raise (Ying.PlayerWin player);
   succ
 
 let peng (player : player) id1 id2 : bool =
@@ -147,5 +143,4 @@ let peng (player : player) id1 id2 : bool =
     "PENG %s: Checking if player %s has completed: %b\n"
     (Tile.tile_to_string dis) (Player.get_name player) (Ying.complete player);
   flush stdout;
-  if Ying.complete player then raise (Ying.PlayerWin player);
   succ
