@@ -34,28 +34,44 @@ let rec remove_tiles tiles ts =
 (** [try_make_melds tiles n] checks if [tiles] can form [n] melds (triples or
     sequences). *)
 let rec try_make_melds tiles n =
-  if n = 0 then tiles = []
-  else
-    match tiles with
-    | [] -> false
-    | t :: _ ->
-        let attempt_triple =
-          if count_same tiles t >= 3 then
-            let rest = remove_n tiles t 3 in
-            try_make_melds rest (n - 1)
+  List.iter
+    (fun t ->
+      if Tile.tile_to_string t <> "3110 Fake" then
+        print_endline (Tile.tile_to_string t))
+    tiles;
+
+  match tiles with
+  | [] -> true
+  | t :: _ ->
+      let attempt_triple =
+        if count_same tiles t >= 3 then (
+          print_endline
+            ("Attempt triple for tile " ^ Tile.tile_to_string t ^ ": true");
+          let rest = remove_n tiles t 3 in
+          try_make_melds rest (n - 1))
+        else (
+          print_endline
+            ("Attempt triple for tile " ^ Tile.tile_to_string t ^ ": false");
+          false)
+      in
+      let attempt_sequence =
+        if is_shu t && Tile.get_num t <= 7 then
+          let t2 = Tile.make_tile (Tile.get_num t + 1) (Tile.get_tao t) in
+          let t3 = Tile.make_tile (Tile.get_num t + 2) (Tile.get_tao t) in
+          if List.mem t2 tiles && List.mem t3 tiles then (
+            print_endline
+              ("Attempt sequence for tile starting at " ^ Tile.tile_to_string t
+             ^ ": true");
+            let rest = remove_tiles tiles [ t; t2; t3 ] in
+            try_make_melds rest (n - 1))
           else false
-        in
-        let attempt_sequence =
-          if is_shu t && Tile.get_num t <= 7 then
-            let t2 = Tile.make_tile (Tile.get_num t + 1) (Tile.get_tao t) in
-            let t3 = Tile.make_tile (Tile.get_num t + 2) (Tile.get_tao t) in
-            if List.mem t2 tiles && List.mem t3 tiles then
-              let rest = remove_tiles tiles [ t; t2; t3 ] in
-              try_make_melds rest (n - 1)
-            else false
-          else false
-        in
-        attempt_triple || attempt_sequence
+        else (
+          print_endline
+            ("Attempt sequence for tile starting at " ^ Tile.tile_to_string t
+           ^ ": false");
+          false)
+      in
+      attempt_triple || attempt_sequence
 
 (** [is_wind t] checks if the tile [t] is a wind tile ("Dong", "Nan", "Xi",
     "Bei"). *)
@@ -73,27 +89,37 @@ let is_wind_group (g, t) =
   | _ -> false
 
 let complete (p : Player.player) : bool =
+  print_endline ("Player that is being checked: " ^ Player.get_name p);
   let hidden = filter_hidden p in
   let exposed_blocks = Exposed_hand.exposed_hand_count (Player.get_exposed p) in
   let needed = 4 - exposed_blocks in
 
+  print_endline ("Number of sets needed: " ^ string_of_int needed);
+
   (* Try each possible pair, and see if the remaining tiles can form the needed
      melds *)
   let rec try_all_pairs = function
-    | [] -> false
+    | [] -> if needed = 0 then true else false
     | t :: rest ->
-        if count_same hidden t >= 2 then
+        if count_same hidden t >= 2 then (
+          print_endline
+            ("Found possible pair for tile: " ^ Tile.tile_to_string t);
           let remaining = remove_n hidden t 2 in
-          if try_make_melds remaining needed then true
+          if try_make_melds remaining needed then (
+            print_endline "Making all melds: true";
+            true)
           else
             try_all_pairs
-              (List.filter (fun x -> Tile.compare_tile x t <> 0) rest)
+              (List.filter (fun x -> Tile.compare_tile x t <> 0) rest))
         else try_all_pairs rest
   in
 
   (* Get unique tiles to try as pairs *)
   let unique_tiles = List.sort_uniq Tile.compare_tile hidden in
-  try_all_pairs unique_tiles
+  let remove_fakes =
+    List.filter (fun t -> Tile.tile_to_string t <> "3110 Fake") unique_tiles
+  in
+  try_all_pairs remove_fakes
 
 (** [has_pon_or_kan p] checks if the player [p] has any exposed "Pon" or "Kan"
     groups. *)
