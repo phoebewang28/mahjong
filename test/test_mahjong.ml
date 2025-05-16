@@ -33,7 +33,6 @@ let test_bad_tiles =
   ]
 
 let players_string = [ ("Caedy", 1); ("Albert", 2); ("Elinor", 3); ("Jess", 4) ]
-let player = Player.create "test" 0
 let test_player hh eh = Player.make_player "test" 0 10 hh eh
 
 (* use for qcheck *)
@@ -216,22 +215,13 @@ let draw_curr_ind_test player =
 
 let throw_discarded_test player id =
   "the last discarded tile is the one just thrown" >:: fun _ ->
-  let thrown = Player_choice.throw player id in
-  let dis_after = List.hd !Tile.discarded in
-  assert_equal thrown dis_after ~printer:Tile.tile_to_string
-
-let chi_check_qcheck_test =
-  QCheck_runner.to_ounit2_test
-    (let arbitrary_hand =
-       QCheck.list_of_size (QCheck.int_range 13 14).gen arbitrary_tile
-     in
-     QCheck.Test.make ~count:100
-       ~name:"tests chi_check with a randomly generated hand" arbitrary_hand
-       (fun x ->
-         let result =
-           Player_choice.chi_check (Hidden_hand.make_hidden_hand x)
-         in
-         result))
+  if Ying.complete player then
+    assert_raises (Ying.PlayerWin player) (fun () ->
+        Player_choice.throw player id)
+  else
+    let thrown = Player_choice.throw player id in
+    let dis_after = List.hd !Tile.discarded in
+    assert_equal thrown dis_after ~printer:Tile.tile_to_string
 
 let chi_peng_check_test move expected hand =
   Tile.discarded :=
@@ -245,16 +235,26 @@ let chi_peng_check_test move expected hand =
       assert_equal (Player_choice.peng_check hand) expected
   | _ -> "use chi or peng only" >:: fun _ -> assert_equal 0 1
 
-let chi_test player t1 t2 expected =
-  "test chi function" ^ string_of_int t1 ^ string_of_int t2 >:: fun _ ->
-  assert_equal (Player_choice.chi player t1 t2) expected
+let chi_test player expected =
+  "test chi function" >:: fun _ ->
+  assert_equal (Player_choice.chi player 0 1) expected
 
-let peng_test player t1 t2 expected =
-  "test peng function" >:: fun _ ->
-  assert_equal (Player_choice.peng player t1 t2) expected
+let peng_test player expected =
+  "test peng function " >:: fun _ ->
+  assert_equal (Player_choice.peng player 0 1) expected
+
+let test_chi = [ Tile.string_to_tile "2 Tong"; Tile.string_to_tile "3 Tong" ]
+
+let test_chi_false =
+  [ Tile.string_to_tile "2 Tong"; Tile.string_to_tile "7 Tong" ]
+
+let test_peng = [ Tile.string_to_tile "1 Tong"; Tile.string_to_tile "1 Tong" ]
+
+let test_peng_false =
+  [ Tile.string_to_tile "1 Tong"; Tile.string_to_tile "5 Tong" ]
 
 let player_choice_tests =
-  let player = player in
+  let player = Player.create "test" 0 in
   [
     draw_next_tile_test (Tile.string_to_tile "1 Tong") player 0;
     draw_next_tile_test (Tile.string_to_tile "2 Tong") player 4;
@@ -273,30 +273,30 @@ let player_choice_tests =
   @ [
       chi_test
         (test_player
-           (Hidden_hand.make_hidden_hand hh9_tiles)
+           (Hidden_hand.make_hidden_hand test_chi)
            (Exposed_hand.empty_exposed_hand ()))
-        2 3 true;
+        true;
     ]
   @ [
       chi_test
         (test_player
-           (Hidden_hand.make_hidden_hand hh7_tiles)
+           (Hidden_hand.make_hidden_hand test_chi_false)
            (Exposed_hand.empty_exposed_hand ()))
-        0 1 false;
+        false;
     ]
   @ [
       peng_test
         (test_player
-           (Hidden_hand.make_hidden_hand hh6_tiles)
+           (Hidden_hand.make_hidden_hand test_peng)
            (Exposed_hand.empty_exposed_hand ()))
-        0 1 true;
+        true;
     ]
   @ [
       peng_test
         (test_player
-           (Hidden_hand.make_hidden_hand hh6_tiles)
+           (Hidden_hand.make_hidden_hand test_peng_false)
            (Exposed_hand.empty_exposed_hand ()))
-        10 11 false;
+        false;
     ]
 
 (**Tests for the [Player.create] function. These check if the name, index, and

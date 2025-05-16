@@ -85,11 +85,6 @@ let chi_check (hand : hidden_hand) : bool =
   let dis_num = get_num dis in
   if dis_num < 1 || dis_num > 9 then false
   else
-    (* array: [| l2 (dis_num -2), l1 (dis_num - 1), u2 (dis_num + 2), u1
-       (dis_num + 1)||]
-
-       Necessary tests: l2 & l1, l1 & u1 (aka. discard in the middle), u1 &
-       u2 *)
     let combo_arr = [| None; None; None; None |] in
     if dis_num - 2 >= 1 then
       combo_arr.(0) <- Some (make_tile (dis_num - 2) (get_tao dis));
@@ -99,9 +94,6 @@ let chi_check (hand : hidden_hand) : bool =
       combo_arr.(2) <- Some (make_tile (dis_num + 2) (get_tao dis));
     if dis_num + 1 <= 9 then
       combo_arr.(3) <- Some (make_tile (dis_num + 1) (get_tao dis));
-    (* Array.iter (fun x -> match x with | None -> print_endline "None; " | Some
-       t -> print_endline (Tile.tile_to_string t)) combo_arr; print_newline
-       (); *)
     match combo_arr with
     | [| Some l2; Some l1; Some u2; Some u1 |] ->
         pair_check l2 l1 || pair_check l1 u1 || pair_check u2 u1

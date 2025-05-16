@@ -31,8 +31,6 @@ let init_hidden_hand tiles =
   { hand; size }
 
 let get hh idx = hh.hand.(idx)
-(* match hh.hand.(idx) with | None -> raise (Invalid_argument "Tile does not
-   exist") | Some tile -> tile *)
 
 let get_tile_index hh tile =
   match Array.find_index (fun x -> x = tile) hh.hand with
@@ -43,12 +41,7 @@ let get_size hh = hh.size
 
 let add hh t =
   hh.hand <- Array.concat [ hh.hand; Array.make 1 t ];
-
-  (* extend the array by one tile, fill with fake tile *)
-  (* add the new tile to the end of the hand *)
-  (* index at hh.size is None *)
   sort hh.hand;
-  (* move this in front of hh.hand assignment?*)
   hh.size <- hh.size + 1
 
 let remove hh tile =
@@ -59,11 +52,6 @@ let remove hh tile =
       sort hh.hand;
       hh.size <- hh.size - 1
 
-(* let replace hh tile idx = if Tile.tile_to_string tile = "Fake" then hh.size
-   <- hh.size - 1; match idx with | x when x >= 13 -> discarded := tile ::
-   !discarded | x -> let discarded_tile = hh.hand.(idx) in hh.hand.(idx) <-
-   tile; discarded := discarded_tile :: !discarded *)
-
 let get_hand hh = hh.hand
 
 let make_hidden_hand hand =
@@ -72,9 +60,6 @@ let make_hidden_hand hand =
 let get_tiles hh = Array.to_list hh.hand
 
 let hidden_hand_to_string hh =
-  (*Just to help w the terminal debugging.*)
-  (* List.iter (printf "  %d   |") [ 1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13 ];
-  print_endline ""; *)
   let s =
     List.fold_left
       (fun acc x -> acc ^ ", " ^ Tile.tile_to_string x)

@@ -8,9 +8,6 @@ type hidden_hand = {
   mutable size : int;
 }
 
-(* val compare_elem : elem -> elem -> int *)
-(** [compare_elem e1 e2] compares the tiles stored at elements [e1] and [e2]. *)
-
 val init_hidden_hand : Tile.tile list -> hidden_hand
 (** [init_hidden_hand tiles] initializes the player's hand using a list of tiles
     passed to it. Requires that [tiles] is a list of tiles with length at most
@@ -34,11 +31,6 @@ val add : hidden_hand -> Tile.tile -> unit
 val remove : hidden_hand -> tile -> unit
 (** [remove hh tile] removes Tile [tile] from the player's hand. Raises
     [Invalid_argument] if [tile] is not in player's hand. *)
-
-(* val replace : hidden_hand -> tile -> int -> unit *)
-(** [replace hh tile idx] replaces the tile at [idx] from the player's hand. If
-    [idx] is equal to 13, then [tile] is discarded. If [tile] is "Fake", then
-    the hand size is decremented. *)
 
 val make_hidden_hand : Tile.tile list -> hidden_hand
 (** [make_hidden_hand tiles] creates a hidden hand from a list of tiles. *)

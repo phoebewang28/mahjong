@@ -130,11 +130,10 @@ let string_to_suit str =
   | "Fake" -> Fake
   | _ -> raise (InvalidTile (str ^ " is not a valid suit string"))
 
-(* Edge case: DaPai -> no number in front, list of length 1 created *)
 let string_to_tile str =
   try
     let t = Str.split (Str.regexp " ") str in
-    if List.length t = 2 then (* normal tile (not Da Pai) *)
+    if List.length t = 2 then
       let n = int_of_string (List.hd t) in
       let tao = string_to_suit (List.hd (List.tl t)) in
       if
@@ -148,7 +147,7 @@ let string_to_tile str =
           (InvalidTile
              (str ^ " is an invalid string, cannot convert to Tile type!"))
       else { num = n; tao }
-    else if List.length t = 1 then (* Da Pai *)
+    else if List.length t = 1 then
       match string_to_suit (List.hd t) with
       | DaPai x -> { num = 0; tao = DaPai x }
       | _ -> raise (InvalidTile (str ^ " is not a valid DaPai string"))
@@ -204,7 +203,6 @@ let compare_tile t1 t2 =
 (* used to sort tiles by number, then by suit *)
 
 let fake_tile = { num = 3110; tao = Fake }
-(* used to represent a tile that doesn't exist, for testing purposes *)
 
 let tile_to_key (t : tile) : string =
   match t.tao with

@@ -1,3 +1,926 @@
+commit 5dc6e5d3c8c1ae53cabc5f4bc9ad2cb3b3b19ea6
+Author: pw483 <pw483@cornell.edu>
+Date:   Thu May 15 18:07:49 2025 -0400
+
+    Fix Win Condition
+
+commit 33792b6878ad4e57a2b638f333530c2e87861062
+Merge: 52f0376 6288a0d
+Author: pw483 <pw483@cornell.edu>
+Date:   Thu May 15 17:29:34 2025 -0400
+
+    Merge remote-tracking branch 'origin/win-attempt'
+
+commit 6288a0d2c10fd061b6c9cc0aaf4a95f4c380e0e8
+Author: pw483 <pw483@cornell.edu>
+Date:   Thu May 15 17:25:35 2025 -0400
+
+    GUI Print for Debugging
+
+commit 52f037620bf9bccfe618af896dcb111d28ae7792
+Merge: b320dca 2fce9b9
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Thu May 15 13:56:13 2025 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:pw483/mahjong
+
+commit b320dcabc5047811cd460e27ebd21a9a948ac36e
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Thu May 15 13:55:18 2025 -0400
+
+    moved all hands to data folder and moved all function in utilities to test
+
+commit 2d7e29f8768d232f4828d22ce0d846e83ab334c8
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Thu May 15 13:53:32 2025 -0400
+
+    deleted dice module
+    
+    - module is never used
+
+commit 2fce9b976b373aaa21d01c1d6da905a36c44edc8
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Fri May 16 01:45:22 2025 +0800
+
+    edit loc.txt
+
+commit 10a72fcd5beb75d46cc6460ace6ee744621af571
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Fri May 16 01:37:22 2025 +0800
+
+    update references
+
+commit b340e8afcdddfe78581fb54caed468fb39b5fcf8
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Fri May 16 01:28:06 2025 +0800
+
+    update references
+
+commit 94e407371fafdccb8c1c519f16f71c6918e1ca99
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Thu May 15 12:25:27 2025 -0400
+
+    updated comment formating
+
+commit e0edaab6662d816ab7e6ff2dfc7cc029aeb395e0
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Fri May 16 00:20:28 2025 +0800
+
+    add documentation for ying.ml
+
+commit 32c4a18ee9b08dfdda8db343a2fc34924d44ad1a
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Thu May 15 21:43:10 2025 +0800
+
+    fix hunyise not tested
+
+commit 48fda26d8b3dbc4552d8690374d7afbe6973170d
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Sun Apr 27 17:06:39 2025 -0400
+
+    add pinghu test
+
+commit 29bdb36d84a9c780067c1fa43953a237c08003b5
+Merge: 24dab67 9e09baf
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Thu May 15 03:54:59 2025 -0400
+
+    Merge pull request #13 from pw483/game_logic
+    
+    Game logic
+
+commit 9e09baf43abb577b31ddcc890c54d252a3e1dfec
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Thu May 15 06:06:48 2025 +0300
+
+    add qingyaojiu, hunyaojiu
+
+commit 4018492ff2ed945caa7a19ba16ea69ed6743bf3e
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Thu May 15 05:50:22 2025 +0300
+
+    add duanyaojiu
+
+commit 81ab5da0d8e4b9952ef072f2a11344ad1a466565
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Thu May 15 05:40:05 2025 +0300
+
+    - fix counting kezi
+    - add sananke,xiaosixi
+
+commit ec97ec0e6dba2911c26022bac38dc33a4f81a200
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Thu May 15 01:47:08 2025 +0300
+
+    add tests for ziyise and hunyise
+
+commit 48cb9ac7cf8a81b39ae71339c3ebc3afa6bc73b9
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Thu May 15 01:34:21 2025 +0300
+
+    add ziyise, hunyise
+
+commit 24dab670d3c6b1288fe688a7942a40b39ab70572
+Merge: 1f2e644 5433fd3
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Wed May 14 17:47:47 2025 -0400
+
+    Merge pull request #12 from pw483/game_logic
+    
+    Game logic
+
+commit 5433fd3f6ebafd3c3ad3fe8a7483eac4c220bda5
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Thu May 15 00:33:25 2025 +0300
+
+    add qingyise
+
+commit 70ba83e1a3d895b4c484213327b2800c3132473b
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Thu May 15 00:24:25 2025 +0300
+
+    add duiduihu and kankanhu
+
+commit 1f2e644a258bffc605192ff2ac9a3bddcf590a1d
+Merge: ef64cc5 c6b63e1
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Wed May 14 17:07:33 2025 -0400
+
+    Merge pull request #11 from pw483/game_logic
+    
+    Game logic: qiduizi, jiulianbaodeng
+
+commit c6b63e1e2aa8d597b2410baf51c6d6eace2ae7dd
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Wed May 14 23:47:33 2025 +0300
+
+    add jiulianbaodeng
+
+commit 8815bdee512ebcfec976d3a9ed9127a70143ab36
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Wed May 14 22:28:18 2025 +0300
+
+    add qidui
+
+commit ef64cc5fd284fad586f3630e232d04ff913f603f
+Merge: 411c7c4 c593673
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Wed May 14 14:56:37 2025 -0400
+
+    Merge pull request #10 from pw483/game_logic
+    
+    add lvyise
+
+commit c59367323ba39ce4e589f6faa324aa22f1d61285
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Wed May 14 21:46:32 2025 +0300
+
+    add lvyise
+
+commit 411c7c40c0eeb9d5ead4169745a90d95396c4093
+Merge: 397fad1 72b099b
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Wed May 14 12:09:28 2025 -0400
+
+    Merge pull request #9 from pw483/game_logic
+    
+    fix dasanyuan dasixi
+
+commit 72b099bbb772b1987ebd28197cc606570aa39c95
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Wed May 14 19:06:23 2025 +0300
+
+    fix dasanyuan dasixi
+
+commit 397fad18632400014dd2934984be9452b8a18a6d
+Merge: da57463 d5e603b
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Wed May 14 11:08:03 2025 -0400
+
+    Merge pull request #8 from pw483/game_logic
+    
+    Game logic
+
+commit d5e603ba2deccccbb7fdc81579c3141a658aaeea
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Wed May 14 18:05:14 2025 +0300
+
+    add dasanyuan
+
+commit e0465e5ab18b522f11fed87f0ce1f17395ef9c36
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Wed May 14 17:50:04 2025 +0300
+
+    fix dasixi
+
+commit 87473c98d0b3a63ca3e0e3dee6e8352577c2b405
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Wed May 14 03:44:54 2025 -0400
+
+    add dasixi check
+
+commit b46d739a72148993f331adf34676fffdcb30913e
+Merge: b9f7d8d da57463
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Wed May 14 02:00:56 2025 -0400
+
+    Merge remote-tracking branch 'origin/main' into game_logic
+
+commit 6d26a19a71536b0d74529b30baa3592c87103d25
+Author: pw483 <pw483@cornell.edu>
+Date:   Wed May 14 01:39:40 2025 -0400
+
+    Trying to Implement Win
+    
+    - works in TUI, not GUI
+
+commit 53caa8146838df454374620f405853de59e01e4d
+Author: ajl396 <ajl396@cornell.edu>
+Date:   Tue May 13 23:41:48 2025 -0400
+
+    Modified server.ml
+
+commit d0131c1414653a9c7625793bcf99390445c79521
+Author: ajl396 <ajl396@cornell.edu>
+Date:   Tue May 13 23:28:45 2025 -0400
+
+    Added multiclient feature to server.ml
+
+commit da574634a74e6de5c01f891fb49e2948b17a22ca
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Tue May 13 11:21:19 2025 -0400
+
+    Made current player's exposed non-buttons:
+    
+    - now, user cannot clicked exposed tiles from current player
+
+commit 313d57a480d5dd272ffad281be577a77386ebdcd
+Merge: cb28d94 f2037fb
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Tue May 13 04:19:03 2025 -0400
+
+    merging for gui exposed hands
+    gerge branch 'main' of github.coecis.cornell.edu:pw483/mahjong
+
+commit cb28d94e2a823c3297c22040834e825f69675399
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Tue May 13 04:17:32 2025 -0400
+
+    Implement exposed hand in gui for all players:
+    
+    - catch error when run out of tiles
+    - a lot of try and guess for positions
+
+commit f2037fb6c639895d0660d45a15c70553d0da55ca
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Sun Apr 27 22:39:36 2025 -0400
+
+    finished testing for player_choice module
+    
+    - added test cases under player_choice_test
+    - turned coverage off for print statements
+    - moved tile hands to Utilities module
+
+commit 4c590b6c23112d264b881753af7b2fa8f654901f
+Merge: 7efbf26 9ab86f6
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Sun Apr 27 20:19:30 2025 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:pw483/mahjong
+
+commit 7efbf26bd9ed3b55b47ac38ba9d81f911beb657e
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Sun Apr 27 20:19:12 2025 -0400
+
+    added LOC.txt file
+    
+    - has instructions for using cloc for line count
+
+commit 9ab86f6a7ee7ecf167ac8ae17bc743e8764d4914
+Author: pw483 <pw483@cornell.edu>
+Date:   Sun Apr 27 17:12:41 2025 -0400
+
+    General Readme Instructions
+
+commit 8f6d5bef647d3a02dd846f00604e51647541461c
+Author: pw483 <pw483@cornell.edu>
+Date:   Sun Apr 27 16:59:25 2025 -0400
+
+    Testing
+    
+    - Tiles.shuffle
+    - More Tiles exception cases
+    - More Documentation
+
+commit d68b76816804974708b1c3b94794edc94bf42458
+Author: pw483 <pw483@cornell.edu>
+Date:   Sun Apr 27 02:49:42 2025 -0400
+
+    Fixed Error:
+    - cannot Make Fake tiles
+
+commit 7effd286dafc6169b04a592ff45d62dc56ca65fb
+Merge: 3cb4eb4 2ef918b
+Author: pw483 <pw483@cornell.edu>
+Date:   Sun Apr 27 02:33:53 2025 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:pw483/cs3110
+
+commit 3cb4eb4ea9b6b0c1c8a7b463c77cf6f4d2107fec
+Author: pw483 <pw483@cornell.edu>
+Date:   Sun Apr 27 02:24:43 2025 -0400
+
+    Exposed Hand Tests
+    
+    - (82% coverage)
+
+commit 2ef918b5607b12eb8fa601d7166473380e29396e
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Fri Apr 25 15:19:09 2025 -0400
+
+    updated player_choice functionality
+    
+    - throw, chi, and peng now take in indexes of the tiles that need to be thrown
+    - bug in chi_update and peng_update that would mistakenly chi/peng incorrect tiles
+    - fixed bug
+
+commit 42671b226a8b36fd1d3ecdc9090e72551988f765
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Fri Apr 25 13:49:24 2025 -0400
+
+    fixed merge issue
+
+commit 2384ee41e33bbfd2ac8022c26003192df19086dd
+Merge: d724485 ccff8f2
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Fri Apr 25 13:48:59 2025 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:pw483/mahjong
+
+commit d724485c191676126ee9efe7561cca3e05eb9d93
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Fri Apr 25 13:44:44 2025 -0400
+
+    separated terminal messages from functionality in player_choice
+    
+    - throw and draw return a tile
+    - chi and peng need tiles as input using prompt_selecter in main.ml
+    - use chi_check and peng_check to check if valid choice
+    - added arbitrary_tile to utilities.ml for testing with qcheck
+    - need to update gui.ml with changed functions
+
+commit ccff8f240174395a00e9db3845a9eb8d046f3b81
+Merge: 9ff656f 6e34d57
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Fri Apr 25 02:51:30 2025 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:pw483/mahjong
+
+commit 9ff656f752b95d3622c3bb85a659669b2f023baf
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Fri Apr 25 02:51:01 2025 -0400
+
+    add pinghu for winning
+
+commit 6e34d57e5654941738bdfaa36fe7c4555632ea3c
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Fri Apr 25 02:22:43 2025 -0400
+
+    oops sry wrong type
+
+commit 800cf5339991bfa7c70420a50dded704e7d04f2f
+Merge: 0884bbb a97b469
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Fri Apr 25 02:20:23 2025 -0400
+
+    Merge pull request #7 from pw483/gui-button-tiles
+    
+    Gui button tiles
+
+commit a97b469a73d2aaa73c6cd5a0aa03a2878095885f
+Merge: 7b0b6f8 0884bbb
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Fri Apr 25 02:18:51 2025 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:pw483/mahjong into gui-button-tiles
+
+commit 7b0b6f8b638fb06afee461500a9c004c0a608f8c
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Fri Apr 25 02:15:47 2025 -0400
+
+    Chi and peng button rendering regulated:
+    
+    - Altered chi_check and peng_check
+    - now, GUI only renders chi and peng buttons when it is possible
+
+commit 0884bbbe95fcf42706f8e340579a09bd4d3a7a51
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Fri Apr 25 02:10:06 2025 -0400
+
+    add test
+
+commit e206abbec7d461e702ac1e16285fe767e524a99e
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Fri Apr 25 02:04:49 2025 -0400
+
+    delete unused functions and added tests
+
+commit 68deae7e6c8d98f1cb372fb94c794570b701c951
+Merge: f43f67c 1592723
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Fri Apr 25 01:58:46 2025 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:pw483/mahjong
+
+commit f43f67c9b7c9bf9bd627dbfef72224850dbc4361
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Fri Apr 25 01:58:42 2025 -0400
+
+    update test
+
+commit 1592723ccaa214305080a4d762b4245369c5cf05
+Merge: d5d3c3f ebd399d
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Fri Apr 25 01:55:14 2025 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:pw483/mahjong
+
+commit d5d3c3fef255377866c990a6f7215bacf39847de
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Fri Apr 25 01:53:14 2025 -0400
+
+    created test cases for ying condition
+    
+    - tested more hands
+    - added bisect to dune to test coverage
+
+commit ebd399dde2b48c23b946c956c50ffdd70fb0b36d
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Fri Apr 25 01:51:44 2025 -0400
+
+    Add additional hidden hand test cases for tile combinations
+
+commit 8a2556384f0786965922c061f400445925fea004
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Fri Apr 25 01:43:22 2025 -0400
+
+    Add complete tests for hidden hands and update test suite structure
+
+commit f43ef5e12e44275016da79fd58f638aef9f695a3
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Fri Apr 25 01:21:52 2025 -0400
+
+    Implemented button selection for chi & peng
+
+commit 4774b841d248078e00d4d6fa4ff303b139e74ee2
+Merge: 2fe93d8 e2a0715
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Fri Apr 25 01:21:03 2025 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:pw483/mahjong
+
+commit 2fe93d86d41c8eb34318474bf813a28bc1e06055
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Fri Apr 25 01:20:54 2025 -0400
+
+    deleted extra print functions
+    
+    - were previously used to figure out bug
+
+commit e2a071535c09bbef22147160d128e14e3c4ae49e
+Merge: 521dea7 b9f7d8d
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Fri Apr 25 01:20:54 2025 -0400
+
+    Merge pull request #5 from pw483/game_logic
+    
+    Finish the basic winning check
+
+commit b9f7d8ddbcb5c83cea2d53350777f52c4710cee3
+Merge: 9d383e9 521dea7
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Fri Apr 25 01:20:47 2025 -0400
+
+    Merge branch 'main' into game_logic
+
+commit 521dea73dd8ba0ce6651abbc37311cd4161ff46a
+Merge: a9c53f0 8c18051
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Fri Apr 25 01:19:02 2025 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:pw483/mahjong
+
+commit a9c53f01e5ece9aa2b45e569bebac3f12ee475f4
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Fri Apr 25 01:17:59 2025 -0400
+
+    added test case for draw
+    
+    - checks if draw draws the correct tile based on curr_index
+
+commit 9d383e94d862d08c0d655b3fdb78cadde41fe080
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Fri Apr 25 01:17:48 2025 -0400
+
+    Finish the basic winning check
+    
+    - have the compilation unit of ying
+    - also add test
+    - modified some existing function
+
+commit 8c180519bcebe4745a159eb489f85e0bd34a0025
+Author: pw483 <pw483@cornell.edu>
+Date:   Fri Apr 25 01:05:02 2025 -0400
+
+    Allow client to connect to server
+
+commit ea82c829715a464753f1df008b0532b3e9f765f6
+Merge: d254039 871eb52
+Author: pw483 <pw483@cornell.edu>
+Date:   Fri Apr 25 00:18:55 2025 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:pw483/cs3110
+
+commit d254039a3ca3945924594b74bbeda768591580df
+Author: pw483 <pw483@cornell.edu>
+Date:   Fri Apr 25 00:18:49 2025 -0400
+
+    Initial Server Code
+
+commit 871eb52b2999978a0058894dd661d28895a4a09a
+Merge: cc2b250 6b73277
+Author: ajl396 <ajl396@cornell.edu>
+Date:   Fri Apr 25 00:16:15 2025 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:pw483/mahjong
+
+commit cc2b25093ae0ebeec33a57c071298d12f91534bf
+Author: ajl396 <ajl396@cornell.edu>
+Date:   Fri Apr 25 00:15:22 2025 -0400
+
+    Small Modification to Hidden Hand
+    - Changed function names for clarity
+
+commit 9c8fbbcde2411ebc11040f1a65fa945997993745
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Thu Apr 24 23:57:17 2025 -0400
+
+    Implemented button tile selection in GUI:
+    
+    - removed throw button
+    - allow player to select tile on gui screen, rather than input index in terminal
+
+commit 6b732777ed2b079f9a53a895884f3f4b0f3c7129
+Author: pw483 <pw483@cornell.edu>
+Date:   Thu Apr 24 23:52:50 2025 -0400
+
+    Player Module
+    
+    - money win logic
+    - OUnit tests for Player module methods
+
+commit 8d82ddcabaf634ee45f2618fc7b1cbf89e5c0a76
+Merge: 48553b8 b11d571
+Author: pw483 <pw483@cornell.edu>
+Date:   Sat Apr 19 09:45:10 2025 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:pw483/cs3110
+
+commit 48553b8282f6800e986bdf963bb820256095e03b
+Author: pw483 <pw483@cornell.edu>
+Date:   Sat Apr 19 09:44:38 2025 -0400
+
+    Debugging + Bisect
+
+commit 58f12a6677198b4c9bfa47edd4e002baf2635fca
+Author: pw483 <pw483@cornell.edu>
+Date:   Fri Apr 18 17:33:08 2025 -0400
+
+    Extra install information
+    
+    -will be tested on Albert.
+
+commit b11d571d917cb17469ca2f259c37f1879eab2ab1
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Tue Apr 15 14:38:29 2025 -0400
+
+    Clean up gui logic:
+    
+    - Fixed discard tile render (would not render immediately after chi/peng)
+    - Restructed button rendering logic
+
+commit 8edc806c3113fdfb0ad39f65a53303e9ba4c0970
+Merge: 7fae682 4ab2a3e
+Author: pw483 <pw483@cornell.edu>
+Date:   Tue Apr 15 10:41:42 2025 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:pw483/cs3110
+
+commit 4ab2a3e5de3849aee47131ff238e5c189d9a04ce
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Fri Apr 11 17:39:31 2025 -0400
+
+    Update the display for group in gui
+    
+    - Refactor tile discard handling
+    - Update exposed hand group diaplayment
+
+commit 4ba83a1756acd0006c611397d7c9d88174b48ccf
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Fri Apr 11 15:28:49 2025 -0400
+
+    Removed unused fields in game_board
+
+commit fe398d5b6f31cb4ba8fff80cb43982c4cbf847a0
+Merge: 04e4d8b 3e4d629
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Fri Apr 11 15:03:39 2025 -0400
+
+    Merge pull request #4 from pw483/feature/gui/tile
+    
+    Add tile display
+
+commit 3e4d62972459f8e6f00dca66c59376ecf9c1bc53
+Merge: 598ef65 04e4d8b
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Fri Apr 11 15:03:26 2025 -0400
+
+    Merge branch 'main' into feature/gui/tile
+
+commit 598ef65736ff4122d256f3019c5cc17ad138dd7b
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Fri Apr 11 14:48:34 2025 -0400
+
+    Add tile display
+    
+    - Add tile image handling
+    - Add related functions for GUI
+
+commit 04e4d8bd50d4785313c211e2c71eceb6bbc624f2
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Fri Apr 11 14:06:07 2025 -0400
+
+    Cleaned up comments
+
+commit ff65336c369a4027adda85e9066fc1f4af4b8715
+Merge: 1bd0f62 57bac81
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Fri Apr 11 13:34:30 2025 -0400
+
+    Merge pull request #3 from pw483/gui
+    
+    Gui
+
+commit 57bac81a373f02511a1b9b719705161f4d1605a4
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Fri Apr 11 13:30:56 2025 -0400
+
+    Cleaned up merge code
+    
+    - Separated start interface and game interface logic/gui into two separate states
+    - simplified start button rendering
+    - altered loop to fit separated states
+
+commit a60432c63dc2d1668522c3849f304216755e55a2
+Merge: c8d94e1 3b8286d
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Fri Apr 11 11:58:36 2025 -0400
+
+    Merge branch 'main' into gui
+    
+    - very messy lol
+    - need to clean up
+    - but works
+
+commit 1bd0f628df0510edd5911a64552aab926da30eb0
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Fri Apr 11 11:36:53 2025 -0400
+
+    Add .clocignore file
+
+commit c8d94e1769e7ff882b387aca207b7ac371765d3b
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Fri Apr 11 11:16:57 2025 -0400
+
+    Changed raylib.opam to avoid conflicts
+
+commit 7fae6829226c72a2ecebe12d12ef2cbb0b264762
+Merge: 746085c 3b8286d
+Author: pw483 <pw483@cornell.edu>
+Date:   Fri Apr 11 01:34:33 2025 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:pw483/cs3110
+
+commit 746085cd48134c632ae3c36a1c4af07fca194d35
+Author: pw483 <pw483@cornell.edu>
+Date:   Fri Apr 11 01:34:12 2025 -0400
+
+    Tile Module Tests
+    
+    wrote testing for
+    tile_to_string, string_to_tile, compare_tiles
+
+commit 3b8286d12e9073bc47b521c87b6d62883566e231
+Merge: 88253aa 3a08193
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Fri Apr 11 01:30:53 2025 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:pw483/mahjong
+
+commit 88253aae6c1f73521fed083827ecfc7673a6cff6
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Fri Apr 11 01:30:49 2025 -0400
+
+    add tiles images
+
+commit 3a081934aff5490c81b30420600d509d82fd4196
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Fri Apr 11 01:27:16 2025 -0400
+
+    added functionality for peng_check
+    
+    - checks if players can peng with their hidden hand
+    - added _src/ to gitignore
+
+commit 6ee737cbf93484ceae86cc7512983c2949e88ccf
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Fri Apr 11 01:26:46 2025 -0400
+
+    oops sry cleaned up chi failure rendering
+
+commit f9fce6a69d6148c84ba4f209bcc843f22a482d4f
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Fri Apr 11 01:24:04 2025 -0400
+
+    Implement player turn toggle in gui
+    
+    - also fixed action button rendering conditions
+
+commit a3ae2cfa05ace97424bf6bfe01b255061900485d
+Merge: 678fc56 b338637
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Fri Apr 11 01:19:09 2025 -0400
+
+    Merge pull request #2 from pw483/feature/gui/player
+    
+    player display
+
+commit b338637dacd3ebbfb9c476b3032a2037a788a383
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Fri Apr 11 01:16:41 2025 -0400
+
+    Refactor game_board structure and update GUI drawing logic
+
+commit 678fc56263f39dbf71f10ecf5da27abe6fddac41
+Merge: a4c95a8 9223225
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Fri Apr 11 01:13:47 2025 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:pw483/mahjong
+
+commit a4c95a8fb5a5012097a40a6ac71fa92ca23986fa
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Fri Apr 11 01:13:33 2025 -0400
+
+    created chi_check function
+    
+    - checks if a player hand is able to chi given their current hidden hand
+
+commit 9223225b16701a7c9cb02f49a4078ff353afa4cb
+Author: pw483 <pw483@cornell.edu>
+Date:   Fri Apr 11 00:44:08 2025 -0400
+
+    String_to_suit implemented
+    
+    - mainly for testing
+    - added test comments
+
+commit ed09bf34a3f632e6f838cfd8f4749487740791d0
+Author: pw483 <pw483@cornell.edu>
+Date:   Fri Apr 11 00:42:56 2025 -0400
+
+    Questionable hand indicing for terminal
+    
+    - mainly for debugging's sake, not perfected bc terminal isn't the focus anyways
+
+commit a66623eae0a5a9bf6a6bded3860131d2ee0d02a5
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Fri Apr 11 00:42:03 2025 -0400
+
+    Implement action buttons:
+    
+    - Conditional rendering of throw/draw/chi/peng buttons
+    - Integration of game logic into GUI
+    - Updated types of fields in game_board
+
+commit 26fdf1b1ff2813a41539e1f4e220f3cab32f5d0f
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Fri Apr 11 00:22:00 2025 -0400
+
+    Add Start screen
+
+commit 08fad83a9ec53a0b7c4e39d1a123ae6728f298c0
+Merge: 4ce1c63 2e8855d
+Author: ajl396 <ajl396@cornell.edu>
+Date:   Fri Apr 11 00:03:04 2025 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:pw483/mahjong
+
+commit 4ce1c6397b5bc761f9c1793a98cd9c8f8a8c5bd7
+Author: ajl396 <ajl396@cornell.edu>
+Date:   Fri Apr 11 00:01:55 2025 -0400
+
+    Modified Hidden Hand
+    - Implemented replace
+    - Added documentation
+
+commit 2e8855d980f6188f9968deba20826f90ac26c7ba
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Thu Apr 10 23:59:47 2025 -0400
+
+    fixed bug
+    
+    - bug was that after chi or peng, would run choose_move again when it shouldn't
+    - surrounded else statements with begin and end to ensure choose_move only happens when necessary
+
+commit 0193e80a751b06e3a03424f9cd668709b9a7f865
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Thu Apr 10 23:41:06 2025 -0400
+
+    new branch for player display
+
+commit 196da35e7c771ff32c3cbcf64c666053b7bf5e60
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Thu Apr 10 23:20:11 2025 -0400
+
+    Found a way to put all necessary raygui folders into mahjong yayyy:
+    
+    - a lot of copy pasting
+    - a lot of trial and error
+    - but it is done
+
+commit 9d72568c0dfadca0e99779845e9d69215c1a3e9d
+Author: jw2773 <jw2773@cornell.edu>
+Date:   Thu Apr 10 22:31:17 2025 -0400
+
+    update color
+
+commit 46c01191cf6478e6a8310b4d3c2cb4219e8aade7
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Thu Apr 10 22:25:07 2025 -0400
+
+    update the color for terminal output
+
+commit d4a17707b162af1faf75deaacb176bba9f24e61d
+Author: ejt74 <ejt74@cornell.edu>
+Date:   Thu Apr 10 22:15:55 2025 -0400
+
+    if peng or chi is not allowed, print out useful message to user
+
+commit 143d33ce08a11f552abfbb101c634e1e252ccea2
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Thu Apr 10 18:39:28 2025 -0400
+
+    Implement Raylib basic gui
+    
+    - Wrote game loop
+    - Not yet integrated actual mahjong logic, just using placeholder text rn
+
+commit 8e42b7bfcc90a68d0903d00bfa13e648a8f887f4
+Author: pw483 <pw483@cornell.edu>
+Date:   Wed Apr 9 01:25:59 2025 -0400
+
+    Testing for Tile Module
+    
+    - Invalid Tiles
+    - Get_num, get_tao
+    - Utilities: tile lists for testing, moved out to simplify testing file
+
+commit b8f06648ffa8e9ec819047a1a1e0a4d989f39f33
+Merge: 25506f2 dfa8c52
+Author: pw483 <pw483@cornell.edu>
+Date:   Wed Apr 9 01:23:59 2025 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:pw483/cs3110
+
+commit 25506f26586fc29094299d6d420fddd781b73d06
+Author: pw483 <pw483@cornell.edu>
+Date:   Wed Apr 9 01:23:35 2025 -0400
+
+    Changed functions to improve testing:
+    
+    - shuffle separated from initialization
+    - custom exception for invalid tiles
+    - new suit_to_string method separated from tile_to_string
+
+commit dfa8c52d88a2b9f56b98e29c7c91978e8d565924
+Author: cl2727 <cl2727@cornell.edu>
+Date:   Tue Apr 8 18:01:38 2025 -0400
+
+    Add colored terminal output using ANSITerminal
+    
+    - Use ANSITerminal.printf to add colored output for better readability of player info, tiles, and game messages.
+
 commit 95f26ac1fc3e7fd3fa6426f7609ed3682ee7f4fa
 Author: cl2727 <cl2727@cornell.edu>
 Date:   Fri Mar 28 11:20:28 2025 -0400
