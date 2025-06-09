@@ -1,9 +1,7 @@
-# CS3110 Final Assignment :D
-
 ## OCaMahJong
 
 This project simulates a game of Mahjong, allowing users to play with other players
-in a local multiplayer mode.
+in a local multiplayer mode. [CS3110 Functional Programming, Final Project]
 
 Authors:
 Caedy Lee (cl2727),
